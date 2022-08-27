@@ -1,8 +1,10 @@
+# main.py
 # Main File for Virtual Assistant
+# Do the following to properly run this script:
 # brew install portaudio
 # pip install 'speechrecognition', 'pyaudio', and 'pyttsx3' before running
 import speech_recognition as sr
-import pyttsx3
+import widgits, pyttsx3
 
 def main():
 	recognizer = sr.Recognizer()
@@ -21,8 +23,9 @@ def main():
 				text = text.lower()
 
 				print(f"Recognized: {text}")
-		except sr.UnknownValueError():
-			print("Error")
+
+		except:# sr.UnknownValueError():
+			# print("Error")
 			# recognizer = sr.Recognizer()
 			continue
 
