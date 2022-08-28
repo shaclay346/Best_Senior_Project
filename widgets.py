@@ -1,4 +1,4 @@
-# widgits.py
+# widgets.py
 # File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
 
 from bs4 import BeautifulSoup 
@@ -8,6 +8,7 @@ import datetime, os, io, re, pdb
 
 def get_menu():
 	'''Returns today's menu at the Caf as a list of strings (to allow for more specific selections in the main app'''
+	# Note: Sometimes this straight up won't work because the caf menu is extremely inconsistent with their formatting
 	link = 'https://www.flsouthern.edu/campus-offices/dining-services/daily-menu.aspx'
 	
 	# Get Menu Content
@@ -22,8 +23,6 @@ def get_menu():
 
 	# Get and Format Today's Date
 	today = datetime.date.today()
-
-	today += datetime.timedelta(days=1) ### this line only exists bc the caf is stupid
 	tomorrow = today + datetime.timedelta(days=1)
 
 	today = f"{today.month}/{today.day}/{str(today.year)}"
