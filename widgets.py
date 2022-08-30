@@ -3,7 +3,7 @@
 
 from bs4 import BeautifulSoup 
 import requests as rq
-import datetime, os, io, re, pdb
+import datetime, random, os, io, re, pdb
 
 
 def get_menu():
@@ -51,9 +51,10 @@ def get_menu():
 
 
 
-
-
-
+def coin_flip():
+	'''Randomly returns either 'heads' or 'tails'''
+	ops = ['heads','tails']
+	return random.choice(ops)
 
 
 
