@@ -3,6 +3,7 @@
 
 from bs4 import BeautifulSoup
 import requests as rq
+<<<<<<< HEAD
 import datetime
 import os
 import io
@@ -10,6 +11,9 @@ import re
 import pdb
 import json
 import math
+=======
+import datetime, random, os, io, re, pdb
+>>>>>>> f6da5facd40bdc0a3f239a172f538dec481ea72b
 
 
 def get_menu():
@@ -55,6 +59,7 @@ def get_menu():
 
     return out
 
+<<<<<<< HEAD
 
 def getWeather():
     openWeatherKey = 'b139d88edbb994bbe4c2026a8de2ed12'
@@ -66,6 +71,12 @@ def getWeather():
 
     # convert the response object to json, so its easy to parse
     json_data = json.loads(response.text)
+=======
+def coin_flip():
+	'''Randomly returns either 'heads' or 'tails'''
+	ops = ['heads','tails']
+	return random.choice(ops)
+>>>>>>> f6da5facd40bdc0a3f239a172f538dec481ea72b
 
     # get data from response
     type_ = json_data['weather'][0]['main']
