@@ -3,7 +3,6 @@
 
 from bs4 import BeautifulSoup
 import requests as rq
-<<<<<<< HEAD
 import datetime
 import os
 import io
@@ -11,9 +10,7 @@ import re
 import pdb
 import json
 import math
-=======
-import datetime, random, os, io, re, pdb
->>>>>>> f6da5facd40bdc0a3f239a172f538dec481ea72b
+import random
 
 
 def get_menu():
@@ -59,9 +56,8 @@ def get_menu():
 
     return out
 
-<<<<<<< HEAD
 
-def getWeather():
+def get_weather():
     openWeatherKey = 'b139d88edbb994bbe4c2026a8de2ed12'
 
     # for now fetch weather in Lakeland, later on maybe allow other cities
@@ -71,12 +67,6 @@ def getWeather():
 
     # convert the response object to json, so its easy to parse
     json_data = json.loads(response.text)
-=======
-def coin_flip():
-	'''Randomly returns either 'heads' or 'tails'''
-	ops = ['heads','tails']
-	return random.choice(ops)
->>>>>>> f6da5facd40bdc0a3f239a172f538dec481ea72b
 
     # get data from response
     type_ = json_data['weather'][0]['main']
@@ -94,6 +84,29 @@ def coin_flip():
     if(type_ == "Rain"):
         output += ' I recommend you bring an umbrella with you today.'
 
+    return output
+
+
+def coin_flip():
+    '''Randomly returns either 'heads' or 'tails'''
+    ops = ['heads', 'tails']
+    return random.choice(ops)
+
+
+def get_time():
+    # datetime object containing current date and time
+    now = datetime.datetime.now()
+    output = now.strftime("%H:%M")
+
+    return output
+
+
+def get_date():
+    date_time = datetime.datetime.now()
+
+    # From the date_time variable, you can extract the date in various
+    # custom formats with .strftime(), for example:
+    output = date_time.strftime("%B %d, %Y")
     return output
 
 
