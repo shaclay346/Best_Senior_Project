@@ -17,6 +17,9 @@ def main():
 	# for index, name in enumerate(sr.Microphone.list_microphone_names()):
 		# print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
+	#Variables setup required for widgets (ex. alarms for the Alarm widget)
+	alarm = ""
+
 	while True:
 		try:
 			with sr.Microphone() as mic:
