@@ -11,6 +11,7 @@ import pdb
 import json
 import math
 import random
+import time
 
 
 def get_menu():
@@ -108,6 +109,16 @@ def get_date():
     # custom formats with .strftime(), for example:
     output = date_time.strftime("%B %d, %Y")
     return output
+
+
+def start_timer(hours, minutes):
+    # could start a timer on a different thread, that will interrupt when its 0
+    total_seconds = hours * 3600 + minutes * 60
+
+    while total_seconds > 0:
+        time.sleep(1)
+
+        total_seconds -= 1
 
 
 def main():
