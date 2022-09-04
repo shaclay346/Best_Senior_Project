@@ -18,7 +18,7 @@ def main():
 		# print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
 	#Variables setup required for widgets (ex. alarms for the Alarm widget)
-	alarm = ""
+	alarm = []
 
 	while True:
 		try:

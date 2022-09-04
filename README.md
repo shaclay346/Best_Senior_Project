@@ -7,6 +7,7 @@ Libraries Used
     - pyttsx3 for offline text-to-speech conversion
     - beautifulsoup for grabbing html from urls
     - requests for grabbing urls off the web
+    - playsound for playing sounds
 
 Installation (Windows)
     - download all necessary files and folders, which currently include:
@@ -23,4 +24,5 @@ Installation (Windows)
         - pip3 install pyttsx3
         - pip3 install beautifulsoup4
         - pip3 install requests
+        - pip3 install playsound==1.2.2
     - Run the program!

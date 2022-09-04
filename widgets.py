@@ -2,6 +2,7 @@
 # File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
 
 from bs4 import BeautifulSoup
+from playsound import playsound #New pip install
 import requests as rq
 import datetime
 import os
@@ -13,6 +14,8 @@ import math
 import time
 import random
 
+#Global variables
+alarmSound = 'alarms/mixkit-retro-game-emergency-alarm-1000.wav'
 
 def get_menu():
     '''Returns today's menu at the Caf as a list of strings (to allow for more specific selections in the main app'''
@@ -129,11 +132,14 @@ def check_alarm(alarm):
     #Check if the current time matches the first alarm in the alarms array
     while True:
         time.sleep(1)
+        print("waiting for {0}, now {1}".format(alarm[0].date(), datetime.datetime.now().date()))
         if datetime.datetime.now().date() == alarm[0].date(): #Check the date
             while True:
                 time.sleep(1)
+                print("waiting for {0}, now {1}".format(alarm[0].minute, datetime.datetime.now().minute))
                 if datetime.datetime.now().hour == alarm[0].hour and datetime.datetime.now().minute == alarm[0].minute: #Check the time
                     print(alarm[1])
+                    playsound(alarmSound)
                     break
             break
 
