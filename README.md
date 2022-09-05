@@ -21,3 +21,14 @@ Installation (Windows)
     </ul>
     <li>Run the program!</li>
 </ul>
+
+Installation (Mac)
+<ul>
+    <li>Enter these commands to install the necessary libraries</li><ul>
+    <li>pip install speechrecognition</li>
+    <li>pip install pyaudio</li>
+    <li>pip install pyttsx3</li>
+    <li><strong>Note:</strong> You may need to install portaudio via homebrew (brew install portaudio)</li>
+    </ul>
+    <li>Run the program!</li>
+</ul>
