@@ -1,6 +1,7 @@
 # widgets.py
 # File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
 
+from robobrowser import RoboBrowser
 from bs4 import BeautifulSoup
 import requests as rq
 import datetime
@@ -11,6 +12,7 @@ import pdb
 import json
 import math
 import random
+
 
 
 def get_menu():
@@ -58,6 +60,7 @@ def get_menu():
 
 
 def get_weather():
+    '''Returns the weather at the specified location.'''
     openWeatherKey = 'b139d88edbb994bbe4c2026a8de2ed12'
 
     # for now fetch weather in Lakeland, later on maybe allow other cities
@@ -94,6 +97,7 @@ def coin_flip():
 
 
 def get_time():
+    '''Returns current time.'''
     # datetime object containing current date and time
     now = datetime.datetime.now()
     output = now.strftime("%H:%M")
@@ -102,12 +106,54 @@ def get_time():
 
 
 def get_date():
+    '''Returns current date.'''
     date_time = datetime.datetime.now()
 
     # From the date_time variable, you can extract the date in various
     # custom formats with .strftime(), for example:
     output = date_time.strftime("%B %d, %Y")
     return output
+
+
+def get_schedule():
+    '''Returns user's class schedule.'''
+    # Credentials (will need to be changed for the presentation/testing, left generic for now)
+    username = 'USERNAME'
+    password = 'PASSWORD'
+
+    # Check to stop function if credentials are still default values
+    if username == 'USERNAME' or password == 'PASSWORD':
+        return ['No login credentials given.']
+
+    # Creates a RoboBrowser Object and Logs into Portal
+    br = RoboBrowser()
+    br.open("https://portal.flsouthern.edu/ICS/Students/")
+
+    form = br.get_form()
+
+    # Login Credentials for Portal Login
+    form['userName'] = username
+    form['password'] = password
+
+    br.submit_form(form)
+
+    src = str(br.parsed())
+
+    soup = BeautifulSoup(src, 'html.parser')
+
+    # Get All Courses
+    table = soup.find('table', {'id':'tblCoursesSched'})
+    table = table.find_all('tr', {'id':re.compile('[trItems$]')})
+
+    # Split Courses
+    courses = []
+
+    for item in table:
+        row = item.find_all('td')
+        courses.append([re.sub(';', '', a.text).strip() for a in row if row and 'No grade' not in a.text])
+
+    return courses
+
 
 
 def main():
