@@ -29,9 +29,17 @@ def main(seconds):
     mythread.start()
 
     mythread.join()
+    print("timer has gone off.")
 
     # call something in main.py to make timer go off
+    # or have a speak object say something in this file
     print("outside of call")
+
+# find a way to make the thread die
+
+
+def cancel_timer():
+    pass
 
 
 if __name__ == '__main__':
