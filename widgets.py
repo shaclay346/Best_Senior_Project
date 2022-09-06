@@ -15,6 +15,7 @@ import json
 import math
 import time
 import random
+import time
 
 #Global variables
 alarmSound = 'alarms/mixkit-retro-game-emergency-alarm-1000.wav'
@@ -120,6 +121,16 @@ def get_date():
     return output
 
 
+
+def start_timer(hours, minutes):
+    # could start a timer on a different thread, that will interrupt when its 0
+    total_seconds = hours * 3600 + minutes * 60
+
+    while total_seconds > 0:
+        time.sleep(1)
+
+        total_seconds -= 1
+
 def get_schedule():
     '''Returns user's class schedule.'''
     # Credentials (will need to be changed for the presentation/testing, left generic for now)
@@ -188,6 +199,7 @@ def check_alarm(alarm):
                     playsound(alarmSound)
                     break
             break
+
 
 
 def main():
