@@ -22,22 +22,22 @@ def main():
     # for index, name in enumerate(sr.Microphone.list_microphone_names()):
     # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
-    while True:
-        try:
-            with sr.Microphone() as mic:
-                recognizer.adjust_for_ambient_noise(mic, duration=0.2)
-                audio = recognizer.listen(mic)
+
+	#Variables setup required for widgets (ex. alarms for the Alarm widget)
+	alarm = []
+
+	while True:
+		try:
+			with sr.Microphone() as mic:
+				recognizer.adjust_for_ambient_noise(mic, duration=0.2)
+				audio = recognizer.listen(mic)
 
                 # Use Google's STT and Get Text Back
                 text = recognizer.recognize_google(audio)
                 text = text.lower()
 
-                #
-                if("weather" in text):
-                    # call weather method
-                    speak(text, converter)
-                    pass
-
+ 
+                #using this to test the timer
                 if("timer" in text):
                     print(text)
                     time = ""
