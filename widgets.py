@@ -121,7 +121,6 @@ def get_date():
     return output
 
 
-
 def start_timer(hours, minutes):
     # could start a timer on a different thread, that will interrupt when its 0
     total_seconds = hours * 3600 + minutes * 60
@@ -130,6 +129,7 @@ def start_timer(hours, minutes):
         time.sleep(1)
 
         total_seconds -= 1
+
 
 def get_schedule():
     '''Returns user's class schedule.'''
@@ -170,6 +170,7 @@ def get_schedule():
 
     return courses
 
+
 def set_alarm(altime, message):
     '''Set an alarm that, when the given time passes, activates an alarm sound'''
     #Test variable (Delete Later)
@@ -199,7 +200,6 @@ def check_alarm(alarm):
                     playsound(alarmSound)
                     break
             break
-
 
 
 def main():
