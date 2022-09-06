@@ -1,23 +1,23 @@
 # widgets.py
 # File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
-
 from robobrowser import RoboBrowser
-from bs4 import BeautifulSoup
-from playsound import playsound #New pip install
-import threading #Built-in method
-import requests as rq
-import datetime
-import os
-import io
-import re
-import pdb
-import json
-import math
-import time
+import threading  # Built-in method
+from playsound import playsound  # New pip install
 import random
 import time
+import math
+import json
+import pdb
+import re
+import io
+import os
+import datetime
+import requests as rq
+from bs4 import BeautifulSoup
+import werkzeug
+werkzeug.cached_property = werkzeug.utils.cached_property
 
-#Global variables
+# Global variables
 alarmSound = 'alarms/mixkit-retro-game-emergency-alarm-1000.wav'
 
 
@@ -121,16 +121,6 @@ def get_date():
     return output
 
 
-def start_timer(hours, minutes):
-    # could start a timer on a different thread, that will interrupt when its 0
-    total_seconds = hours * 3600 + minutes * 60
-
-    while total_seconds > 0:
-        time.sleep(1)
-
-        total_seconds -= 1
-
-
 def get_schedule():
     '''Returns user's class schedule.'''
     # Credentials (will need to be changed for the presentation/testing, left generic for now)
@@ -158,44 +148,68 @@ def get_schedule():
     soup = BeautifulSoup(src, 'html.parser')
 
     # Get All Courses
-    table = soup.find('table', {'id':'tblCoursesSched'})
-    table = table.find_all('tr', {'id':re.compile('[trItems$]')})
+    table = soup.find('table', {'id': 'tblCoursesSched'})
+    table = table.find_all('tr', {'id': re.compile('[trItems$]')})
 
     # Split Courses
     courses = []
 
     for item in table:
         row = item.find_all('td')
-        courses.append([re.sub(';', '', a.text).strip() for a in row if row and 'No grade' not in a.text])
+        courses.append([re.sub(';', '', a.text).strip()
+                       for a in row if row and 'No grade' not in a.text])
 
     return courses
 
 
+def set_timer(text):
+    time = ""
+    for i in range(len(text)):
+        if(text[i].isdigit()):
+            time += text[i]
+
+    seconds = int(time)
+
+    # convert minutes to seconds
+    if("minute" in text):
+        seconds *= 60
+    elif("hour" in text):
+        seconds *= 3600
+
+    # call the timer method to run in background
+    timer.main(seconds)
+
+
 def set_alarm(altime, message):
     '''Set an alarm that, when the given time passes, activates an alarm sound'''
-    #Test variable (Delete Later)
-    altime = datetime.datetime(2022, 9, 1, 22, 24) #Change to wanted time (year, month, day, hour(24 base), minute, second)
+    # Test variable (Delete Later)
+    # Change to wanted time (year, month, day, hour(24 base), minute, second)
+    altime = datetime.datetime(2022, 9, 1, 22, 24)
     message = "Hello There, I'm working"
 
-    #Add the alarm with the time (dateTime object) and message (string)
+    # Add the alarm with the time (dateTime object) and message (string)
     alarm = [altime, message]
 
-    #Wait for the alarm to go off (Testing Only)
-    t1 = threading.Thread(target = check_alarm, args= (alarm, )) #Add "daemon = True" to make the thread end when the main program ends
+    # Wait for the alarm to go off (Testing Only)
+    # Add "daemon = True" to make the thread end when the main program ends
+    t1 = threading.Thread(target=check_alarm, args=(alarm, ))
     t1.start()
 
 
 def check_alarm(alarm):
     '''Check the current alarms. If the time matches one of the alarms, activate an alarm sound'''
-    #Check if the current time matches the first alarm in the alarms array
+    # Check if the current time matches the first alarm in the alarms array
     while True:
         time.sleep(1)
-        print("waiting for {0}, now {1}".format(alarm[0].date(), datetime.datetime.now().date()))
-        if datetime.datetime.now().date() == alarm[0].date(): #Check the date
+        print("waiting for {0}, now {1}".format(
+            alarm[0].date(), datetime.datetime.now().date()))
+        if datetime.datetime.now().date() == alarm[0].date():  # Check the date
             while True:
                 time.sleep(1)
-                print("waiting for {0}, now {1}".format(alarm[0].minute, datetime.datetime.now().minute))
-                if datetime.datetime.now().hour == alarm[0].hour and datetime.datetime.now().minute == alarm[0].minute: #Check the time
+                print("waiting for {0}, now {1}".format(
+                    alarm[0].minute, datetime.datetime.now().minute))
+                # Check the time
+                if datetime.datetime.now().hour == alarm[0].hour and datetime.datetime.now().minute == alarm[0].minute:
                     print(alarm[1])
                     playsound(alarmSound)
                     break
