@@ -3,6 +3,8 @@
 
 from robobrowser import RoboBrowser
 from bs4 import BeautifulSoup
+from playsound import playsound #New pip install
+import threading #Built-in method
 import requests as rq
 import datetime
 import os
@@ -11,8 +13,11 @@ import re
 import pdb
 import json
 import math
+import time
 import random
 
+#Global variables
+alarmSound = 'alarms/mixkit-retro-game-emergency-alarm-1000.wav'
 
 
 def get_menu():
@@ -154,6 +159,35 @@ def get_schedule():
 
     return courses
 
+def set_alarm(altime, message):
+    '''Set an alarm that, when the given time passes, activates an alarm sound'''
+    #Test variable (Delete Later)
+    altime = datetime.datetime(2022, 9, 1, 22, 24) #Change to wanted time (year, month, day, hour(24 base), minute, second)
+    message = "Hello There, I'm working"
+
+    #Add the alarm with the time (dateTime object) and message (string)
+    alarm = [altime, message]
+
+    #Wait for the alarm to go off (Testing Only)
+    t1 = threading.Thread(target = check_alarm, args= (alarm, )) #Add "daemon = True" to make the thread end when the main program ends
+    t1.start()
+
+
+def check_alarm(alarm):
+    '''Check the current alarms. If the time matches one of the alarms, activate an alarm sound'''
+    #Check if the current time matches the first alarm in the alarms array
+    while True:
+        time.sleep(1)
+        print("waiting for {0}, now {1}".format(alarm[0].date(), datetime.datetime.now().date()))
+        if datetime.datetime.now().date() == alarm[0].date(): #Check the date
+            while True:
+                time.sleep(1)
+                print("waiting for {0}, now {1}".format(alarm[0].minute, datetime.datetime.now().minute))
+                if datetime.datetime.now().hour == alarm[0].hour and datetime.datetime.now().minute == alarm[0].minute: #Check the time
+                    print(alarm[1])
+                    playsound(alarmSound)
+                    break
+            break
 
 
 def main():
