@@ -15,10 +15,14 @@ import datetime
 import requests as rq
 from bs4 import BeautifulSoup
 import werkzeug
-werkzeug.cached_property = werkzeug.utils.cached_property
+from timer import Timer
+# werkzeug.cached_property = werkzeug.utils.cached_property
+
 
 # Global variables
 alarmSound = 'alarms/mixkit-retro-game-emergency-alarm-1000.wav'
+timerSound = 'alarms/mixkit-scanning-sci-fi-alarm-905.wav'
+timer = Timer(0, timerSound)
 
 
 def get_menu():
@@ -164,20 +168,25 @@ def get_schedule():
 
 def set_timer(text):
     time = ""
+    # gonna need a way to find out if they want
+    # a timer in minutes or hours. Or they could say
+    # set a timer for 2 and a half hours. Going to convert
+    # what they say to seconds
     for i in range(len(text)):
         if(text[i].isdigit()):
             time += text[i]
 
-    seconds = int(time)
-
-    # convert minutes to seconds
-    if("minute" in text):
-        seconds *= 60
-    elif("hour" in text):
-        seconds *= 3600
+    time = int(time)
 
     # call the timer method to run in background
-    timer.main(seconds)
+    timer.set_time(time)
+
+    timer.start()
+
+
+def cancel_timer():
+    # call the stop method on timer thread
+    timer.stop()
 
 
 def set_alarm(altime, message):
