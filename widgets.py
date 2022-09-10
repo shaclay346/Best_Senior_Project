@@ -14,6 +14,7 @@ import os
 import datetime
 import requests as rq
 from bs4 import BeautifulSoup
+from googlesearch import search
 import werkzeug
 from timer import Timer
 # werkzeug.cached_property = werkzeug.utils.cached_property
@@ -104,6 +105,10 @@ def coin_flip():
     '''Randomly returns either 'heads' or 'tails'''
     ops = ['heads', 'tails']
     return random.choice(ops)
+
+
+def dice_roll():
+    return random.randint(1, 6)
 
 
 def get_time():
@@ -223,6 +228,10 @@ def check_alarm(alarm):
                     playsound(alarmSound)
                     break
             break
+
+
+def google_search():
+    pass
 
 
 def main():

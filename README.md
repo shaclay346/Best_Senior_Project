@@ -2,16 +2,19 @@
 
 Docs:
 Libraries Used
+
 <ul>
     <li>speech_recognition for performing speech recognition online and offline</li>
     <li>pyaudio for playing and recording audio on a variety of platforms</li>
     <li>pyttsx3 for offline text-to-speech conversion</li>
     <li>beautifulsoup for grabbing html from urls</li>
+    <li>googlesearch for searching google and returning top results</li>
     <li>requests for grabbing urls off the web</li>
     <li>playsound for playing sounds</li>
 </ul>
 
 Installation (Windows)
+
 <ul>
 <li>DEownload all necessary files and folders, which currently include:</li>
     <ul>
@@ -29,6 +32,7 @@ Installation (Windows)
     <li>pip install pyaudio</li>
     <li>pip install pyttsx3</li>
     <li>pip3 install beautifulsoup4</li>
+    <li>pip install google</li>
     <li>pip3 install requests</li>
     <li>pip3 install playsound==1.2.2</li>
     </ul>
@@ -36,6 +40,7 @@ Installation (Windows)
 </ul>
 
 Installation (Mac)
+
 <ul>
     <li>Enter these commands to install the necessary libraries</li><ul>
     <li>pip install speechrecognition</li>
