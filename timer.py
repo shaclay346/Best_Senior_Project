@@ -4,6 +4,8 @@ from playsound import playsound
 
 timerSound = 'alarms/mixkit-scanning-sci-fi-alarm-905.wav'
 
+# class for Timer Thread
+
 
 class Timer(threading.Thread):
     # Default called function with mythread.start()

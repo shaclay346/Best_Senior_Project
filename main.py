@@ -9,6 +9,7 @@ import pyttsx3
 import threading
 import pdb
 import timer
+import keyboard
 
 
 def main():
@@ -69,4 +70,10 @@ def speak(text, converter):
 
 
 if __name__ == '__main__':
-    main()
+    print("Press Space Bar to start the virtual assistant")
+
+    while True:
+        if keyboard.is_pressed('space'):
+            print("here")
+            main()
+            break
