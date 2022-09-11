@@ -108,6 +108,7 @@ def coin_flip():
 
 
 def dice_roll():
+    '''Returns the result of flipping a die'''
     return random.randint(1, 6)
 
 
@@ -121,11 +122,9 @@ def get_time():
 
 
 def get_date():
-    '''Returns current date.'''
+    '''Returns current date in 'day month, year' format.'''
     date_time = datetime.datetime.now()
 
-    # From the date_time variable, you can extract the date in various
-    # custom formats with .strftime(), for example:
     output = date_time.strftime("%B %d, %Y")
     return output
 
@@ -172,6 +171,7 @@ def get_schedule():
 
 
 def set_timer(text):
+    '''sets a timer for a given period of time'''
     time = ""
     # gonna need a way to find out if they want
     # a timer in minutes or hours. Or they could say
@@ -190,6 +190,7 @@ def set_timer(text):
 
 
 def cancel_timer():
+    '''cancels the timer by killing the thread'''
     # call the stop method on timer thread
     timer.stop()
 

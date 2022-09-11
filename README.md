@@ -33,6 +33,9 @@ Installation (Windows)
     <li>pip install pyttsx3</li>
     <li>pip3 install beautifulsoup4</li>
     <li>pip install google</li>
+    <li>pip install keyboard</li>
+    <li>pip install pandas</li>
+    <li>pip install requests_html</li>
     <li>pip3 install requests</li>
     <li>pip3 install playsound==1.2.2</li>
     </ul>
