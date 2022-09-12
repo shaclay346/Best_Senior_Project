@@ -17,7 +17,7 @@ Libraries Used
     <li>time: Lets certian threads wait to not clog resources</li>
     <li>math: Complex math</li>
     <li>json: Easy parsing through returned web information</li>
-    <li>pbd: Python debugging</li>
+    <li>pdb: Python debugging</li>
     <li>re: Provides regular expression matching operations for strings (Unicode and 8-bit)</li>
     <li>datetime: Provides objects for any time, present or other</li>
     <li>keyboard: Grabs keyboard presses</li>
