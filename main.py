@@ -9,6 +9,7 @@ import pyttsx3
 import threading
 import pdb
 import timer
+import keyboard
 
 
 def main():
@@ -16,8 +17,8 @@ def main():
     recognizer = sr.Recognizer()
 
     # TTS Initialization
-    converter = pyttsx3.init()
-    converter.setProperty('volume', 0.7)
+    # converter = pyttsx3.init()
+    # converter.setProperty('volume', 0.7)
 
     # for index, name in enumerate(sr.Microphone.list_microphone_names()):
     # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
@@ -25,41 +26,46 @@ def main():
     # Variables setup required for widgets (ex. alarms for the Alarm widget)
     alarm = []
 
+    print("Press Space Bar to start the virtual assistant")
+
     while True:
-        try:
-            with sr.Microphone() as mic:
-                recognizer.adjust_for_ambient_noise(mic, duration=0.2)
-                audio = recognizer.listen(mic)
+        if keyboard.is_pressed('space'):
+            print("here")
 
-                # Use Google's STT and Get Text Back
-                text = recognizer.recognize_google(audio)
-                text = text.lower()
+            try:
+                with sr.Microphone() as mic:
+                    recognizer.adjust_for_ambient_noise(mic, duration=0.2)
+                    audio = recognizer.listen(mic)
 
-                # using this to test the timer
-                if("timer" in text):
-                    print(text)
-                    time = ""
-                    for i in range(len(text)):
-                        if(text[i].isdigit()):
-                            time += text[i]
+                    # Use Google's STT and Get Text Back
+                    text = recognizer.recognize_google(audio)
+                    text = text.lower()
 
-                    seconds = int(time)
+                    # using this to test the timer
+                    if("timer" in text):
+                        print(text)
+                        time = ""
+                        for i in range(len(text)):
+                            if(text[i].isdigit()):
+                                time += text[i]
 
-                    # convert minutes to seconds
-                    if("minute" in text):
-                        seconds *= 60
-                    elif("hour" in text):
-                        seconds *= 3600
+                        seconds = int(time)
 
-                    # call the timer method to run in background
-                    timer.main(seconds)
+                        # convert minutes to seconds
+                        if("minute" in text):
+                            seconds *= 60
+                        elif("hour" in text):
+                            seconds *= 3600
 
-                print(f"Recognized: {text}")
+                        # call the timer method to run in background
+                        timer.Timer(seconds)
 
-        except sr.UnknownValueError:
-            # print("Error")
-            # recognizer = sr.Recognizer()
-            continue
+                    print(f"Recognized: {text}")
+
+            except sr.UnknownValueError:
+                # print("Error")
+                # recognizer = sr.Recognizer()
+                continue
 
 
 def speak(text, converter):
