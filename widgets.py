@@ -17,7 +17,10 @@ from bs4 import BeautifulSoup
 from googlesearch import search
 import werkzeug
 from timer import Timer
-# werkzeug.cached_property = werkzeug.utils.cached_property
+import urllib
+import pandas as pd  # pip install pandas
+from requests_html import HTML  # pip install requests_html
+from requests_html import HTMLSession
 
 
 # Global variables
@@ -108,6 +111,7 @@ def coin_flip():
 
 
 def dice_roll():
+    '''Returns the result of flipping a die'''
     return random.randint(1, 6)
 
 
@@ -121,11 +125,9 @@ def get_time():
 
 
 def get_date():
-    '''Returns current date.'''
+    '''Returns current date in 'day month, year' format.'''
     date_time = datetime.datetime.now()
 
-    # From the date_time variable, you can extract the date in various
-    # custom formats with .strftime(), for example:
     output = date_time.strftime("%B %d, %Y")
     return output
 
@@ -172,6 +174,7 @@ def get_schedule():
 
 
 def set_timer(text):
+    '''sets a timer for a given period of time'''
     time = ""
     # gonna need a way to find out if they want
     # a timer in minutes or hours. Or they could say
@@ -190,6 +193,7 @@ def set_timer(text):
 
 
 def cancel_timer():
+    '''cancels the timer by killing the thread'''
     # call the stop method on timer thread
     timer.stop()
 
@@ -230,13 +234,67 @@ def check_alarm(alarm):
             break
 
 
-def google_search():
-    pass
+def parse_results(response):
+    # google uses these css identifiers on all of their results
+    css_identifier_result = ".tF2Cxc"
+
+    # CSS identifiers to
+    css_identifier_title = "h3"
+    css_identifier_link = ".yuRUbf a"
+    css_identifier_text = ".VwiC3b"
+
+    # save the results from the google page
+    results = response.html.find(css_identifier_result)
+
+    output = []
+
+    for result in results:
+
+        item = {
+            'title': result.find(css_identifier_title, first=True).text,
+            'link': result.find(css_identifier_link, first=True).attrs['href'],
+            # 'yXK7lf', 'MUxGbd', 'yDYNvb', 'lyLwlc', 'lEBKkf
+            'text': result.find(css_identifier_text, first=True).text
+        }
+
+        output.append(item)
+
+    for i in range(len(output)):
+        print("Title: {}".format(output[i]["title"]))
+        print("Link: {}".format(output[i]["link"]))
+        print("Text: {}\n".format(output[i]["text"]))
+
+    return output
+
+
+def google_search(query):
+    '''Does a google search on a command, returns title and link to results.
+    example command: How old is Ryan Reynolds?
+                    How many ounces in a cup
+    '''
+
+    # parse the query
+    query = urllib.parse.quote_plus(query)
+    url = "https://www.google.co.uk/search?q=" + query
+
+    response = ""
+
+    # get the source code for the page
+    try:
+        session = HTMLSession()
+        response = session.get(url)
+
+    except rq.exceptions.RequestException as e:
+        print(e)
+
+    # parse the data we want from the page
+    return parse_results(response)
 
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    pdb.set_trace()
+    # pdb.set_trace()
+    set_timer("set a timer for 4 seconds")
 
 
 if __name__ == '__main__':
