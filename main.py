@@ -13,12 +13,19 @@ import keyboard
 
 
 def main():
+    print("Press Space Bar to start the virtual assistant")
+
+    while True:
+        if keyboard.is_pressed('space'):
+            print("here")
+            break
+
     # Voice Recognizer
     recognizer = sr.Recognizer()
 
     # TTS Initialization
-    converter = pyttsx3.init()
-    converter.setProperty('volume', 0.7)
+    # converter = pyttsx3.init()
+    # converter.setProperty('volume', 0.7)
 
     # for index, name in enumerate(sr.Microphone.list_microphone_names()):
     # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
@@ -53,7 +60,7 @@ def main():
                         seconds *= 3600
 
                     # call the timer method to run in background
-                    timer.main(seconds)
+                    timer.Timer(seconds)
 
                 print(f"Recognized: {text}")
 
@@ -70,10 +77,4 @@ def speak(text, converter):
 
 
 if __name__ == '__main__':
-    print("Press Space Bar to start the virtual assistant")
-
-    while True:
-        if keyboard.is_pressed('space'):
-            print("here")
-            main()
-            break
+    main()
