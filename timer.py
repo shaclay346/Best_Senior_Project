@@ -8,10 +8,7 @@ timerSound = 'alarms/mixkit-scanning-sci-fi-alarm-905.wav'
 
 
 class Timer(threading.Thread):
-    # Default called function with mythread.start()
     def run(self):
-        print('here', self.time)
-
         # get the amount of seconds to sleep for
         seconds = int(self.time)
 
@@ -36,4 +33,19 @@ class Timer(threading.Thread):
         self.time = time
 
     def stop(self):
+        print("stopping timer")
         self.__stopper = True
+
+
+def create_timer(time, sound):
+    # use this to start a timer
+    Timer(time, sound).start()
+
+
+def main():
+    # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
+    create_timer()
+
+
+if __name__ == '__main__':
+    main()

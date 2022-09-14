@@ -26,7 +26,7 @@ from requests_html import HTMLSession
 # Global variables
 alarmSound = 'alarms/mixkit-retro-game-emergency-alarm-1000.wav'
 timerSound = 'alarms/mixkit-scanning-sci-fi-alarm-905.wav'
-timer = Timer(0, timerSound)
+timer = None
 
 
 def get_menu():
@@ -175,27 +175,41 @@ def get_schedule():
 
 def set_timer(text):
     '''sets a timer for a given period of time'''
-    time = ""
-    # gonna need a way to find out if they want
-    # a timer in minutes or hours. Or they could say
-    # set a timer for 2 and a half hours. Going to convert
-    # what they say to seconds
-    for i in range(len(text)):
-        if(text[i].isdigit()):
-            time += text[i]
+    seconds = 0
+    if("and" in text):
+        # handle this seperately
+        pass
+    else:
+        time = ""
 
-    time = int(time)
+        for i in range(len(text)):
+            if(text[i].isdigit()):
+                time += text[i]
 
-    # call the timer method to run in background
-    timer.set_time(time)
+        seconds = int(time)
+        if("hour" in text):
+            seconds *= 3600
+        elif("minute" in text):
+            seconds *= 60
 
+    # create thread for timer and start it
+    global timer
+    timer = Timer(seconds, timerSound)
     timer.start()
 
 
 def cancel_timer():
     '''cancels the timer by killing the thread'''
     # call the stop method on timer thread
-    timer.stop()
+    print("timer is", timer)
+    if(timer != None):
+        timer.stop()
+    else:
+        print("No active timers")
+
+
+def calculator():
+    pass
 
 
 def set_alarm(altime, message):
@@ -294,7 +308,7 @@ def google_search(query):
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
     # pdb.set_trace()
-    set_timer("set a timer for 4 seconds")
+    set_timer("set a timer for 5 seconds")
 
 
 if __name__ == '__main__':
