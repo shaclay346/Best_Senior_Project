@@ -6,7 +6,7 @@ from nltk.corpus import stopwords, wordnet
 from sklearn.feature_extraction.text import TfidfVectorizer
 import openpyxl as pyxl
 import numpy as np
-import math, os, re , pdb
+import math, os, re, pdb
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,10 +44,19 @@ def process(sentence):
 	return np.array(sentence)		
 
 
-def preprocess(content):
+def preprocess():
 	'''Performs all the preprocessing necessary to train the SVM (we don't want to train it every time we run the VA)'''
-	pass
+	# Load Data from intents.xlsx
+	wb = pyxl.load_workbook('intents.xlsx')
+	sheet = wb.active
 
+	labels = []
+	data = []
+	
+	# Iterate Col by Col
+	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
+		labels.append(col[0])
+		data.append([a for a in col[1:] if a])
 
 
 def get_wordnet_pos(word):
@@ -70,15 +79,30 @@ def to_sentence(arr):
 
 def view_intents():
 	'''Quality of Life Function that returns intents.xmls as a dictionary'''
+	# Load Data from intents.xlsx
+	wb = pyxl.load_workbook('intents.xlsx')
+	sheet = wb.active
+
+	info = {}
+	
+	# Iterate Col by Col
+	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
+		info.update({col[0]:[a for a in col[1:] if a]})
+
+	return info
+
+
+def train_svm(data, labels):
+	'''Trains the SVM with the given dataset and labels.'''
+	
 	pass
-
-
 
 
 
 
 def main():
-	pass
+	pdb.set_trace()
+	preprocess()
 
 
 
