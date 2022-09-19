@@ -49,6 +49,11 @@ Installation (Windows)
     <li>pip install requests_html</li>
     <li>pip3 install requests</li>
     <li>pip3 install playsound==1.2.2</li>
+    <li>pip3 install nltk</li>
+    <li>pip3 install nltk.corpus</li>
+    <li>pip3 install sklearn.feature_extraction.text</li>
+    <li>pip3 install openpyxl</li>
+    <li>pip3 install numpy</li>
     </ul>
     <li>Run the program!</li>
 </ul>
@@ -67,6 +72,11 @@ Installation (Mac)
     <li>pip install requests_html</li>
     <li>pip3 install requests</li>
     <li>pip3 install playsound==1.2.2</li>
+    <li>pip3 install nltk</li>
+    <li>pip3 install nltk.corpus</li>
+    <li>pip3 install sklearn.feature_extraction.text</li>
+    <li>pip3 install openpyxl</li>
+    <li>pip3 install numpy</li>
     <li><strong>Note:</strong> You may need to install portaudio via homebrew (brew install portaudio)</li>
     </ul>
     <li>Run the program!</li>
