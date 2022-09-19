@@ -15,9 +15,11 @@ def process(sentence):
 
 	# Invalid sentence type
 	if not isinstance(sentence, str):
-		raise Exception("Processing Error: Invalid type: must be str")
+		raise Exception("Processing Error: type must be str")
 		return # unnecessary return but maintains my sanity
 
+	# Initialize Lemmatizer
+	lemmatizer = WordNetLemmatizer()
 
 	# Convert to Lowercase
 	sentence = sentence.lower()
@@ -26,7 +28,7 @@ def process(sentence):
 	sentence = re.sub('[^a-z]', " ", sentence)
 
 	# Tokenize Sentence
-	sentence = [word for word in sentence if word != ' ' and len(word) > 1]
+	sentence = [word for word in sentence.split() if word != ' ' and len(word) > 1]
 
 	# Remove Stop Words
 	stop_words = set(stopwords.words("english"))
@@ -36,27 +38,51 @@ def process(sentence):
 	sentence = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in sentence]
 
 	# Calculate TF-IDF Score
-	tfidf_vectorizer = TfidfVectorizer(lowercase=False)
+	tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
 
-	sentence = tfidf_vectorizer.fit_transform(" ".join(sentence))
-	sentence = np.asarray(sentence.todense())
+	vectors = tfidf_vectorizer.fit_transform(sentence)
 
-	return np.array(sentence)		
+	return vectors
 
 
 def preprocess():
 	'''Performs all the preprocessing necessary to train the SVM (we don't want to train it every time we run the VA)'''
+	# Initialize Lemmatizer
+	lemmatizer = WordNetLemmatizer()
+
 	# Load Data from intents.xlsx
 	wb = pyxl.load_workbook('intents.xlsx')
 	sheet = wb.active
 
 	labels = []
 	data = []
-	
+
 	# Iterate Col by Col
 	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
 		labels.append(col[0])
 		data.append([a for a in col[1:] if a])
+
+	for i, v in enumerate(data):
+		for j, k in enumerate(data[i]):
+			# Convert to Lowercase
+			sentence = k.lower()
+
+			# Replace Nonletter Characters with Spaces
+			sentence = re.sub('[^a-z]', " ", sentence)
+
+			# Tokenize Sentence
+			sentence = [word for word in sentence.split() if word != ' ' and len(word) > 1]
+
+			# Remove Stop Words
+			stop_words = set(stopwords.words("english"))
+			sentence = [word for word in sentence if word not in stop_words]
+
+			# Lemmatize
+			sentence = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in sentence]
+
+			pdb.set_trace()
+
+	pdb.set_trace()
 
 
 def get_wordnet_pos(word):
@@ -69,12 +95,6 @@ def get_wordnet_pos(word):
 				"R": wordnet.ADV}
 
 	return tag_dict.get(tag, wordnet.NOUN) # return simplified POS (defaults to NOUN)
-
-
-def to_sentence(arr):
-	'''Converts numpy array into a string'''
-	for i in range(arr.size):
-		arr[i] = ' '.join(str(word) for word in arr[i])
 
 
 def view_intents():
@@ -101,8 +121,9 @@ def train_svm(data, labels):
 
 
 def main():
-	pdb.set_trace()
+	# temp = process("In my opinon, the newer model is better")
 	preprocess()
+	pdb.set_trace()
 
 
 

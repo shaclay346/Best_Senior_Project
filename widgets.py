@@ -132,15 +132,12 @@ def get_date():
     return output
 
 
-def get_schedule():
+def get_schedule(username='USERNAME', password='PASSWORD'):
     '''Returns user's class schedule.'''
-    # Credentials (will need to be changed for the presentation/testing, left generic for now)
-    username = 'USERNAME'
-    password = 'PASSWORD'
 
     # Check to stop function if credentials are still default values
     if username == 'USERNAME' or password == 'PASSWORD':
-        return ['No login credentials given.']
+        return ['Incomplete login credentials given.']
 
     # Creates a RoboBrowser Object and Logs into Portal
     br = RoboBrowser()
@@ -167,8 +164,10 @@ def get_schedule():
 
     for item in table:
         row = item.find_all('td')
-        courses.append([re.sub(';', '', a.text).strip()
-                       for a in row if row and 'No grade' not in a.text])
+        course = [re.sub(';', '', a.text).strip() for a in row if row and 'No grade' not in a.text]
+
+        # Append Only if Course Found (fixes small bug)
+        if course: courses.append(course)
 
     return courses
 
@@ -208,7 +207,7 @@ def cancel_timer():
         print("No active timers")
 
 
-def calculator():
+def calculate():
     pass
 
 
@@ -307,8 +306,8 @@ def google_search(query):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    # pdb.set_trace()
-    set_timer("set a timer for 5 seconds")
+    pdb.set_trace()
+    # set_timer("set a timer for 5 seconds")
 
 
 if __name__ == '__main__':
