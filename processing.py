@@ -4,6 +4,7 @@
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import stopwords, wordnet
 from sklearn.feature_extraction.text import TfidfVectorizer
+from collections import Counter
 import openpyxl as pyxl
 import numpy as np
 import math, os, re, pdb
@@ -41,7 +42,7 @@ def process(sentence):
 	tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
 
 	vectors = tfidf_vectorizer.fit_transform(sentence)
-
+	pdb.set_trace()
 	return vectors
 
 
@@ -59,10 +60,12 @@ def preprocess():
 
 	# Iterate Col by Col
 	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
-		labels.append(col[0])
 		data.append([a for a in col[1:] if a])
+		# pdb.set_trace()
+		labels += [col[0]] * len(data[-1])
 
 	for i, v in enumerate(data):
+		row = []
 		for j, k in enumerate(data[i]):
 			# Convert to Lowercase
 			sentence = k.lower()
@@ -80,9 +83,26 @@ def preprocess():
 			# Lemmatize
 			sentence = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in sentence]
 
-			pdb.set_trace()
+			# Save Processed Sentence
+			row.append(' '.join(sentence))
 
-	pdb.set_trace()
+		data[i] = row
+
+	# Lower Dimensionality of Data (Easier to do this now than earlier)
+	data = [str(a) for b in data for a in b]
+
+	# Remove Duplicates from Data and their Corresponding Labels
+	for i in range(len(data) - 1, -1, -1):
+		if data[i] in data[:i]:
+			data.pop(i)
+			labels.pop(i)
+
+	# Calculate TF-IDF Score
+	tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+
+	vectors = tfidf_vectorizer.fit_transform(data)
+
+	return vectors
 
 
 def get_wordnet_pos(word):
