@@ -19,8 +19,6 @@ import werkzeug
 from timer import Timer
 import urllib
 import pandas as pd  # pip install pandas
-from requests_html import HTML  # pip install requests_html
-from requests_html import HTMLSession
 
 
 # Global variables
@@ -111,7 +109,7 @@ def coin_flip():
 
 
 def dice_roll():
-    '''Returns the result of flipping a die'''
+    '''Returns the result of rolling a die'''
     return random.randint(1, 6)
 
 

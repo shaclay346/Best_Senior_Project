@@ -7,12 +7,15 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from collections import Counter
 import openpyxl as pyxl
 import numpy as np
+import pandas as pd
 import math, os, re, pdb
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 def process(sentence):
 	'''Processes the string 'sentence' in such a way that it can be used with the SVM'''
+
+	# This whole thing? wrong for the moment.
 
 	# Invalid sentence type
 	if not isinstance(sentence, str):
@@ -97,11 +100,10 @@ def preprocess():
 			data.pop(i)
 			labels.pop(i)
 
-	# Calculate TF-IDF Score
-	tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
-
-	vectors = tfidf_vectorizer.fit_transform(data)
-
+	# Calculate TF-IDF Score (Need to change this to BoW later)
+	vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+	vectors = vectorizer.fit_transform(data)
+	pdb.set_trace()
 	return vectors
 
 
@@ -115,6 +117,10 @@ def get_wordnet_pos(word):
 				"R": wordnet.ADV}
 
 	return tag_dict.get(tag, wordnet.NOUN) # return simplified POS (defaults to NOUN)
+
+
+def save_t():
+	pass
 
 
 def view_intents():
@@ -134,7 +140,6 @@ def view_intents():
 
 def train_svm(data, labels):
 	'''Trains the SVM with the given dataset and labels.'''
-	
 	pass
 
 
