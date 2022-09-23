@@ -195,6 +195,10 @@ def set_timer(text):
     # create thread for timer and start it
     global timer
     timer = Timer(seconds, timerSound)
+
+    if("name" in text):
+        name_timer(text)
+
     timer.start()
 
 
@@ -208,8 +212,61 @@ def cancel_timer():
         print("No active timers")
 
 
-def calculator():
-    pass
+def name_timer(text):
+    timer.set_name(text)
+
+
+def get_operands(text):
+    # whats 18 times 20
+
+    left_operand = ""
+    right_operand = ""
+
+    flag1 = False
+    flag2 = False
+    # get left operand
+    for i in range(len(text)):
+        if(flag1):
+            break
+        if(text[i].isdigit()):
+            for j in range(i, len(text)):
+                if(text[j].isdigit()):
+                    left_operand += text[j]
+                else:
+                    flag1 = True
+                    break
+
+    # get right operand
+    for i in range(len(text) - 1, -1, -1):
+        if(flag2):
+            break
+
+        if(text[i].isdigit()):
+            for j in range(i, -1, -1):
+                if(text[j].isdigit()):
+                    right_operand += text[j]
+                else:
+                    flag2 = True
+                    break
+    # reverse right operand
+    right_operand = right_operand[::-1]
+
+    return [int(left_operand), int(right_operand)]
+
+
+def calculator(text):
+    operands = get_operands(text)
+    result = 0
+    if("plus" in text):
+        result = operands[0] + operands[1]
+    elif("minus" in text):
+        result = operands[0] - operands[1]
+    elif("times" in text):
+        result = operands[0] * operands[1]
+    elif("divide" in text):
+        result = operands[0] // operands[1]
+
+    return result
 
 
 def set_alarm(altime, message):
@@ -307,8 +364,7 @@ def google_search(query):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    # pdb.set_trace()
-    set_timer("set a timer for 5 seconds")
+    pdb.set_trace()
 
 
 if __name__ == '__main__':
