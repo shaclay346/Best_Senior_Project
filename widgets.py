@@ -19,8 +19,6 @@ import werkzeug
 from timer import Timer
 import urllib
 import pandas as pd  # pip install pandas
-from requests_html import HTML  # pip install requests_html
-from requests_html import HTMLSession
 
 
 # Global variables
@@ -111,7 +109,7 @@ def coin_flip():
 
 
 def dice_roll():
-    '''Returns the result of flipping a die'''
+    '''Returns the result of rolling a die'''
     return random.randint(1, 6)
 
 
@@ -132,15 +130,12 @@ def get_date():
     return output
 
 
-def get_schedule():
+def get_schedule(username='USERNAME', password='PASSWORD'):
     '''Returns user's class schedule.'''
-    # Credentials (will need to be changed for the presentation/testing, left generic for now)
-    username = 'USERNAME'
-    password = 'PASSWORD'
 
     # Check to stop function if credentials are still default values
     if username == 'USERNAME' or password == 'PASSWORD':
-        return ['No login credentials given.']
+        return ['Incomplete login credentials given.']
 
     # Creates a RoboBrowser Object and Logs into Portal
     br = RoboBrowser()
@@ -167,8 +162,12 @@ def get_schedule():
 
     for item in table:
         row = item.find_all('td')
-        courses.append([re.sub(';', '', a.text).strip()
-                       for a in row if row and 'No grade' not in a.text])
+        course = [re.sub(';', '', a.text).strip()
+                  for a in row if row and 'No grade' not in a.text]
+
+        # Append Only if Course Found (fixes small bug)
+        if course:
+            courses.append(course)
 
     return courses
 

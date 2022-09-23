@@ -4,20 +4,26 @@
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import stopwords, wordnet
 from sklearn.feature_extraction.text import TfidfVectorizer
+from collections import Counter
 import openpyxl as pyxl
 import numpy as np
-import math, os, re , pdb
+import pandas as pd
+import math, os, re, pdb
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 def process(sentence):
 	'''Processes the string 'sentence' in such a way that it can be used with the SVM'''
 
+	# This whole thing? wrong for the moment.
+
 	# Invalid sentence type
 	if not isinstance(sentence, str):
-		raise Exception("Processing Error: Invalid type: must be str")
+		raise Exception("Processing Error: type must be str")
 		return # unnecessary return but maintains my sanity
 
+	# Initialize Lemmatizer
+	lemmatizer = WordNetLemmatizer()
 
 	# Convert to Lowercase
 	sentence = sentence.lower()
@@ -26,7 +32,7 @@ def process(sentence):
 	sentence = re.sub('[^a-z]', " ", sentence)
 
 	# Tokenize Sentence
-	sentence = [word for word in sentence if word != ' ' and len(word) > 1]
+	sentence = [word for word in sentence.split() if word != ' ' and len(word) > 1]
 
 	# Remove Stop Words
 	stop_words = set(stopwords.words("english"))
@@ -36,18 +42,69 @@ def process(sentence):
 	sentence = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in sentence]
 
 	# Calculate TF-IDF Score
-	tfidf_vectorizer = TfidfVectorizer(lowercase=False)
+	tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
 
-	sentence = tfidf_vectorizer.fit_transform(" ".join(sentence))
-	sentence = np.asarray(sentence.todense())
+	vectors = tfidf_vectorizer.fit_transform(sentence)
+	pdb.set_trace()
+	return vectors
 
-	return np.array(sentence)		
 
-
-def preprocess(content):
+def preprocess():
 	'''Performs all the preprocessing necessary to train the SVM (we don't want to train it every time we run the VA)'''
-	pass
+	# Initialize Lemmatizer
+	lemmatizer = WordNetLemmatizer()
 
+	# Load Data from intents.xlsx
+	wb = pyxl.load_workbook('intents.xlsx')
+	sheet = wb.active
+
+	labels = []
+	data = []
+
+	# Iterate Col by Col
+	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
+		data.append([a for a in col[1:] if a])
+		# pdb.set_trace()
+		labels += [col[0]] * len(data[-1])
+
+	for i, v in enumerate(data):
+		row = []
+		for j, k in enumerate(data[i]):
+			# Convert to Lowercase
+			sentence = k.lower()
+
+			# Replace Nonletter Characters with Spaces
+			sentence = re.sub('[^a-z]', " ", sentence)
+
+			# Tokenize Sentence
+			sentence = [word for word in sentence.split() if word != ' ' and len(word) > 1]
+
+			# Remove Stop Words
+			stop_words = set(stopwords.words("english"))
+			sentence = [word for word in sentence if word not in stop_words]
+
+			# Lemmatize
+			sentence = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in sentence]
+
+			# Save Processed Sentence
+			row.append(' '.join(sentence))
+
+		data[i] = row
+
+	# Lower Dimensionality of Data (Easier to do this now than earlier)
+	data = [str(a) for b in data for a in b]
+
+	# Remove Duplicates from Data and their Corresponding Labels
+	for i in range(len(data) - 1, -1, -1):
+		if data[i] in data[:i]:
+			data.pop(i)
+			labels.pop(i)
+
+	# Calculate TF-IDF Score (Need to change this to BoW later)
+	vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+	vectors = vectorizer.fit_transform(data)
+	pdb.set_trace()
+	return vectors
 
 
 def get_wordnet_pos(word):
@@ -62,23 +119,36 @@ def get_wordnet_pos(word):
 	return tag_dict.get(tag, wordnet.NOUN) # return simplified POS (defaults to NOUN)
 
 
-def to_sentence(arr):
-	'''Converts numpy array into a string'''
-	for i in range(arr.size):
-		arr[i] = ' '.join(str(word) for word in arr[i])
+def save_t():
+	pass
 
 
 def view_intents():
 	'''Quality of Life Function that returns intents.xmls as a dictionary'''
+	# Load Data from intents.xlsx
+	wb = pyxl.load_workbook('intents.xlsx')
+	sheet = wb.active
+
+	info = {}
+	
+	# Iterate Col by Col
+	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
+		info.update({col[0]:[a for a in col[1:] if a]})
+
+	return info
+
+
+def train_svm(data, labels):
+	'''Trains the SVM with the given dataset and labels.'''
 	pass
-
-
 
 
 
 
 def main():
-	pass
+	# temp = process("In my opinon, the newer model is better")
+	preprocess()
+	pdb.set_trace()
 
 
 
