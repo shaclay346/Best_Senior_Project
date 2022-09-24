@@ -3,8 +3,9 @@
 
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import stopwords, wordnet
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from collections import Counter
+from joblib import dump, load
 import openpyxl as pyxl
 import numpy as np
 import pandas as pd
@@ -14,8 +15,6 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 
 def process(sentence):
 	'''Processes the string 'sentence' in such a way that it can be used with the SVM'''
-
-	# This whole thing? wrong for the moment.
 
 	# Invalid sentence type
 	if not isinstance(sentence, str):
@@ -41,10 +40,14 @@ def process(sentence):
 	# Lemmatize
 	sentence = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in sentence]
 
-	# Calculate TF-IDF Score
-	tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+	# Calculate Individual BoW Score
 
-	vectors = tfidf_vectorizer.fit_transform(sentence)
+
+
+	# # Calculate TF-IDF Score
+	# tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+
+	# vectors = tfidf_vectorizer.fit_transform(sentence)
 	pdb.set_trace()
 	return vectors
 
@@ -95,15 +98,22 @@ def preprocess():
 	data = [str(a) for b in data for a in b]
 
 	# Remove Duplicates from Data and their Corresponding Labels
-	for i in range(len(data) - 1, -1, -1):
-		if data[i] in data[:i]:
-			data.pop(i)
-			labels.pop(i)
+	# for i in range(len(data) - 1, -1, -1):
+	# 	if data[i] in data[:i]:
+	# 		data.pop(i)
+	# 		labels.pop(i)
 
-	# Calculate TF-IDF Score (Need to change this to BoW later)
-	vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+	# Sort Data/Labels Alphabetically ### unnecessary, just here for ease of reading
+	data, labels = zip(*sorted(zip(data, labels)))
+
+	# Calculate BoW Counts
+	vectorizer = CountVectorizer(ngram_range=(1,2))
 	vectors = vectorizer.fit_transform(data)
-	pdb.set_trace()
+
+	# Make DataFrame and Save ### delete later, just using this for sanity
+	# frame = pd.DataFrame(vectors.toarray(), columns=vectorizer.get_feature_names())
+	# frame.to_excel(os.path.join(ROOT, "bow_visualized.xlsx"))
+
 	return vectors
 
 
@@ -117,10 +127,6 @@ def get_wordnet_pos(word):
 				"R": wordnet.ADV}
 
 	return tag_dict.get(tag, wordnet.NOUN) # return simplified POS (defaults to NOUN)
-
-
-def save_t():
-	pass
 
 
 def view_intents():
@@ -142,6 +148,17 @@ def train_svm(data, labels):
 	'''Trains the SVM with the given dataset and labels.'''
 	pass
 
+
+def save_svm(SVM):
+	'''Saves the trained SVM to trained_SVM.joblib for later use'''
+	dump(SVM, os.path.join(ROOT, "trained_SVM.joblib"))
+	print("SVM successfully saved.") 
+
+
+def load_svm():
+	'''Loads the Pre-Trained SVM for use.'''
+	clf = load(os.path.join(ROOT, "trained_SVM.joblib"))
+	return clf
 
 
 
