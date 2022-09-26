@@ -1,4 +1,5 @@
 #ignore these, intents is giving merge conflicts
 intents.xlsx
-google.py
 __pycache__/
+#file to test locally
+garbage.py  

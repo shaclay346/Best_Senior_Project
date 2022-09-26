@@ -23,14 +23,18 @@ class Timer(threading.Thread):
             if(seconds == 0):
                 playsound(self.sound)
 
-    def __init__(self, time, timerSound):
+    def __init__(self, time, timerSound, name=None):
         super(Timer, self).__init__()
         self.time = time
         self.sound = timerSound
+        self.name = name
         self.__stopper = False
 
     def set_time(self, time):
         self.time = time
+
+    def set_name(self, name):
+        self.name = name
 
     def stop(self):
         print("stopping timer")
