@@ -19,6 +19,7 @@ import werkzeug
 from timer import Timer
 import urllib
 import pandas as pd  # pip install pandas
+import multiprocessing 
 
 
 # Global variables
@@ -273,18 +274,15 @@ def calculator(text):
 
 def set_alarm(altime, message):
     """Set an alarm that, when the given time passes, activates an alarm sound"""
-    # Test variable (Delete Later)
-    # Change to wanted time (year, month, day, hour(24 base), minute, second)
-    altime = datetime.datetime(2022, 9, 1, 22, 24)
-    message = "Hello There, I'm working"
 
     # Add the alarm with the time (dateTime object) and message (string)
     alarm = [altime, message]
 
     # Wait for the alarm to go off (Testing Only)
     # Add "daemon = True" to make the thread end when the main program ends
-    t1 = threading.Thread(target=check_alarm, args=(alarm,))
-    t1.start()
+    global al
+    al = multiprocessing.Process(target=check_alarm, args=(alarm,))
+    al.start()
 
 
 def check_alarm(alarm):
@@ -311,9 +309,24 @@ def check_alarm(alarm):
                     and datetime.datetime.now().minute == alarm[0].minute
                 ):
                     print(alarm[1])
-                    playsound(alarmSound)
+                    global soundAlarm
+                    soundAlarm = multiprocessing.Process(target=playsound, args=(alarmSound,))
+                    soundAlarm.start()
+                    print("Press enter to stop the sound")
                     break
             break
+
+def cancel_alarm():
+    if al != None:
+        al.terminate()
+    else:
+        print("There are no set alarms")
+
+def stop_alarm():
+    if soundAlarm != None:
+        soundAlarm.terminate()
+    else:
+        print("There are no alarms currently ringing")
 
 
 def parse_results(response):

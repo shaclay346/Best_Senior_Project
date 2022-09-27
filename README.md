@@ -13,6 +13,7 @@ Libraries Used
     <li>playsound: Playing sounds</li>
     <li>robobrowser: Fetching websites, submitting login forms, and grabbing html</li>
     <li>threading: Allows for multiple threads to track alarms and timers</li>
+    <li>multithreading: Allows for multiple threads to track alarms and timers</li>
     <li>random: Random events (coin flips, responses to certian questions, etc.)</li>
     <li>time: Lets certian threads wait to not clog resources</li>
     <li>math: Complex math</li>

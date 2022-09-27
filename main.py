@@ -10,6 +10,7 @@ import threading
 import pdb
 import timer
 import keyboard
+import datetime
 import multiprocessing
 import time
 from threading import Thread
@@ -116,6 +117,17 @@ def main():
                     response = widgets.coin_flip()
                 elif "dice" in text:
                     response = widgets.dice_roll()
+                elif "alarm" in text:
+                    if "stop" in text:
+                        print("stopping alarm")
+                        widgets.stop_alarm()
+                    elif "cancel" in text:
+                        print("cancelling alarm")
+                        widgets.cancel_alarm()
+                        response = "Alarm cancelled"
+                    else:
+                        widgets.set_alarm(datetime.datetime.now(), "alarm") # Testing values, change later
+                        response = "Alarm set"
 
                 print(f"Recognized: {text}")
                 print("response is: ", response)
