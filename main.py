@@ -115,7 +115,7 @@ def main():
                 elif "coin" in text:
                     response = widgets.coin_flip()
                 elif "dice" in text:
-                    response = widgets.dice_roll()
+                    response = widgets.dice_roll(text)
 
                 print(f"Recognized: {text}")
                 print("response is: ", response)

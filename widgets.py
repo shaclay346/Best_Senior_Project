@@ -108,9 +108,11 @@ def coin_flip():
     return random.choice(ops)
 
 
-def dice_roll():
+def dice_roll(text):
     """Returns the result of rolling a die"""
-    return random.randint(1, 6)
+    sides = 6
+    # find way to get the number of sides of desired die
+    return random.randint(1, sides)
 
 
 def get_time():
