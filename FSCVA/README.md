@@ -13,6 +13,7 @@ Libraries Used
     <li>playsound: Playing sounds</li>
     <li>robobrowser: Fetching websites, submitting login forms, and grabbing html</li>
     <li>threading: Allows for multiple threads to track alarms and timers</li>
+    <li>multithreading: Allows for multiple threads to track alarms and timers</li>
     <li>random: Random events (coin flips, responses to certian questions, etc.)</li>
     <li>time: Lets certian threads wait to not clog resources</li>
     <li>math: Complex math</li>
@@ -46,7 +47,6 @@ Installation (Windows)
     <li>pip install google</li>
     <li>pip install keyboard</li>
     <li>pip install pandas</li>
-    <li>pip install requests_html</li>
     <li>pip3 install requests</li>
     <li>pip3 install playsound==1.2.2</li>
     </ul>

@@ -1,22 +1,25 @@
 # processing.py
-# Performs all the preproccessing required on plaintext for use with the SVM
+# (Insert description line here)
 
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import stopwords, wordnet
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.svm import SVC
 from collections import Counter
 import openpyxl as pyxl
 import numpy as np
 import pandas as pd
-import math, os, re, pdb
+import pickle as pkl
+import math, os, re, joblib, pdb
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
-def process(sentence):
-	'''Processes the string 'sentence' in such a way that it can be used with the SVM'''
+global clf
+global feature_names
 
-	# This whole thing? wrong for the moment.
 
+def predict(sentence):
+	'''Processes and predicts the string "sentence"'''
 	# Invalid sentence type
 	if not isinstance(sentence, str):
 		raise Exception("Processing Error: type must be str")
@@ -41,16 +44,24 @@ def process(sentence):
 	# Lemmatize
 	sentence = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in sentence]
 
-	# Calculate TF-IDF Score
-	tfidf_vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+	# Remove Unique Words (Present in Query but not in feature_names)
+	sentence = [word for word in sentence if word in feature_names]
 
-	vectors = tfidf_vectorizer.fit_transform(sentence)
-	pdb.set_trace()
-	return vectors
+	# Calculate Individual BoW Score
+	vectors = np.zeros(len(feature_names))
+
+	for word in sentence:
+		vectors[feature_names.index(word)] += 1
+
+	# Predict Function
+	prediction = clf.predict(vectors.reshape(1,-1))
+
+	# Return Prediction
+	return prediction
 
 
 def preprocess():
-	'''Performs all the preprocessing necessary to train the SVM (we don't want to train it every time we run the VA)'''
+	'''Performs all the necessary preprocessing, trains the SVM, and saves it'''
 	# Initialize Lemmatizer
 	lemmatizer = WordNetLemmatizer()
 
@@ -64,7 +75,6 @@ def preprocess():
 	# Iterate Col by Col
 	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
 		data.append([a for a in col[1:] if a])
-		# pdb.set_trace()
 		labels += [col[0]] * len(data[-1])
 
 	for i, v in enumerate(data):
@@ -94,17 +104,26 @@ def preprocess():
 	# Lower Dimensionality of Data (Easier to do this now than earlier)
 	data = [str(a) for b in data for a in b]
 
-	# Remove Duplicates from Data and their Corresponding Labels
-	for i in range(len(data) - 1, -1, -1):
-		if data[i] in data[:i]:
-			data.pop(i)
-			labels.pop(i)
+	# Sort Data/Labels Alphabetically ### unnecessary, just here for ease of reading
+	data, labels = zip(*sorted(zip(data, labels)))
 
-	# Calculate TF-IDF Score (Need to change this to BoW later)
-	vectorizer = TfidfVectorizer(lowercase=False, ngram_range=(1,2))
+	# Calculate BoW Counts
+	vectorizer = CountVectorizer(ngram_range=(1,2))
 	vectors = vectorizer.fit_transform(data)
-	pdb.set_trace()
-	return vectors
+
+	# Make DataFrame and Save ### delete later, just using this for sanity
+	# frame = pd.DataFrame(vectors.toarray(), columns=vectorizer.get_feature_names())
+	# frame.to_excel(os.path.join(ROOT, "bow_visualized.xlsx"))
+
+	# Create SVM
+	clf = SVC(kernel='linear')
+	clf.fit(vectors, labels)
+
+	# Save SVM
+	save_svm(clf)
+
+	# Save Feature Names
+	save_corpus(vectorizer.get_feature_names())
 
 
 def get_wordnet_pos(word):
@@ -117,10 +136,6 @@ def get_wordnet_pos(word):
 				"R": wordnet.ADV}
 
 	return tag_dict.get(tag, wordnet.NOUN) # return simplified POS (defaults to NOUN)
-
-
-def save_t():
-	pass
 
 
 def view_intents():
@@ -138,18 +153,45 @@ def view_intents():
 	return info
 
 
-def train_svm(data, labels):
-	'''Trains the SVM with the given dataset and labels.'''
-	pass
+def save_svm(clf):
+	'''Saves the trained SVM to trained_SVM.joblib for later use'''
+	joblib.dump(clf, os.path.join(ROOT, "trained_SVM.joblib"))
+	print("SVM successfully saved.") 
 
 
+def load_svm_corpus():
+	'''Loads the Pre-Trained SVM and feature names for use.'''
+	global clf
+	global feature_names
+
+	# Load SVM
+	clf = joblib.load(os.path.join(ROOT, "trained_SVM.joblib"))
+
+	# Load Feature Names
+	with open(os.path.join(ROOT, "feature_names.pkl"), "rb") as f:
+		feature_names = pkl.load(f)
+
+
+def save_corpus(feature_names):
+	'''Saves the corpus of feature names into feature_names.pkl.
+	This will only be used initially / if new intents are added.'''
+	with open(os.path.join(ROOT, "feature_names.pkl"), "wb") as f:
+		pkl.dump(feature_names, f)
 
 
 def main():
-	# temp = process("In my opinon, the newer model is better")
-	preprocess()
-	pdb.set_trace()
+	load_svm_corpus()
 
+	# Testing Loop
+	while True:
+		query = input("\nEnter Query > ")
+
+		if query == 'q':
+			break
+
+		prediction = predict(query)
+
+		print(f"\tPrediction: {prediction}")
 
 
 if __name__ == '__main__':
