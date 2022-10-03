@@ -110,13 +110,15 @@ def main():
                         widgets.cancel_timer()
                     else:
                         widgets.set_timer(text)
+
                 # mostly just have these here for testing, to test VA speech and interuption
                 if "time" in text:
                     response = widgets.get_time()
                 elif "coin" in text:
                     response = widgets.coin_flip()
                 elif "dice" in text:
-                    response = widgets.dice_roll(text)
+                    # decipher how many sided die they want
+                    response = widgets.dice_roll(6)
                 elif "alarm" in text:
                     if "stop" in text:
                         print("stopping alarm")

@@ -19,7 +19,10 @@ import werkzeug
 from timer import Timer
 import urllib
 import pandas as pd  # pip install pandas
-import multiprocessing 
+import multiprocessing
+
+# will need to be added to setup
+from PyDictionary import PyDictionary  # pip install PyDictionary
 
 
 # Global variables
@@ -109,7 +112,7 @@ def coin_flip():
     return random.choice(ops)
 
 
-def dice_roll(text):
+def dice_roll(sides):
     """Returns the result of rolling a die"""
     sides = 6
     # find way to get the number of sides of desired die
@@ -312,17 +315,21 @@ def check_alarm(alarm):
                 ):
                     print(alarm[1])
                     global soundAlarm
-                    soundAlarm = multiprocessing.Process(target=playsound, args=(alarmSound,))
+                    soundAlarm = multiprocessing.Process(
+                        target=playsound, args=(alarmSound,)
+                    )
                     soundAlarm.start()
                     print("Press enter to stop the sound")
                     break
             break
+
 
 def cancel_alarm():
     if al != None:
         al.terminate()
     else:
         print("There are no set alarms")
+
 
 def stop_alarm():
     if soundAlarm != None:
@@ -388,9 +395,15 @@ def google_search(query):
     return parse_results(response)
 
 
+def definition_lookup():
+    dictionary = PyDictionary()
+    print(dictionary.meaning("protein"))
+
+
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    pdb.set_trace()
+    # pdb.set_trace()
+    definition_lookup()
 
 
 if __name__ == "__main__":
