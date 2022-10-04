@@ -18,11 +18,8 @@ from googlesearch import search
 import werkzeug
 from timer import Timer
 import urllib
-import pandas as pd  # pip install pandas
+import pandas as pd
 import multiprocessing
-
-# will need to be added to setup
-from PyDictionary import PyDictionary  # pip install PyDictionary
 
 
 # Global variables
@@ -112,10 +109,16 @@ def coin_flip():
     return random.choice(ops)
 
 
-def dice_roll(sides):
+def dice_roll(text):
     """Returns the result of rolling a die"""
-    sides = 6
-    # find way to get the number of sides of desired die
+    sides = ""
+    for i in range(len(text)):
+        if text[i].isdigit():
+            sides += text[i]
+
+    sides = int(sides)
+
+    # return random number
     return random.randint(1, sides)
 
 
@@ -395,15 +398,28 @@ def google_search(query):
     return parse_results(response)
 
 
-def definition_lookup():
-    dictionary = PyDictionary()
-    print(dictionary.meaning("protein"))
+def definition_lookup(word):
+    """uses the dictionaryapi to get the dictionary definition of a word"""
+    # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = rq.request("GET", url)
+    text = json.loads(response.text)
+
+    # get the important data
+    data = text[0]["meanings"][0]
+    type_of_speach = data["partOfSpeech"]
+
+    # save the top definition
+    definition = data["definitions"][0]["definition"]
+
+    output = f"{word}: {type_of_speach}, {definition}"
+
+    return output
 
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    # pdb.set_trace()
-    definition_lookup()
+    pdb.set_trace()
 
 
 if __name__ == "__main__":
