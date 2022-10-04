@@ -1,5 +1,5 @@
 # classifier.py
-# (Insert description line here)
+# Performs query processing and prediction.
 
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import stopwords, wordnet
@@ -9,12 +9,18 @@ import openpyxl as pyxl
 import numpy as np
 import pandas as pd
 import pickle as pkl
-import math, os, re, joblib, pdb
+import math, argparse, os, re, joblib, pdb
+
+# Argument Parsing
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--train', help='retrains/saves the SVM using intents.xlsx', action='store_true')
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
+# Yes, global variables are gross. They're also convenient.
 global clf
 global feature_names
+
 
 def predict(sentence):
 	'''Processes and predicts the string "sentence"'''
@@ -113,9 +119,13 @@ def preprocess():
 	# frame = pd.DataFrame(vectors.toarray(), columns=vectorizer.get_feature_names())
 	# frame.to_excel(os.path.join(ROOT, "bow_visualized.xlsx"))
 
+	print("Training SVM...\r", end='')
+
 	# Create SVM
 	clf = SVC(kernel='linear')
 	clf.fit(vectors, labels)
+
+	print("SVM successfully trained.")
 
 	# Save SVM
 	save_svm(clf)
@@ -177,7 +187,12 @@ def save_corpus(feature_names):
 		pkl.dump(feature_names, f)
 
 
-def main():
+def main(args):
+	# Retrain the SVM
+	if args.train:
+		preprocess()
+		return
+
 	# This is just for testing purposes (and also to retrain the model if need be)
 	load_svm_corpus()
 
@@ -187,16 +202,12 @@ def main():
 		if query == 'q':
 			break
 
-		elif query == 'train':
-			preprocess()
-			break
-
 		prediction = predict(query)
 
 		print(f"\tPrediction: {prediction}")
 
 
 if __name__ == '__main__':
-	main()
+	main(parser.parse_args())
 
 
