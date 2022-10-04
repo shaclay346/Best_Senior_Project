@@ -1,0 +1,15 @@
+speechrecognition
+pyaudio
+pyttsx3
+bs4
+google
+keyboard
+pandas
+requests
+playsound==1.2.2
+nltk
+sklearn
+openpyxl
+numpy
+robobrowser
+werkzeug

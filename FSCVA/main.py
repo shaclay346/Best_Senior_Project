@@ -3,7 +3,9 @@
 # Do the following to properly run this script:
 # brew install portaudio
 # pip install 'speechrecognition', 'pyaudio', and 'pyttsx3' before running
+from threading import Thread
 import speech_recognition as sr
+import classifier as clf
 import widgets
 import pyttsx3
 import threading
@@ -13,7 +15,7 @@ import keyboard
 import datetime
 import multiprocessing
 import time
-from threading import Thread
+
 
 # threaded function to allow quick stopping of VA
 def threaded(fn):
@@ -80,6 +82,12 @@ def get_keyboard_input():
 
 
 def main():
+    # Load the SVM in classifier.py
+    clf.load_svm_corpus()
+
+    # Give it a Dummy Query (the first one is slow for some reason)
+    clf.predict("The cake is a lie.")
+
     print("Press Space Bar to start the virtual assistant")
     get_keyboard_input()
 
@@ -103,35 +111,41 @@ def main():
                 text = text.lower()
                 text = str(text)
 
+                #### This will be the chain of widget stuff. we might want to offload this to another file?
+                intent = clf.predict(text)
+
+
+
                 response = ""
-                if "timer" in text:
-                    if "cancel" in text:
-                        print("cancelling timer ")
-                        widgets.cancel_timer()
-                    else:
-                        widgets.set_timer(text)
-                # mostly just have these here for testing, to test VA speech and interuption
-                if "time" in text:
-                    response = widgets.get_time()
-                elif "coin" in text:
-                    response = widgets.coin_flip()
-                elif "dice" in text:
-                    response = widgets.dice_roll()
-                elif "alarm" in text:
-                    if "stop" in text:
-                        print("stopping alarm")
-                        widgets.stop_alarm()
-                    elif "cancel" in text:
-                        print("cancelling alarm")
-                        widgets.cancel_alarm()
-                        response = "Alarm cancelled"
-                    else:
-                        widgets.set_alarm(datetime.datetime.now(), "alarm") # Testing values, change later
-                        response = "Alarm set"
+                # if "timer" in text:
+                #     if "cancel" in text:
+                #         print("cancelling timer ")
+                #         widgets.cancel_timer()
+                #     else:
+                #         widgets.set_timer(text)
+                # # mostly just have these here for testing, to test VA speech and interuption
+                # if "time" in text:
+                #     response = widgets.get_time()
+                # elif "coin" in text:
+                #     response = widgets.coin_flip()
+                # elif "dice" in text:
+                #     response = widgets.dice_roll()
+                # elif "alarm" in text:
+                #     if "stop" in text:
+                #         print("stopping alarm")
+                #         widgets.stop_alarm()
+                #     elif "cancel" in text:
+                #         print("cancelling alarm")
+                #         widgets.cancel_alarm()
+                #         response = "Alarm cancelled"
+                #     else:
+                #         widgets.set_alarm(datetime.datetime.now(), "alarm") # Testing values, change later
+                #         response = "Alarm set"
 
                 print(f"Recognized: {text}")
-                print("response is: ", response)
-                print("Press space to say another command\n")
+                print(f"Intent: {intent}")
+                print(f"Response: {response}")
+                print("Press [Space] to say another command\n")
                 if response != "":
                     say(response)
 
