@@ -18,8 +18,8 @@ from googlesearch import search
 import werkzeug
 from timer import Timer
 import urllib
-import pandas as pd  # pip install pandas
-import multiprocessing 
+import pandas as pd
+import multiprocessing
 
 
 # Global variables
@@ -109,9 +109,17 @@ def coin_flip():
     return random.choice(ops)
 
 
-def dice_roll():
+def dice_roll(text):
     """Returns the result of rolling a die"""
-    return random.randint(1, 6)
+    sides = ""
+    for i in range(len(text)):
+        if text[i].isdigit():
+            sides += text[i]
+
+    sides = int(sides)
+
+    # return random number
+    return random.randint(1, sides)
 
 
 def get_time():
@@ -310,17 +318,21 @@ def check_alarm(alarm):
                 ):
                     print(alarm[1])
                     global soundAlarm
-                    soundAlarm = multiprocessing.Process(target=playsound, args=(alarmSound,))
+                    soundAlarm = multiprocessing.Process(
+                        target=playsound, args=(alarmSound,)
+                    )
                     soundAlarm.start()
                     print("Press enter to stop the sound")
                     break
             break
+
 
 def cancel_alarm():
     if al != None:
         al.terminate()
     else:
         print("There are no set alarms")
+
 
 def stop_alarm():
     if soundAlarm != None:
@@ -384,6 +396,25 @@ def google_search(query):
 
     # parse the data we want from the page
     return parse_results(response)
+
+
+def definition_lookup(word):
+    """uses the dictionaryapi to get the dictionary definition of a word"""
+    # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = rq.request("GET", url)
+    text = json.loads(response.text)
+
+    # get the important data
+    data = text[0]["meanings"][0]
+    type_of_speach = data["partOfSpeech"]
+
+    # save the top definition
+    definition = data["definitions"][0]["definition"]
+
+    output = f"{word}: {type_of_speach}, {definition}"
+
+    return output
 
 
 def main():
