@@ -27,47 +27,34 @@ Libraries Used
 Installation (Windows)
 
 <ul>
-<li>Download all necessary files and folders, which currently include:</li>
+<li>Download the Project</li>
     <ul>
-    <li>timer.py</li>
-    <li>alarms (folder)</li>
-    <li>main.py</li>
-    <li>widgets.py</li>
-    <li>README.md (this file) (optional)</li>
+    <li>1) Open a terminal in the same folder as the setpy.py file</li>
+    <li>2) Run "pip install ." Note: Do not forget the "." / Full stop</li>
+        <ul>
+        <li>a) This will install all of the necessary installs from pip and create a build of the project</li>
+        </ul>
     </ul>
-    <li>Download Python (Link: https://www.python.org/downloads/)</li>
-<li>Check if pip is installed by going into the terminal/command prompt and typing "py -m pip --version"</li><ul><li>
-        If pip is not installed, install pip (Steps Link: https://www.makeuseof.com/tag/install-pip-for-python/)</li></ul>
-<li>Go into command prompt and move into your python version's script folder (Example path: C:\Users\bob\AppData\Local\Programs\Python\Python310\Scripts)</li>
-    <li>Enter these commands to install the necessary libraries</li><ul>
-    <li>pip install speechrecognition</li>
-    <li>pip install pyaudio</li>
-    <li>pip install pyttsx3</li>
-    <li>pip3 install beautifulsoup4</li>
-    <li>pip install google</li>
-    <li>pip install keyboard</li>
-    <li>pip install pandas</li>
-    <li>pip3 install requests</li>
-    <li>pip3 install playsound==1.2.2</li>
+<li>Running the project Build</li>
+    <ul>
+    <li>1) Open the new build -> lib -> FSCVA folder</li>
+    <li>2) From there you can open a terminal and run “python” -> “import main” -> “main.main()” to run the program</li>
     </ul>
-    <li>Run the program!</li>
 </ul>
 
 Installation (Mac)
 
-<ul>
-    <li>Enter these commands to install the necessary libraries</li><ul>
-    <li>pip install speechrecognition</li>
-    <li>pip install pyaudio</li>
-    <li>pip install pyttsx3</li>
-    <li>pip3 install beautifulsoup4</li>
-    <li>pip install google</li>
-    <li>pip install keyboard</li>
-    <li>pip install pandas</li>
-    <li>pip install requests_html</li>
-    <li>pip3 install requests</li>
-    <li>pip3 install playsound==1.2.2</li>
-    <li><strong>Note:</strong> You may need to install portaudio via homebrew (brew install portaudio)</li>
+<li>Download the Project</li>
+    <ul>
+    <li>1) Open a terminal in the same folder as the setpy.py file</li>
+    <li>2) Run "python -m pip install ." Note: Do not forget the "." / Full stop</li>
+        <ul>
+        <li>a) This will install all of the necessary installs from pip and create a build of the project</li>
+        </ul>
     </ul>
-    <li>Run the program!</li>
+<li>Running the project Build</li>
+    <ul>
+    <li>1) Open the new build -> lib -> FSCVA folder</li>
+    <li>2) From there you can open a terminal and run “python” -> “import main” -> “main.main()” to run the program</li>
+    </ul>
 </ul>
