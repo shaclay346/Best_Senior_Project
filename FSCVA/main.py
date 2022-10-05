@@ -33,8 +33,11 @@ def speak(text):
     converter.setProperty("volume", 0.7)
     # changed the speed of the VA, default was 200 wpm, too fast imo
     converter.setProperty("rate", 175)
-    converter.say(text)
-    converter.runAndWait()
+
+    for item in text:
+        converter.say(item)
+        converter.runAndWait()
+
     converter.stop()
 
 
@@ -167,7 +170,7 @@ def main():
 
                 print("Press [Space] to say another command\n")
 
-                # say(response)
+                say(response)
 
                 get_keyboard_input()
 
