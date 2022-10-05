@@ -24,5 +24,6 @@ setup(
         "robobrowser",
         "werkzeug",
         "multiprocessing",
+        "pyaudio",
     ],
 )

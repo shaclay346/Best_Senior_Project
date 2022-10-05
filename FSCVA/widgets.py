@@ -20,10 +20,15 @@ from timer import Timer
 import urllib
 import pandas as pd
 import multiprocessing
+#New imports
+import wave
+import pyaudio
 
 
 # Global variables
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
+soundFile = wave.open(alarmSound, "rb")
+audio = pyaudio.PyAudio()
 timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 
@@ -280,65 +285,71 @@ def calculator(text):
     return result
 
 
-def set_alarm(altime, message):
+def set_alarm(altime, message, flag):
     """Set an alarm that, when the given time passes, activates an alarm sound"""
+
+    #Testing data
+    altime = datetime.datetime.now()
+    if altime.minute == 59:
+        altime = altime.replace(hour = altime.hour + 1, minute = 00)
+    else:
+        altime = altime.replace(minute = altime.minute + 1)
+    message = "Hello There, I'm working"
 
     # Add the alarm with the time (dateTime object) and message (string)
     alarm = [altime, message]
 
-    # Wait for the alarm to go off (Testing Only)
-    # Add "daemon = True" to make the thread end when the main program ends
-    global al
-    al = multiprocessing.Process(target=check_alarm, args=(alarm,))
-    al.start()
+    #Set alarm and play the alarm sound when the time comes
+    print("Setting Alarm, press tab to cancel it")
+    result = check_alarm(alarm, flag)
+    if result == -1:
+        print("Alarm Cancelled")
+        return
+    print("Playing Alarm, press shift to stop the alarm")
+    play_alarm(flag)
 
 
-def check_alarm(alarm):
+def check_alarm(alarm, flag):
     """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
+
     # Check if the current time matches the first alarm in the alarms array
     while True:
-        time.sleep(1)
-        print(
-            "waiting for {0}, now {1}".format(
-                alarm[0].date(), datetime.datetime.now().date()
-            )
-        )
+        if flag:
+            print("Canceling Alarm")
+            return -1
         if datetime.datetime.now().date() == alarm[0].date():  # Check the date
             while True:
-                time.sleep(1)
-                print(
-                    "waiting for {0}, now {1}".format(
-                        alarm[0].minute, datetime.datetime.now().minute
-                    )
-                )
+                if flag:
+                    print("Canceling Alarm")
+                    return -1
                 # Check the time
                 if (
                     datetime.datetime.now().hour == alarm[0].hour
                     and datetime.datetime.now().minute == alarm[0].minute
                 ):
                     print(alarm[1])
-                    global soundAlarm
-                    soundAlarm = multiprocessing.Process(
-                        target=playsound, args=(alarmSound,)
-                    )
-                    soundAlarm.start()
-                    print("Press enter to stop the sound")
-                    break
-            break
+                    return 1
 
+def play_alarm(flag):
+    '''Play an alarm sound, unless flagged to stop or the sound ends'''
 
-def cancel_alarm():
-    if al != None:
-        al.terminate()
-    else:
-        print("There are no set alarms")
+    #Grab global variables and play the alarm sound
+    global soundFile
+    global audio
+    stream = audio.open(format = audio.get_format_from_width(soundFile.getsampwidth()), channels = soundFile.getnchannels(), rate = soundFile.getframerate(), output = True, stream_callback = alarm_callback)
+    stream.start_stream()
+    while stream.is_active():
+        if flag:
+            print("Stopping Alarm")
+            stream.stop_stream()
+            stream.close()
+            print("Alarm Stopped")
+            return
 
-
-def stop_alarm():
-    if soundAlarm != None:
-        soundAlarm.terminate()
-    else:
-        print("There are no alarms currently ringing")
+def alarm_callback(in_data, frame_count, time_info, status):
+    '''Callback function for playing alarm sound'''
+    data = soundFile.readframes(frame_count)
+    return (data, pyaudio.paContinue)
 
 
 def parse_results(response):
