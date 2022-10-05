@@ -135,7 +135,9 @@ def main():
                 intent = clf.predict(text)
 
                 # Call Corresponding Widget from Predicted Intent
-                response = intents[intent]()
+                response = intents[intent](text)
+
+                # Format Widget Response
 
 
                 # if "timer" in text:
@@ -171,7 +173,7 @@ def main():
 
                 print("Press [Space] to say another command\n")
                 
-                say(response)
+                # say(response)
 
                 get_keyboard_input()
 

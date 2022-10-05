@@ -33,7 +33,7 @@ timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 
 
-def get_menu():
+def get_menu(text):
     """Returns today's menu at the Caf as a list of strings (to allow for more specific selections in the main app"""
     # Note: Sometimes this straight up won't work because the caf menu is extremely inconsistent with their formatting
     link = "https://www.flsouthern.edu/campus-offices/dining-services/daily-menu.aspx"
@@ -60,21 +60,43 @@ def get_menu():
     tomorrow = [tomorrow, tomorrow[:-4] + tomorrow[-2:]]
 
     # Extract Today's Menu
-    out = []
+    dishes = []
     seen = False
     for line in menu:
         if seen:
             if any(b in line for b in tomorrow):
                 break
 
-            out.append(line)
+            dishes.append(line)
 
         else:
             if any(a in line for a in today):
                 seen = True
-                out.append(line)
+                dishes.append(line)
 
-    return out
+
+
+    ### temp logic, refactor to formatting.py after presentation
+    rnames = set(["Wright at Home","Portabello's","LUNCH & DINNER","World Tour", "DINNER"])
+
+    
+    if 'breakfast' in text:
+        meal = 'breakfast'
+        dishes = dishes[dishes.index('BREAKFAST')+1:dishes.index('LUNCH')]
+        dishes = list(set(dishes)-rnames)
+    elif 'lunch' in text:
+        meal = 'lunch'
+        dishes = dishes[dishes.index('LUNCH')+1:dishes.index('DINNER')]
+        dishes = list(set(dishes)-rnames)
+    elif 'dinner' in text:
+        meal = 'dinner'
+        dishes = dishes[dishes.index('LUNCH & DINNER')+1:]
+        dishes = list(set(dishes)-rnames)
+
+
+    response = f"For {meal}, the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
+
+    return response
 
 
 def get_balance(text):
@@ -82,7 +104,7 @@ def get_balance(text):
     pass
 
 
-def get_weather():
+def get_weather(text):
     """Returns the weather at the specified location."""
     openWeatherKey = "b139d88edbb994bbe4c2026a8de2ed12"
 
@@ -113,10 +135,10 @@ def get_weather():
     return output
 
 
-def flip_coin():
+def flip_coin(text):
     """Randomly returns either 'heads' or 'tails"""
-    ops = ["heads", "tails"]
-    return random.choice(ops)
+    sides = ["heads", "tails"]
+    return f"It's {random.choice(sides)}." ### temp ugly formatting for presentation
 
 
 def roll_dice(text):
@@ -132,16 +154,16 @@ def roll_dice(text):
     return random.randint(1, sides)
 
 
-def get_time():
+def get_time(text):
     """Returns current time."""
     # datetime object containing current date and time
     now = datetime.datetime.now()
     output = now.strftime("%H:%M")
 
-    return output
+    return f"It's currently {output}." ### temp ugly formatting for presentation
 
 
-def get_date():
+def get_date(text):
     """Returns current date in 'day month, year' format."""
     date_time = datetime.datetime.now()
 
@@ -149,7 +171,7 @@ def get_date():
     return output
 
 
-def get_schedule(username="USERNAME", password="PASSWORD"):
+def get_schedule(text, username="USERNAME", password="PASSWORD"):
     """Returns user's class schedule."""
 
     # Check to stop function if credentials are still default values
@@ -445,7 +467,10 @@ def define_word(word):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
+    # pdb.set_trace()
+    stuff = get_menu(["dinner", "caf"])
     pdb.set_trace()
+
 
 
 if __name__ == "__main__":
