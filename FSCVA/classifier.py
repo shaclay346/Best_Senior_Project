@@ -61,7 +61,7 @@ def predict(sentence):
 	prediction = clf.predict(vectors.reshape(1,-1))
 
 	# Return Prediction
-	return prediction
+	return str(prediction[0])
 
 
 def preprocess():

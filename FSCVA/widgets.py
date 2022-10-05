@@ -77,6 +77,11 @@ def get_menu():
     return out
 
 
+def get_balance(text):
+    '''Returns the student's Snake Bite Balance.'''
+    pass
+
+
 def get_weather():
     """Returns the weather at the specified location."""
     openWeatherKey = "b139d88edbb994bbe4c2026a8de2ed12"
@@ -108,13 +113,13 @@ def get_weather():
     return output
 
 
-def coin_flip():
+def flip_coin():
     """Randomly returns either 'heads' or 'tails"""
     ops = ["heads", "tails"]
     return random.choice(ops)
 
 
-def dice_roll(text):
+def roll_dice(text):
     """Returns the result of rolling a die"""
     sides = ""
     for i in range(len(text)):
@@ -187,6 +192,11 @@ def get_schedule(username="USERNAME", password="PASSWORD"):
             courses.append(course)
 
     return courses
+
+
+def manage_timer(text):
+    '''Wrapper method for setting/canceling timers.'''
+    pass
 
 
 def set_timer(text):
@@ -270,7 +280,7 @@ def get_operands(text):
     return [int(left_operand), int(right_operand)]
 
 
-def calculator(text):
+def calculate(text):
     operands = get_operands(text)
     result = 0
     if "plus" in text:
@@ -283,6 +293,11 @@ def calculator(text):
         result = operands[0] // operands[1]
 
     return result
+
+
+def manage_alarm(text):
+    '''Wrapper method for adding/removing alarms.'''
+    pass
 
 
 def set_alarm(altime, message, flag):
@@ -409,7 +424,7 @@ def google_search(query):
     return parse_results(response)
 
 
-def definition_lookup(word):
+def define_word(word):
     """uses the dictionaryapi to get the dictionary definition of a word"""
     # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
     url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
