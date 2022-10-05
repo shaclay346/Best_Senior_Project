@@ -74,7 +74,7 @@ def get_keyboard_input():
     while True:
         if keyboard.is_pressed("space"):
             stop_speaker()
-            print("Virtual Assistant started")
+            print("Virtual Assistant listening")
             break
         elif keyboard.is_pressed("Esc"):
             print("exiting program")
@@ -83,7 +83,7 @@ def get_keyboard_input():
 
 def main():
     # Load the SVM in classifier.py
-    print("Loading...\r", end='')
+    print("Loading...\r", end="")
     clf.load_svm_corpus()
 
     # Give it a Dummy Query (the first one is slow for some reason)
@@ -91,18 +91,18 @@ def main():
 
     # Dictionary of Intent Functions for Easy Calling
     intents = {
-        "get_weather" : widgets.get_weather,
-        "get_time" : widgets.get_time,
-        "get_date" : widgets.get_date,
-        "get_menu" : widgets.get_menu,
-        "get_balance" : widgets.get_balance,
-        "flip_coin" : widgets.flip_coin,
-        "roll_dice" : widgets.roll_dice,
-        "manage_alarm" : widgets.manage_alarm,
-        "manage_timer" : widgets.manage_timer,
-        "define_word" : widgets.define_word,
-        "get_schedule" : widgets.get_schedule,
-        "calculate" : widgets.calculate
+        "get_weather": widgets.get_weather,
+        "get_time": widgets.get_time,
+        "get_date": widgets.get_date,
+        "get_menu": widgets.get_menu,
+        "get_balance": widgets.get_balance,
+        "flip_coin": widgets.flip_coin,
+        "roll_dice": widgets.roll_dice,
+        "manage_alarm": widgets.manage_alarm,
+        "manage_timer": widgets.manage_timer,
+        "define_word": widgets.define_word,
+        "get_schedule": widgets.get_schedule,
+        "calculate": widgets.calculate,
     }
 
     print("Press Space Bar to start the virtual assistant")
@@ -133,7 +133,6 @@ def main():
 
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent]()
-
 
                 # if "timer" in text:
                 #     if "cancel" in text:
@@ -167,7 +166,7 @@ def main():
                 # response = f'I detected a {intent} query.' # testing
 
                 print("Press [Space] to say another command\n")
-                
+
                 # say(response)
 
                 get_keyboard_input()

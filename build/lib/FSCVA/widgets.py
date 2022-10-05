@@ -18,12 +18,18 @@ from googlesearch import search
 import werkzeug
 from timer import Timer
 import urllib
-import pandas as pd  # pip install pandas
-import multiprocessing 
+import pandas as pd
+import multiprocessing
+
+# New imports
+import wave
+import pyaudio
 
 
 # Global variables
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
+soundFile = wave.open(alarmSound, "rb")
+audio = pyaudio.PyAudio()
 timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 
@@ -72,6 +78,11 @@ def get_menu():
     return out
 
 
+def get_balance(text):
+    """Returns the student's Snake Bite Balance."""
+    pass
+
+
 def get_weather():
     """Returns the weather at the specified location."""
     openWeatherKey = "b139d88edbb994bbe4c2026a8de2ed12"
@@ -103,15 +114,23 @@ def get_weather():
     return output
 
 
-def coin_flip():
+def flip_coin():
     """Randomly returns either 'heads' or 'tails"""
     ops = ["heads", "tails"]
     return random.choice(ops)
 
 
-def dice_roll():
+def roll_dice(text):
     """Returns the result of rolling a die"""
-    return random.randint(1, 6)
+    sides = ""
+    for i in range(len(text)):
+        if text[i].isdigit():
+            sides += text[i]
+
+    sides = int(sides)
+
+    # return random number
+    return random.randint(1, sides)
 
 
 def get_time():
@@ -174,6 +193,14 @@ def get_schedule(username="USERNAME", password="PASSWORD"):
             courses.append(course)
 
     return courses
+
+
+def manage_timer(text):
+    """Wrapper method for setting/canceling timers."""
+    if "cancel" in text:
+        cancel_timer()
+    else:
+        set_timer(text)
 
 
 def set_timer(text):
@@ -257,7 +284,7 @@ def get_operands(text):
     return [int(left_operand), int(right_operand)]
 
 
-def calculator(text):
+def calculate(text):
     operands = get_operands(text)
     result = 0
     if "plus" in text:
@@ -272,61 +299,84 @@ def calculator(text):
     return result
 
 
-def set_alarm(altime, message):
+def manage_alarm(text):
+    """Wrapper method for adding/removing alarms."""
+    pass
+
+
+def set_alarm(altime, message, flag):
     """Set an alarm that, when the given time passes, activates an alarm sound"""
+
+    # Testing data
+    altime = datetime.datetime.now()
+    if altime.minute == 59:
+        altime = altime.replace(hour=altime.hour + 1, minute=00)
+    else:
+        altime = altime.replace(minute=altime.minute + 1)
+    message = "Hello There, I'm working"
 
     # Add the alarm with the time (dateTime object) and message (string)
     alarm = [altime, message]
 
-    # Wait for the alarm to go off (Testing Only)
-    # Add "daemon = True" to make the thread end when the main program ends
-    global al
-    al = multiprocessing.Process(target=check_alarm, args=(alarm,))
-    al.start()
+    # Set alarm and play the alarm sound when the time comes
+    print("Setting Alarm, press tab to cancel it")
+    result = check_alarm(alarm, flag)
+    if result == -1:
+        print("Alarm Cancelled")
+        return
+    print("Playing Alarm, press shift to stop the alarm")
+    play_alarm(flag)
 
 
-def check_alarm(alarm):
+def check_alarm(alarm, flag):
     """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
+
     # Check if the current time matches the first alarm in the alarms array
     while True:
-        time.sleep(1)
-        print(
-            "waiting for {0}, now {1}".format(
-                alarm[0].date(), datetime.datetime.now().date()
-            )
-        )
+        if flag:
+            print("Canceling Alarm")
+            return -1
         if datetime.datetime.now().date() == alarm[0].date():  # Check the date
             while True:
-                time.sleep(1)
-                print(
-                    "waiting for {0}, now {1}".format(
-                        alarm[0].minute, datetime.datetime.now().minute
-                    )
-                )
+                if flag:
+                    print("Canceling Alarm")
+                    return -1
                 # Check the time
                 if (
                     datetime.datetime.now().hour == alarm[0].hour
                     and datetime.datetime.now().minute == alarm[0].minute
                 ):
                     print(alarm[1])
-                    global soundAlarm
-                    soundAlarm = multiprocessing.Process(target=playsound, args=(alarmSound,))
-                    soundAlarm.start()
-                    print("Press enter to stop the sound")
-                    break
-            break
+                    return 1
 
-def cancel_alarm():
-    if al != None:
-        al.terminate()
-    else:
-        print("There are no set alarms")
 
-def stop_alarm():
-    if soundAlarm != None:
-        soundAlarm.terminate()
-    else:
-        print("There are no alarms currently ringing")
+def play_alarm(flag):
+    """Play an alarm sound, unless flagged to stop or the sound ends"""
+
+    # Grab global variables and play the alarm sound
+    global soundFile
+    global audio
+    stream = audio.open(
+        format=audio.get_format_from_width(soundFile.getsampwidth()),
+        channels=soundFile.getnchannels(),
+        rate=soundFile.getframerate(),
+        output=True,
+        stream_callback=alarm_callback,
+    )
+    stream.start_stream()
+    while stream.is_active():
+        if flag:
+            print("Stopping Alarm")
+            stream.stop_stream()
+            stream.close()
+            print("Alarm Stopped")
+            return
+
+
+def alarm_callback(in_data, frame_count, time_info, status):
+    """Callback function for playing alarm sound"""
+    data = soundFile.readframes(frame_count)
+    return (data, pyaudio.paContinue)
 
 
 def parse_results(response):
@@ -384,6 +434,25 @@ def google_search(query):
 
     # parse the data we want from the page
     return parse_results(response)
+
+
+def define_word(word):
+    """uses the dictionaryapi to get the dictionary definition of a word"""
+    # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = rq.request("GET", url)
+    text = json.loads(response.text)
+
+    # get the important data
+    data = text[0]["meanings"][0]
+    type_of_speach = data["partOfSpeech"]
+
+    # save the top definition
+    definition = data["definitions"][0]["definition"]
+
+    output = f"{word}: {type_of_speach}, {definition}"
+
+    return output
 
 
 def main():

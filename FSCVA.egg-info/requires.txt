@@ -13,3 +13,4 @@ openpyxl
 numpy
 robobrowser
 werkzeug
+pyaudio

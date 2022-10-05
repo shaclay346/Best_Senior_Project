@@ -3,7 +3,9 @@
 # Do the following to properly run this script:
 # brew install portaudio
 # pip install 'speechrecognition', 'pyaudio', and 'pyttsx3' before running
+from threading import Thread
 import speech_recognition as sr
+import classifier as clf
 import widgets
 import pyttsx3
 import threading
@@ -13,7 +15,7 @@ import keyboard
 import datetime
 import multiprocessing
 import time
-from threading import Thread
+
 
 # threaded function to allow quick stopping of VA
 def threaded(fn):
@@ -72,7 +74,7 @@ def get_keyboard_input():
     while True:
         if keyboard.is_pressed("space"):
             stop_speaker()
-            print("Virtual Assistant started")
+            print("Virtual Assistant listening")
             break
         elif keyboard.is_pressed("Esc"):
             print("exiting program")
@@ -80,6 +82,29 @@ def get_keyboard_input():
 
 
 def main():
+    # Load the SVM in classifier.py
+    print("Loading...\r", end="")
+    clf.load_svm_corpus()
+
+    # Give it a Dummy Query (the first one is slow for some reason)
+    clf.predict("The cake is a lie.")
+
+    # Dictionary of Intent Functions for Easy Calling
+    intents = {
+        "get_weather": widgets.get_weather,
+        "get_time": widgets.get_time,
+        "get_date": widgets.get_date,
+        "get_menu": widgets.get_menu,
+        "get_balance": widgets.get_balance,
+        "flip_coin": widgets.flip_coin,
+        "roll_dice": widgets.roll_dice,
+        "manage_alarm": widgets.manage_alarm,
+        "manage_timer": widgets.manage_timer,
+        "define_word": widgets.define_word,
+        "get_schedule": widgets.get_schedule,
+        "calculate": widgets.calculate,
+    }
+
     print("Press Space Bar to start the virtual assistant")
     get_keyboard_input()
 
@@ -103,40 +128,48 @@ def main():
                 text = text.lower()
                 text = str(text)
 
-                response = ""
-                if "timer" in text:
-                    if "cancel" in text:
-                        print("cancelling timer ")
-                        widgets.cancel_timer()
-                    else:
-                        widgets.set_timer(text)
-                # mostly just have these here for testing, to test VA speech and interuption
-                if "time" in text:
-                    response = widgets.get_time()
-                elif "coin" in text:
-                    response = widgets.coin_flip()
-                elif "dice" in text:
-                    response = widgets.dice_roll()
-                elif "alarm" in text:
-                    if "stop" in text:
-                        print("stopping alarm")
-                        widgets.stop_alarm()
-                    elif "cancel" in text:
-                        print("cancelling alarm")
-                        widgets.cancel_alarm()
-                        response = "Alarm cancelled"
-                    else:
-                        widgets.set_alarm(datetime.datetime.now(), "alarm") # Testing values, change later
-                        response = "Alarm set"
+                # Predict Intent
+                intent = clf.predict(text)
+
+                # Call Corresponding Widget from Predicted Intent
+                response = intents[intent]()
+
+                # if "timer" in text:
+                #     if "cancel" in text:
+                #         print("cancelling timer ")
+                #         widgets.cancel_timer()
+                #     else:
+                #         widgets.set_timer(text)
+                # # mostly just have these here for testing, to test VA speech and interuption
+                # if "time" in text:
+                #     response = widgets.get_time()
+                # elif "coin" in text:
+                #     response = widgets.coin_flip()
+                # elif "dice" in text:
+                #     response = widgets.dice_roll()
+                # elif "alarm" in text:
+                #     if "stop" in text:
+                #         print("stopping alarm")
+                #         widgets.stop_alarm()
+                #     elif "cancel" in text:
+                #         print("cancelling alarm")
+                #         widgets.cancel_alarm()
+                #         response = "Alarm cancelled"
+                #     else:
+                #         widgets.set_alarm(datetime.datetime.now(), "alarm") # Testing values, change later
+                #         response = "Alarm set"
 
                 print(f"Recognized: {text}")
-                print("response is: ", response)
-                print("Press space to say another command\n")
-                if response != "":
-                    say(response)
+                print(f"Intent: {intent}")
+                print(f"Response: {response}")
+
+                # response = f'I detected a {intent} query.' # testing
+
+                print("Press [Space] to say another command\n")
+
+                # say(response)
 
                 get_keyboard_input()
-                response = ""
 
         except sr.UnknownValueError:
             # print("Error")
