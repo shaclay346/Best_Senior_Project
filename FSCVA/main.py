@@ -31,10 +31,19 @@ def threaded(fn):
 def speak(text):
     converter = pyttsx3.init()
     converter.setProperty("volume", 0.7)
-    # changed the speed of the VA, default was 200 wpm, too fast imo
-    converter.setProperty("rate", 175)
-    converter.say(text)
-    converter.runAndWait()
+    converter.setProperty("rate", 175) # changed the speed of the VA, default was 200 wpm, too fast imo
+    
+    # String to Speak
+    if isinstance(text, str):
+        converter.say(text)
+        converter.runAndWait()
+
+    # List to Speak
+    else:
+        for item in text:
+            converter.say(text)
+            converter.runAndWait()
+    
     converter.stop()
 
 
