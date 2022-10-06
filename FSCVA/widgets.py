@@ -27,8 +27,8 @@ import pyaudio
 
 
 # Global variables
-# alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
-# soundFile = wave.open(alarmSound, "rb")
+alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
+soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
 timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
@@ -105,8 +105,11 @@ def get_weather():
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    # might want to change response but will do for now
-    output = f"the weather is {type_} and the temperature is {temperature}, but feels like {feels_like}."
+    output = f"the weather is {type_} and the temperature is {temperature}"
+
+    # only add feels like temperature if it is different than actual temp
+    if feels_like != temperature:
+        output = f"the weather is {type_} and the temperature is {temperature}, but feels like {feels_like}."
 
     if type_ == "Rain":
         output += " I recommend you bring an umbrella with you today."
@@ -137,7 +140,11 @@ def get_time():
     """Returns current time."""
     # datetime object containing current date and time
     now = datetime.datetime.now()
-    output = now.strftime("%H:%M")
+    hours = int(now.strftime("%H"))
+    if hours > 12:
+        hours = hours % 12
+    minutes = now.strftime("%M")
+    output = str(hours) + ":" + minutes
 
     return output
 
