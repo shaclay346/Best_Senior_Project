@@ -137,8 +137,12 @@ def main():
                 text = text.lower()
                 text = str(text)
 
+                print(f"Recognized: {text}")
+
                 # Predict Intent
                 intent = clf.predict(text)
+
+                print(f"Intent: {intent}")
 
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
@@ -170,13 +174,13 @@ def main():
                 #         widgets.set_alarm(datetime.datetime.now(), "alarm") # Testing values, change later
                 #         response = "Alarm set"
 
-                print(f"Recognized: {text}")
-                print(f"Intent: {intent}")
+                
+                
                 print(f"Response: {response}")
 
-                print("Press [Space] to say another command\n")
+                print("\nPress [Space] to say another command\n")
 
-                say(response)
+                # say(response)
 
                 get_keyboard_input()
 

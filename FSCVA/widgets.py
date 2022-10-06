@@ -221,7 +221,18 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
         if course:
             courses.append(course)
 
-    return courses
+    ### temp ugly formatting for presentation
+    days = {0:'Mon',1:'Tue',2:'Wed',3:'Thu',4:'Fri',5:'Sat',6:'Sun'}
+    today = days.get(datetime.datetime.now().weekday())
+
+    schedule = []
+
+    # Check if Class is Today
+    for course in courses:
+        if today in course[-1]:
+            schedule.append(course[1])
+
+    return f"Looks like you don't have anything planned for today." if not schedule else f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today."
 
 
 def manage_timer(text):
@@ -488,7 +499,8 @@ def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
     # pdb.set_trace()
     # stuff = get_menu(["dinner", "caf"])
-    pdb.set_trace()
+    # pdb.set_trace()
+    get_schedule('')
 
 
 
