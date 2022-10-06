@@ -127,11 +127,11 @@ def get_weather(text):
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    output = f"the weather is {type_} and the temperature is {temperature}"
+    output = f"The weather is {type_.lower()} and the temperature is {temperature}ºF"
 
     # only add feels like temperature if it is different than actual temp
     if feels_like != temperature:
-        output = f"the weather is {type_} and the temperature is {temperature}, but feels like {feels_like}."
+        output = f"The weather is {type_.lower()} and the temperature is {temperature}ºF, but it feels like {feels_like}ºF."
 
     if type_ == "Rain":
         output += " I recommend you bring an umbrella with you today."
@@ -487,7 +487,7 @@ def define_word(word):
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
     # pdb.set_trace()
-    stuff = get_menu(["dinner", "caf"])
+    # stuff = get_menu(["dinner", "caf"])
     pdb.set_trace()
 
 

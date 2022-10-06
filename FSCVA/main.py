@@ -174,8 +174,6 @@ def main():
                 print(f"Intent: {intent}")
                 print(f"Response: {response}")
 
-                # response = f'I detected a {intent} query.' # testing
-
                 print("Press [Space] to say another command\n")
 
                 say(response)
