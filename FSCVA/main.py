@@ -132,7 +132,9 @@ def main():
                 intent = clf.predict(text)
 
                 # Call Corresponding Widget from Predicted Intent
-                response = intents[intent]()
+                response = intents[intent](text)
+
+                # Format Widget Response
 
                 # if "timer" in text:
                 #     if "cancel" in text:
