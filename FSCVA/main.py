@@ -118,6 +118,7 @@ def main():
 
     print("Press Space Bar to start the virtual assistant")
     get_keyboard_input()
+    response = ""
 
     # Voice Recognizer
     recognizer = sr.Recognizer()
@@ -147,6 +148,9 @@ def main():
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
+                if response != "" and response != None:
+                    say(response)
+
                 # Format Widget Response
                 print(f"Intent: {intent}")
                 print(f"Response: {response}")
@@ -154,8 +158,6 @@ def main():
                 # response = f'I detected a {intent} query.' # testing
 
                 print("\nPress [Space] to say another command\n")
-
-                say(response)
 
                 get_keyboard_input()
 

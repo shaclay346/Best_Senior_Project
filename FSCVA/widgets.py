@@ -36,6 +36,10 @@ timer = None
 
 def get_menu(text):
     """Returns today's menu at the Caf as a list of strings (to allow for more specific selections in the main app"""
+    if "dinner" not in text and "lunch" not in text and "breakfast" not in text:
+        print("Error, no meal was given with menu request")
+        return
+
     # Note: Sometimes this straight up won't work because the caf menu is extremely inconsistent with their formatting
     link = "https://www.flsouthern.edu/campus-offices/dining-services/daily-menu.aspx"
 
