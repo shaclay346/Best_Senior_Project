@@ -31,8 +31,10 @@ def threaded(fn):
 def speak(text):
     converter = pyttsx3.init()
     converter.setProperty("volume", 0.7)
-    converter.setProperty("rate", 175) # changed the speed of the VA, default was 200 wpm, too fast imo
-    
+    converter.setProperty(
+        "rate", 175
+    )  # changed the speed of the VA, default was 200 wpm, too fast imo
+
     # String to Speak
     if isinstance(text, str):
         converter.say(text)
@@ -43,7 +45,7 @@ def speak(text):
         for item in text:
             converter.say(text)
             converter.runAndWait()
-    
+
     converter.stop()
 
 
@@ -116,6 +118,7 @@ def main():
 
     print("Press Space Bar to start the virtual assistant")
     get_keyboard_input()
+    response = ""
 
     # Voice Recognizer
     recognizer = sr.Recognizer()
@@ -142,45 +145,19 @@ def main():
                 # Predict Intent
                 intent = clf.predict(text)
 
-                print(f"Intent: {intent}")
-
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
+                if response != "" and response != None:
+                    say(response)
+
                 # Format Widget Response
-
-                # if "timer" in text:
-                #     if "cancel" in text:
-                #         print("cancelling timer ")
-                #         widgets.cancel_timer()
-                #     else:
-                #         widgets.set_timer(text)
-                # # mostly just have these here for testing, to test VA speech and interuption
-                # if "time" in text:
-                #     response = widgets.get_time()
-                # elif "coin" in text:
-                #     response = widgets.coin_flip()
-                # elif "dice" in text:
-                #     response = widgets.dice_roll()
-                # elif "alarm" in text:
-                #     if "stop" in text:
-                #         print("stopping alarm")
-                #         widgets.stop_alarm()
-                #     elif "cancel" in text:
-                #         print("cancelling alarm")
-                #         widgets.cancel_alarm()
-                #         response = "Alarm cancelled"
-                #     else:
-                #         widgets.set_alarm(datetime.datetime.now(), "alarm") # Testing values, change later
-                #         response = "Alarm set"
-
-                
-                
+                print(f"Intent: {intent}")
                 print(f"Response: {response}")
 
-                print("\nPress [Space] to say another command\n")
+                # response = f'I detected a {intent} query.' # testing
 
-                # say(response)
+                print("\nPress [Space] to say another command\n")
 
                 get_keyboard_input()
 

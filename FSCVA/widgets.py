@@ -27,15 +27,19 @@ import pyaudio
 
 
 # Global variables
-alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
-soundFile = wave.open(alarmSound, "rb")
-audio = pyaudio.PyAudio()
+# alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
+# soundFile = wave.open(alarmSound, "rb")
+# audio = pyaudio.PyAudio()
 timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 
 
 def get_menu(text):
     """Returns today's menu at the Caf as a list of strings (to allow for more specific selections in the main app"""
+    if "dinner" not in text and "lunch" not in text and "breakfast" not in text:
+        print("Error, no meal was given with menu request")
+        return
+
     # Note: Sometimes this straight up won't work because the caf menu is extremely inconsistent with their formatting
     link = "https://www.flsouthern.edu/campus-offices/dining-services/daily-menu.aspx"
 
@@ -75,25 +79,23 @@ def get_menu(text):
                 seen = True
                 dishes.append(line)
 
-
-
     ### temp logic, refactor to formatting.py after presentation
-    rnames = set(["Wright at Home","Portabello's","LUNCH & DINNER","World Tour", "DINNER"])
+    rnames = set(
+        ["Wright at Home", "Portabello's", "LUNCH & DINNER", "World Tour", "DINNER"]
+    )
 
-    
-    if 'breakfast' in text:
-        meal = 'breakfast'
-        dishes = dishes[dishes.index('BREAKFAST')+1:dishes.index('LUNCH')]
-        dishes = list(set(dishes)-rnames)
-    elif 'lunch' in text:
-        meal = 'lunch'
-        dishes = dishes[dishes.index('LUNCH')+1:dishes.index('DINNER')]
-        dishes = list(set(dishes)-rnames)
-    elif 'dinner' in text:
-        meal = 'dinner'
-        dishes = dishes[dishes.index('LUNCH & DINNER')+1:]
-        dishes = list(set(dishes)-rnames)
-
+    if "breakfast" in text:
+        meal = "breakfast"
+        dishes = dishes[dishes.index("BREAKFAST") + 1 : dishes.index("LUNCH")]
+        dishes = list(set(dishes) - rnames)
+    elif "lunch" in text:
+        meal = "lunch"
+        dishes = dishes[dishes.index("LUNCH") + 1 : dishes.index("DINNER")]
+        dishes = list(set(dishes) - rnames)
+    elif "dinner" in text:
+        meal = "dinner"
+        dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+        dishes = list(set(dishes) - rnames)
 
     response = f"For {meal}, the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
 
@@ -127,11 +129,11 @@ def get_weather(text):
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    output = f"The weather is {type_.lower()} and the temperature is {temperature}ºF"
+    output = f"The weather description is {description} and the temperature is {temperature}ºF"
 
     # only add feels like temperature if it is different than actual temp
     if feels_like != temperature:
-        output = f"The weather is {type_.lower()} and the temperature is {temperature}ºF, but it feels like {feels_like}ºF."
+        output = f"The weather description is {description} and the temperature is {temperature}ºF, but feels like {feels_like}ºF."
 
     if type_ == "Rain":
         output += " I recommend you bring an umbrella with you today."
@@ -142,7 +144,7 @@ def get_weather(text):
 def flip_coin(text):
     """Randomly returns either 'heads' or 'tails"""
     sides = ["heads", "tails"]
-    return f"It's {random.choice(sides)}." ### temp ugly formatting for presentation
+    return f"It's {random.choice(sides)}."  ### temp ugly formatting for presentation
 
 
 def roll_dice(text):
@@ -168,7 +170,7 @@ def get_time(text):
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
 
-    return f"It's currently {output}." ### temp ugly formatting for presentation
+    return f"It's currently {output}."  ### temp ugly formatting for presentation
 
 
 def get_date(text):
@@ -181,7 +183,6 @@ def get_date(text):
 
 def get_schedule(text, username="USERNAME", password="PASSWORD"):
     """Returns user's class schedule."""
-
     # Check to stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
         return ["Incomplete login credentials given."]
@@ -222,7 +223,7 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
             courses.append(course)
 
     ### temp ugly formatting for presentation
-    days = {0:'Mon',1:'Tue',2:'Wed',3:'Thu',4:'Fri',5:'Sat',6:'Sun'}
+    days = {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
     today = days.get(datetime.datetime.now().weekday())
 
     schedule = []
@@ -232,7 +233,11 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
         if today in course[-1]:
             schedule.append(course[1])
 
-    return f"Looks like you don't have anything planned for today." if not schedule else f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today."
+    return (
+        f"Looks like you don't have anything planned for today."
+        if not schedule
+        else f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today."
+    )
 
 
 def manage_timer(text):
@@ -499,9 +504,8 @@ def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
     # pdb.set_trace()
     # stuff = get_menu(["dinner", "caf"])
-    # pdb.set_trace()
-    get_schedule('')
-
+    pdb.set_trace()
+    # get_schedule("")
 
 
 if __name__ == "__main__":
