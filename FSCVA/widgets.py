@@ -1,5 +1,7 @@
 # widgets.py
 # File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
+import werkzeug
+werkzeug.cached_property = werkzeug.utils.cached_property #Fixes roboBrowser error I (William) was getting
 from robobrowser import RoboBrowser
 import threading  # Built-in method
 from playsound import playsound  # New pip install
@@ -15,12 +17,10 @@ import datetime
 import requests as rq
 from bs4 import BeautifulSoup
 from googlesearch import search
-import werkzeug
 from timer import Timer
 import urllib
 import pandas as pd
 import multiprocessing
-
 # New imports
 import wave
 import pyaudio
