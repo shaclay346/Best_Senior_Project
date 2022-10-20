@@ -21,6 +21,9 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 global clf
 global feature_names
 
+# IDK Threshold
+idk = 0.2
+
 
 def predict(sentence):
 	'''Processes and predicts the string "sentence"'''
@@ -59,6 +62,9 @@ def predict(sentence):
 
 	# Predict Function
 	prediction = clf.predict(vectors.reshape(1,-1))
+
+	# pdb.set_trace()
+
 
 	# Return Prediction
 	return str(prediction[0])
@@ -122,7 +128,7 @@ def preprocess():
 	print("Training SVM...\r", end='')
 
 	# Create SVM
-	clf = SVC(kernel='linear')
+	clf = SVC(kernel='linear',probability=True)
 	clf.fit(vectors, labels)
 
 	print("SVM successfully trained.")

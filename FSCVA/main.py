@@ -153,8 +153,8 @@ def main():
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
-                if response != "" and response != None:
-                    say(response)
+                # if response != "" and response != None:
+                #     say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")
