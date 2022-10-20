@@ -154,10 +154,13 @@ def roll_dice(text):
         if text[i].isdigit():
             sides += text[i]
 
-    sides = int(sides)
+    if sides != "":
+        sides = int(sides)
+    else:
+        sides = 6
 
-    # return random number
-    return random.randint(1, sides)
+    # return random number. Make sure it is a string
+    return str(random.randint(1, sides))
 
 
 def get_time(text):
@@ -261,7 +264,9 @@ def set_timer(text):
             if text[i].isdigit():
                 time += text[i]
 
-        seconds = int(time)
+        if time != "":
+            seconds = int(time)
+
         if "hour" in text:
             seconds *= 3600
         elif "minute" in text:

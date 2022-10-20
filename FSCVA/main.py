@@ -16,6 +16,11 @@ import datetime
 import multiprocessing
 import time
 
+# "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate 
+# access tokens and *use the Canvas Open API* to come up with your own integrations."
+# Canvas key
+# 15349~tpAglw1sd1wSVNED61mjP8KrewLv22rrMpvLzi0kQcF7rzky15rQlphXsF2PLPby
+
 
 # threaded function to allow quick stopping of VA
 def threaded(fn):
