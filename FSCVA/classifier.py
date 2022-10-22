@@ -21,8 +21,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 global clf
 global feature_names
 
-# IDK Threshold
-idk = 0.2
+# Confidence Threshold
+CONFIDENCE_THRESHOLD = 0.3
 
 
 def predict(sentence):
@@ -63,8 +63,16 @@ def predict(sentence):
 	# Predict Function
 	prediction = clf.predict(vectors.reshape(1,-1))
 
-	# pdb.set_trace()
+	# Check for Empty Sentence (Invalid Query) or Low Confidence
+	confidence = np.max(clf.predict_proba(vectors.reshape(1,-1)))
 
+	# pdb.set_trace()
+	# print(f"\tSentence: {sentence}")
+	# print(f"\tPrediction: {prediction}")
+	# print(f"\tConfidence: {confidence}")
+
+	if not sentence or confidence < CONFIDENCE_THRESHOLD:
+		return "unknown"
 
 	# Return Prediction
 	return str(prediction[0])
@@ -128,7 +136,7 @@ def preprocess():
 	print("Training SVM...\r", end='')
 
 	# Create SVM
-	clf = SVC(kernel='linear',probability=True)
+	clf = SVC(kernel='linear', probability=True)
 	clf.fit(vectors, labels)
 
 	print("SVM successfully trained.")

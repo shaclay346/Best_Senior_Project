@@ -34,13 +34,15 @@ timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 
 
+def unknown(text):
+    '''Returns "invalid query" message.'''
+    responses = ["I didn't get that.", "I'm not sure what you're asking.", "What?"]
+    return random.choice(responses)
+
+
 def get_menu(text):
     """Returns today's menu at the Caf as a list of strings (to allow for more specific selections in the main app"""
-    if "dinner" not in text and "lunch" not in text and "breakfast" not in text:
-        print("Error, no meal was given with menu request")
-        return
-
-    # Note: Sometimes this straight up won't work because the caf menu is extremely inconsistent with their formatting
+    # Note: Sometimes this straight-up won't work because the caf menu is extremely inconsistent with their formatting
     link = "https://www.flsouthern.edu/campus-offices/dining-services/daily-menu.aspx"
 
     # Get Menu Content
@@ -69,7 +71,7 @@ def get_menu(text):
     seen = False
     for line in menu:
         if seen:
-            if any(b in line for b in tomorrow):
+            if any(a in line for a in tomorrow):
                 break
 
             dishes.append(line)
@@ -79,32 +81,35 @@ def get_menu(text):
                 seen = True
                 dishes.append(line)
 
-    ### temp logic, refactor to formatting.py after presentation
-    rnames = set(
-        ["Wright at Home", "Portabello's", "LUNCH & DINNER", "World Tour", "DINNER"]
-    )
+    # Safety Check in case Menu is Formatted Incorrectly
+    if not dishes:
+        return random.choice(["Sorry, I can't find the menu.", "They formatted it weird, so I have no idea.", "Figure it out."])
 
+    # Check for Specific Meal Query
     if "breakfast" in text:
         meal = "breakfast"
         dishes = dishes[dishes.index("BREAKFAST") + 1 : dishes.index("LUNCH")]
-        dishes = list(set(dishes) - rnames)
     elif "lunch" in text:
         meal = "lunch"
         dishes = dishes[dishes.index("LUNCH") + 1 : dishes.index("DINNER")]
-        dishes = list(set(dishes) - rnames)
     elif "dinner" in text:
         meal = "dinner"
         dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
-        dishes = list(set(dishes) - rnames)
+        
+    # Remove Useless Information from dishes
+    rnames = set(["Wright at Home", "Portabello's", "World Tour", "BREAKFAST", "LUNCH & DINNER", "DINNER"])
+    dishes = list(set(dishes) - rnames)
 
-    response = f"For {meal}, the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
+    # Output
+    response = "Today" if not any ["breakfast", "lunch", "dinner"] in text else f"For {meal}" 
+    response += f", the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
 
     return response
 
 
 def get_balance(text):
     """Returns the student's Snake Bite Balance."""
-    pass
+    return "Still working on this."
 
 
 def get_weather(text):
