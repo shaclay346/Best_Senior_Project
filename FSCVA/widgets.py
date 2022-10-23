@@ -81,18 +81,32 @@ def get_menu(text):
                 seen = True
                 dishes.append(line)
 
+    # Fail Answwers
+    fanswers = ["Sorry, I can't find the menu.", "They formatted it weird, so I have no idea.", "Figure it out."]
     # Safety Check in case Menu is Formatted Incorrectly
     if not dishes:
-        return random.choice(["Sorry, I can't find the menu.", "They formatted it weird, so I have no idea.", "Figure it out."])
+        return random.choice(fanswers)
 
     # Check for Specific Meal Query
     if "breakfast" in text:
+        # Bad Menu Check
+        if "BREAKFAST" not in dishes or "LUNCH" not in dishes:
+            return random.choice(fanswers)
+
         meal = "breakfast"
         dishes = dishes[dishes.index("BREAKFAST") + 1 : dishes.index("LUNCH")]
     elif "lunch" in text:
+        # Bad Menu Check
+        if "LUNCH" not in dishes or "DINNER" not in dishes:
+            return random.choice(fanswers)
+
         meal = "lunch"
         dishes = dishes[dishes.index("LUNCH") + 1 : dishes.index("DINNER")]
     elif "dinner" in text:
+        # Bad Menu Check
+        if "DINNER" not in dishes:
+            return random.choice(fanswers)
+
         meal = "dinner"
         dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
         
@@ -101,7 +115,7 @@ def get_menu(text):
     dishes = list(set(dishes) - rnames)
 
     # Output
-    response = "Today" if not any ["breakfast", "lunch", "dinner"] in text else f"For {meal}" 
+    response = "Today" if not any([a in text for a in ["breakfast", "lunch", "dinner"]]) else f"For {meal}" 
     response += f", the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
 
     return response
@@ -148,8 +162,8 @@ def get_weather(text):
 
 def flip_coin(text):
     """Randomly returns either 'heads' or 'tails"""
-    sides = ["heads", "tails"]
-    return f"It's {random.choice(sides)}."  ### temp ugly formatting for presentation
+    results = ["It's heads.", "Flipping...it's heads.", "It's tails.", "Flipping...it's tails."]
+    return random.choice(results)
 
 
 def roll_dice(text):
