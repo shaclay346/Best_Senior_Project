@@ -5,16 +5,29 @@
 # pip install 'speechrecognition', 'pyaudio', and 'pyttsx3' before running
 from threading import Thread
 import speech_recognition as sr
+#Make sure nltk import will work
+import sys
+import nltk
+import keyboard
+import time
+try:
+    import nltk.corpus
+except KeyError:
+    import importCheck
+    print("nltk download needed, press space when you are done")
+    time.sleep(1)
+    importCheck.firstTimenltk()
+    while True:
+        if keyboard.is_pressed("space"):
+            break
 import classifier as clf
 import widgets
 import pyttsx3
 import threading
 import pdb
 import timer
-import keyboard
 import datetime
 import multiprocessing
-import time
 
 
 # threaded function to allow quick stopping of VA

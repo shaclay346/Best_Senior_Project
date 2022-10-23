@@ -25,5 +25,6 @@ setup(
         "werkzeug",
         # "multiprocessing",    #this was causing "pip install ." to fail for me, so I'm doing this for now
         "pyaudio",
+        "wave",
     ],
 )

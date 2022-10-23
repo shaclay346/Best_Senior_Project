@@ -63,7 +63,7 @@ def predict(sentence):
 	# Predict Function
 	prediction = clf.predict(vectors.reshape(1,-1))
 
-	pdb.set_trace()
+	# pdb.set_trace()
 
 
 	# Return Prediction
