@@ -1,7 +1,10 @@
 # widgets.py
 # File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
 import werkzeug
-werkzeug.cached_property = werkzeug.utils.cached_property #Fixes roboBrowser error I (William) was getting
+
+werkzeug.cached_property = (
+    werkzeug.utils.cached_property
+)  # Fixes roboBrowser error I (William) was getting
 from robobrowser import RoboBrowser
 import threading  # Built-in method
 from playsound import playsound  # New pip install
@@ -17,10 +20,12 @@ import datetime
 import requests as rq
 from bs4 import BeautifulSoup
 from googlesearch import search
+from requests_html import HTMLSession
 from timer import Timer
 import urllib
 import pandas as pd
 import multiprocessing
+
 # New imports
 import wave
 import pyaudio
@@ -32,6 +37,29 @@ import pyaudio
 # audio = pyaudio.PyAudio()
 timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
+
+
+def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
+    # robobrowser
+    link = r"""https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-21T13%3A15%3A25Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=0f8b7a5d-4491-4530-9fc1-61c3da9512c3&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL"""
+
+    # robobrowser to login to canvas first? then beautifulsoup to pull the upcoming assignments
+    br = RoboBrowser()
+
+    br.open(link)
+
+    form = br.get_form()
+
+    form["username"] = username
+    form["password"] = password
+    # form["branding-username"] = username
+    # form["branding-username"] = password
+
+    br.submit_form(form)
+
+    src = str(br.parsed())
+
+    print(src)
 
 
 def get_menu(text):
@@ -441,23 +469,15 @@ def parse_results(response):
     # save the results from the google page
     results = response.html.find(css_identifier_result)
 
-    output = []
+    output = "Here are the results\n"
 
-    for result in results:
+    for i in range(3):
 
-        item = {
-            "title": result.find(css_identifier_title, first=True).text,
-            "link": result.find(css_identifier_link, first=True).attrs["href"],
-            # 'yXK7lf', 'MUxGbd', 'yDYNvb', 'lyLwlc', 'lEBKkf
-            "text": result.find(css_identifier_text, first=True).text,
-        }
+        title = results[i].find(css_identifier_title, first=True).text
+        text = results[i].find(css_identifier_text, first=True).text
+        link = results[i].find(css_identifier_link, first=True).attrs["href"]
 
-        output.append(item)
-
-    for i in range(len(output)):
-        print("Title: {}".format(output[i]["title"]))
-        print("Link: {}".format(output[i]["link"]))
-        print("Text: {}\n".format(output[i]["text"]))
+        output += f"Title: {title}\nText: {text}\nLink: {link}\n\n"
 
     return output
 
@@ -507,10 +527,8 @@ def define_word(word):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
+    print(google_search("how old is Ryan Reynolds"))
     # pdb.set_trace()
-    # stuff = get_menu(["dinner", "caf"])
-    pdb.set_trace()
-    # get_schedule("")
 
 
 if __name__ == "__main__":
