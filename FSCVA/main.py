@@ -107,18 +107,19 @@ def main():
 
     # Dictionary of Intent Functions for Easy Calling
     intents = {
-        "get_weather": widgets.get_weather,
-        "get_time": widgets.get_time,
+        "calculate": widgets.calculate,
+        "define_word": widgets.define_word,
+        "flip_coin": widgets.flip_coin,
+        "get_balance": widgets.get_balance,
         "get_date": widgets.get_date,
         "get_menu": widgets.get_menu,
-        "get_balance": widgets.get_balance,
-        "flip_coin": widgets.flip_coin,
-        "roll_dice": widgets.roll_dice,
+        "get_schedule": widgets.get_schedule,
+        "get_time": widgets.get_time,
+        "get_weather": widgets.get_weather,
         "manage_alarm": widgets.manage_alarm,
         "manage_timer": widgets.manage_timer,
-        "define_word": widgets.define_word,
-        "get_schedule": widgets.get_schedule,
-        "calculate": widgets.calculate,
+        "roll_dice": widgets.roll_dice,
+        "unknown": widgets.unknown
     }
 
     print("Press Space Bar to start the virtual assistant")
@@ -159,8 +160,6 @@ def main():
                 # Format Widget Response
                 print(f"Intent: {intent}")
                 print(f"Response: {response}")
-
-                # response = f'I detected a {intent} query.' # testing
 
                 print("\nPress [Space] to say another command\n")
 

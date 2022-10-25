@@ -21,8 +21,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 global clf
 global feature_names
 
-# IDK Threshold
-idk = 0.2
+# Confidence Threshold
+CONFIDENCE_THRESHOLD = 0.3
 
 
 def predict(sentence):
@@ -39,10 +39,10 @@ def predict(sentence):
 	sentence = sentence.lower()
 
 	# Replace Nonletter Characters with Spaces
-	sentence = re.sub('[^a-z]', " ", sentence)
+	sentence = re.sub('[^a-z\+\-\*\/]', " ", sentence)
 
 	# Tokenize Sentence
-	sentence = [word for word in sentence.split() if word != ' ' and len(word) > 1]
+	sentence = [word for word in sentence.split() if word != ' ' and (len(word) > 1 or word in ['+','-','*','/'])]
 
 	# Remove Stop Words
 	stop_words = set(stopwords.words("english"))
@@ -63,8 +63,16 @@ def predict(sentence):
 	# Predict Function
 	prediction = clf.predict(vectors.reshape(1,-1))
 
-	# pdb.set_trace()
+	# Check for Empty Sentence (Invalid Query) or Low Confidence
+	confidence = np.max(clf.predict_proba(vectors.reshape(1,-1)))
 
+	pdb.set_trace()
+	print(f"\tSentence: {sentence}")
+	print(f"\tPrediction: {prediction}")
+	print(f"\tConfidence: {confidence}")
+
+	if not sentence or confidence < CONFIDENCE_THRESHOLD:
+		return "unknown"
 
 	# Return Prediction
 	return str(prediction[0])
@@ -94,11 +102,11 @@ def preprocess():
 			sentence = k.lower()
 
 			# Replace Nonletter Characters with Spaces
-			sentence = re.sub('[^a-z]', " ", sentence)
+			sentence = re.sub('[^a-z\+\-\*\/]', " ", sentence)
 
 			# Tokenize Sentence
-			sentence = [word for word in sentence.split() if word != ' ' and len(word) > 1]
-
+			sentence = [word for word in sentence.split() if word != ' ' and (len(word) > 1 or word in ['+','-','*','/'])]
+			
 			# Remove Stop Words
 			stop_words = set(stopwords.words("english"))
 			sentence = [word for word in sentence if word not in stop_words]
@@ -112,7 +120,7 @@ def preprocess():
 		data[i] = row
 
 	# Lower Dimensionality of Data (Easier to do this now than earlier)
-	data = [str(a) for b in data for a in b]
+	data = [str(a) for b in data for a in b if a]
 
 	# Sort Data/Labels Alphabetically ### unnecessary, just here for ease of reading
 	data, labels = zip(*sorted(zip(data, labels)))
@@ -128,7 +136,7 @@ def preprocess():
 	print("Training SVM...\r", end='')
 
 	# Create SVM
-	clf = SVC(kernel='linear',probability=True)
+	clf = SVC(kernel='linear', probability=True)
 	clf.fit(vectors, labels)
 
 	print("SVM successfully trained.")

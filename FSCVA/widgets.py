@@ -64,11 +64,7 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
 
 def get_menu(text):
     """Returns today's menu at the Caf as a list of strings (to allow for more specific selections in the main app"""
-    if "dinner" not in text and "lunch" not in text and "breakfast" not in text:
-        print("Error, no meal was given with menu request")
-        return
-
-    # Note: Sometimes this straight up won't work because the caf menu is extremely inconsistent with their formatting
+    # Note: Sometimes this straight-up won't work because the caf menu is extremely inconsistent with their formatting
     link = "https://www.flsouthern.edu/campus-offices/dining-services/daily-menu.aspx"
 
     # Get Menu Content
@@ -97,7 +93,7 @@ def get_menu(text):
     seen = False
     for line in menu:
         if seen:
-            if any(b in line for b in tomorrow):
+            if any(a in line for a in tomorrow):
                 break
 
             dishes.append(line)
@@ -107,32 +103,66 @@ def get_menu(text):
                 seen = True
                 dishes.append(line)
 
-    ### temp logic, refactor to formatting.py after presentation
-    rnames = set(
-        ["Wright at Home", "Portabello's", "LUNCH & DINNER", "World Tour", "DINNER"]
-    )
+    # Fail Answwers
+    fanswers = [
+        "Sorry, I can't find the menu.",
+        "They formatted it weird, so I have no idea.",
+        "Figure it out.",
+    ]
+    # Safety Check in case Menu is Formatted Incorrectly
+    if not dishes:
+        return random.choice(fanswers)
 
+    # Check for Specific Meal Query
     if "breakfast" in text:
+        # Bad Menu Check
+        if "BREAKFAST" not in dishes or "LUNCH" not in dishes:
+            return random.choice(fanswers)
+
         meal = "breakfast"
         dishes = dishes[dishes.index("BREAKFAST") + 1 : dishes.index("LUNCH")]
-        dishes = list(set(dishes) - rnames)
     elif "lunch" in text:
+        # Bad Menu Check
+        if "LUNCH" not in dishes or "DINNER" not in dishes:
+            return random.choice(fanswers)
+
         meal = "lunch"
         dishes = dishes[dishes.index("LUNCH") + 1 : dishes.index("DINNER")]
-        dishes = list(set(dishes) - rnames)
     elif "dinner" in text:
+        # Bad Menu Check
+        if "DINNER" not in dishes:
+            return random.choice(fanswers)
+
         meal = "dinner"
         dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
-        dishes = list(set(dishes) - rnames)
 
-    response = f"For {meal}, the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
+    # Remove Useless Information from dishes
+    rnames = set(
+        [
+            "Wright at Home",
+            "Portabello's",
+            "World Tour",
+            "BREAKFAST",
+            "LUNCH & DINNER",
+            "DINNER",
+        ]
+    )
+    dishes = list(set(dishes) - rnames)
+
+    # Output
+    response = (
+        "Today"
+        if not any([a in text for a in ["breakfast", "lunch", "dinner"]])
+        else f"For {meal}"
+    )
+    response += f", the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
 
     return response
 
 
 def get_balance(text):
     """Returns the student's Snake Bite Balance."""
-    pass
+    return "Still working on this."
 
 
 def get_weather(text):
@@ -171,8 +201,13 @@ def get_weather(text):
 
 def flip_coin(text):
     """Randomly returns either 'heads' or 'tails"""
-    sides = ["heads", "tails"]
-    return f"It's {random.choice(sides)}."  ### temp ugly formatting for presentation
+    results = [
+        "It's heads.",
+        "Flipping...it's heads.",
+        "It's tails.",
+        "Flipping...it's tails.",
+    ]
+    return random.choice(results)
 
 
 def roll_dice(text):
