@@ -40,6 +40,7 @@ timer = None
 
 
 def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
+    """Gets the users upcoming assignments by webscraping Canvas"""
     # robobrowser
     link = r"""https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-21T13%3A15%3A25Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=0f8b7a5d-4491-4530-9fc1-61c3da9512c3&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL"""
 
@@ -231,10 +232,18 @@ def get_time(text):
     # datetime object containing current date and time
     now = datetime.datetime.now()
     hours = int(now.strftime("%H"))
+    flag = False
+
     if hours > 12:
         hours = hours % 12
+        flag = True
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
+
+    if flag:
+        output += "PM"
+    else:
+        output += "AM"
 
     return f"It's currently {output}."  ### temp ugly formatting for presentation
 
@@ -541,7 +550,7 @@ def google_search(query):
     return parse_results(response)
 
 
-def define_word(word):
+def define_word(text):
     """uses the dictionaryapi to get the dictionary definition of a word"""
     # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
     url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
