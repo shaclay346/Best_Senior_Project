@@ -66,10 +66,10 @@ def predict(sentence):
 	# Check for Empty Sentence (Invalid Query) or Low Confidence
 	confidence = np.max(clf.predict_proba(vectors.reshape(1,-1)))
 
-	pdb.set_trace()
-	print(f"\tSentence: {sentence}")
-	print(f"\tPrediction: {prediction}")
-	print(f"\tConfidence: {confidence}")
+	# pdb.set_trace()
+	# print(f"\tSentence: {sentence}")
+	# print(f"\tPrediction: {prediction}")
+	# print(f"\tConfidence: {confidence}")
 
 	if not sentence or confidence < CONFIDENCE_THRESHOLD:
 		return "unknown"

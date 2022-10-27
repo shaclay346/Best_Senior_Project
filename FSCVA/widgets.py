@@ -135,7 +135,7 @@ def get_menu(text):
             return random.choice(fanswers)
 
         meal = "dinner"
-        dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+        dishes = dishes[dishes.index("LUNCH & DINNER") + 1:]
 
     # Remove Useless Information from dishes
     rnames = set(
@@ -567,6 +567,12 @@ def define_word(text):
     output = f"{word}: {type_of_speach}, {definition}"
 
     return output
+
+
+def unknown(text):
+    '''Returns "I don't know" answer'''
+    options = ["I didn't get that.", "What?", "Not sure I understand what you're asking.", "Figure it out yourself."]
+    return random.choice(options)
 
 
 def main():
