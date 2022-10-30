@@ -50,12 +50,12 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
-    #
     path = "./chromedriver.exe"
 
     driver = webdriver.Chrome(path)
     # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
 
+    # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
     driver.get(
         r"""https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-21T13%3A15%3A25Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=0f8b7a5d-4491-4530-9fc1-61c3da9512c3&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL"""
     )
@@ -66,9 +66,10 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     driver.find_element(By.ID, "branding-password").send_keys(password)
 
     # id = branding-sumbit-button
-    # class="btn btn-primary mrg-T30 ng-binding"
-    login_button = driver.find_element(By.CLASS_NAME, "branding-sumbit-button")
+    login_button = driver.find_element(By.ID, "branding-sumbit-button")
     login_button.click()
+
+    time.sleep(3)
 
 
 def get_menu(text):
@@ -143,7 +144,7 @@ def get_menu(text):
             return random.choice(fanswers)
 
         meal = "dinner"
-        dishes = dishes[dishes.index("LUNCH & DINNER") + 1:]
+        dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
 
     # Remove Useless Information from dishes
     rnames = set(
@@ -591,8 +592,13 @@ def define_word(text):
 
 
 def unknown(text):
-    '''Returns "I don't know" answer'''
-    options = ["I didn't get that.", "What?", "Not sure I understand what you're asking.", "Figure it out yourself."]
+    """Returns "I don't know" answer"""
+    options = [
+        "I didn't get that.",
+        "What?",
+        "Not sure I understand what you're asking.",
+        "Figure it out yourself.",
+    ]
     return random.choice(options)
 
 
