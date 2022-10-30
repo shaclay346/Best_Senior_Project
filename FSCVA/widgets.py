@@ -26,6 +26,12 @@ import urllib
 import pandas as pd
 import multiprocessing
 
+# needs to be added to build
+# don't want to mess anything up so I'm not adding it command was 'pip install selenium'
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+
 # New imports
 import wave
 import pyaudio
@@ -41,26 +47,28 @@ timer = None
 
 def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
-    # robobrowser
-    link = r"""https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-21T13%3A15%3A25Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=0f8b7a5d-4491-4530-9fc1-61c3da9512c3&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL"""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
 
-    # robobrowser to login to canvas first? then beautifulsoup to pull the upcoming assignments
-    br = RoboBrowser()
+    #
+    path = "./chromedriver.exe"
 
-    br.open(link)
+    driver = webdriver.Chrome(path)
+    # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
 
-    form = br.get_form()
+    driver.get(
+        r"""https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-21T13%3A15%3A25Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=0f8b7a5d-4491-4530-9fc1-61c3da9512c3&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL"""
+    )
 
-    form["username"] = username
-    form["password"] = password
-    # form["branding-username"] = username
-    # form["branding-username"] = password
+    time.sleep(4)
 
-    br.submit_form(form)
+    driver.find_element(By.ID, "branding-username").send_keys(username)
+    driver.find_element(By.ID, "branding-password").send_keys(password)
 
-    src = str(br.parsed())
-
-    print(src)
+    # id = branding-sumbit-button
+    # class="btn btn-primary mrg-T30 ng-binding"
+    login_button = driver.find_element(By.CLASS_NAME, "branding-sumbit-button")
+    login_button.click()
 
 
 def get_menu(text):
@@ -188,11 +196,11 @@ def get_weather(text):
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    output = f"The weather description is {description} and the temperature is {temperature}ºF"
+    output = f"The weather is being described as {description} and the temperature is {temperature}ºF"
 
     # only add feels like temperature if it is different than actual temp
     if feels_like != temperature:
-        output = f"The weather description is {description} and the temperature is {temperature}ºF, but feels like {feels_like}ºF."
+        output = f"The weather is being described as {description} and the temperature is {temperature}ºF, but feels like {feels_like}ºF."
 
     if type_ == "Rain":
         output += " I recommend you bring an umbrella with you today."
@@ -513,15 +521,19 @@ def parse_results(response):
     # save the results from the google page
     results = response.html.find(css_identifier_result)
 
-    output = "Here are the results\n"
+    output = "Here are the results:\n"
 
     for i in range(3):
+        try:
+            title = results[i].find(css_identifier_title, first=True).text
+            text = results[i].find(css_identifier_text, first=True).text
+            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+        except:
+            title = results[i].find(css_identifier_title, first=True).text
+            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+            text = "Not available"
 
-        title = results[i].find(css_identifier_title, first=True).text
-        text = results[i].find(css_identifier_text, first=True).text
-        link = results[i].find(css_identifier_link, first=True).attrs["href"]
-
-        output += f"Title: {title}\nText: {text}\nLink: {link}\n\n"
+        output += f"\nTitle: {title}\nText: {text}\nLink: {link}\n"
 
     return output
 
@@ -552,6 +564,15 @@ def google_search(query):
 
 def define_word(text):
     """uses the dictionaryapi to get the dictionary definition of a word"""
+    # need to parse the word they want defined
+
+    # if they said define _____   extract the second word
+    if "define" in text:
+        word = text.split(" ", 1)[1].rsplit(" ", 1)[0]
+    # otherwise they probably said whats the definition of ____
+    else:
+        pass
+
     # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
     url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
     response = rq.request("GET", url)
@@ -571,8 +592,7 @@ def define_word(text):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    print(google_search("how old is Ryan Reynolds"))
-    # pdb.set_trace()
+    pdb.set_trace()
 
 
 if __name__ == "__main__":
