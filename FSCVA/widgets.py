@@ -1,7 +1,10 @@
 # widgets.py
 # File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
 import werkzeug
-werkzeug.cached_property = werkzeug.utils.cached_property #Fixes roboBrowser error I (William) was getting
+
+werkzeug.cached_property = (
+    werkzeug.utils.cached_property
+)  # Fixes roboBrowser error I (William) was getting
 from robobrowser import RoboBrowser
 import threading  # Built-in method
 from playsound import playsound  # New pip install
@@ -17,10 +20,18 @@ import datetime
 import requests as rq
 from bs4 import BeautifulSoup
 from googlesearch import search
+from requests_html import HTMLSession
 from timer import Timer
 import urllib
 import pandas as pd
 import multiprocessing
+
+# needs to be added to build
+# don't want to mess anything up so I'm not adding it command was 'pip install selenium'
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+
 # New imports
 import wave
 import pyaudio
@@ -36,10 +47,31 @@ alarm = None
 alarmPros = multiprocessing.Process()
 
 
-def unknown(text):
-    '''Returns "invalid query" message.'''
-    responses = ["I didn't get that.", "I'm not sure what you're asking.", "What?"]
-    return random.choice(responses)
+def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
+    """Gets the users upcoming assignments by webscraping Canvas"""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+
+    path = "./chromedriver.exe"
+
+    driver = webdriver.Chrome(path)
+    # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
+
+    # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
+    driver.get(
+        r"""https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-21T13%3A15%3A25Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=0f8b7a5d-4491-4530-9fc1-61c3da9512c3&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL"""
+    )
+
+    time.sleep(4)
+
+    driver.find_element(By.ID, "branding-username").send_keys(username)
+    driver.find_element(By.ID, "branding-password").send_keys(password)
+
+    # id = branding-sumbit-button
+    login_button = driver.find_element(By.ID, "branding-sumbit-button")
+    login_button.click()
+
+    time.sleep(3)
 
 
 def get_menu(text):
@@ -84,7 +116,11 @@ def get_menu(text):
                 dishes.append(line)
 
     # Fail Answwers
-    fanswers = ["Sorry, I can't find the menu.", "They formatted it weird, so I have no idea.", "Figure it out."]
+    fanswers = [
+        "Sorry, I can't find the menu.",
+        "They formatted it weird, so I have no idea.",
+        "Figure it out.",
+    ]
     # Safety Check in case Menu is Formatted Incorrectly
     if not dishes:
         return random.choice(fanswers)
@@ -111,13 +147,26 @@ def get_menu(text):
 
         meal = "dinner"
         dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
-        
+
     # Remove Useless Information from dishes
-    rnames = set(["Wright at Home", "Portabello's", "World Tour", "BREAKFAST", "LUNCH & DINNER", "DINNER"])
+    rnames = set(
+        [
+            "Wright at Home",
+            "Portabello's",
+            "World Tour",
+            "BREAKFAST",
+            "LUNCH & DINNER",
+            "DINNER",
+        ]
+    )
     dishes = list(set(dishes) - rnames)
 
     # Output
-    response = "Today" if not any([a in text for a in ["breakfast", "lunch", "dinner"]]) else f"For {meal}" 
+    response = (
+        "Today"
+        if not any([a in text for a in ["breakfast", "lunch", "dinner"]])
+        else f"For {meal}"
+    )
     response += f", the Caf will be serving {', '.join(dishes[:-1])}, and {dishes[-1]}."
 
     return response
@@ -150,11 +199,11 @@ def get_weather(text):
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    output = f"The weather description is {description} and the temperature is {temperature}ºF"
+    output = f"The weather is being described as {description} and the temperature is {temperature}ºF"
 
     # only add feels like temperature if it is different than actual temp
     if feels_like != temperature:
-        output = f"The weather description is {description} and the temperature is {temperature}ºF, but feels like {feels_like}ºF."
+        output = f"The weather is being described as {description} and the temperature is {temperature}ºF, but feels like {feels_like}ºF."
 
     if type_ == "Rain":
         output += " I recommend you bring an umbrella with you today."
@@ -164,7 +213,12 @@ def get_weather(text):
 
 def flip_coin(text):
     """Randomly returns either 'heads' or 'tails"""
-    results = ["It's heads.", "Flipping...it's heads.", "It's tails.", "Flipping...it's tails."]
+    results = [
+        "It's heads.",
+        "Flipping...it's heads.",
+        "It's tails.",
+        "Flipping...it's tails.",
+    ]
     return random.choice(results)
 
 
@@ -189,10 +243,18 @@ def get_time(text):
     # datetime object containing current date and time
     now = datetime.datetime.now()
     hours = int(now.strftime("%H"))
+    flag = False
+
     if hours > 12:
         hours = hours % 12
+        flag = True
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
+
+    if flag:
+        output += "PM"
+    else:
+        output += "AM"
 
     return f"It's currently {output}."  ### temp ugly formatting for presentation
 
@@ -460,23 +522,19 @@ def parse_results(response):
     # save the results from the google page
     results = response.html.find(css_identifier_result)
 
-    output = []
+    output = "Here are the results:\n"
 
-    for result in results:
+    for i in range(3):
+        try:
+            title = results[i].find(css_identifier_title, first=True).text
+            text = results[i].find(css_identifier_text, first=True).text
+            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+        except:
+            title = results[i].find(css_identifier_title, first=True).text
+            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+            text = "Not available"
 
-        item = {
-            "title": result.find(css_identifier_title, first=True).text,
-            "link": result.find(css_identifier_link, first=True).attrs["href"],
-            # 'yXK7lf', 'MUxGbd', 'yDYNvb', 'lyLwlc', 'lEBKkf
-            "text": result.find(css_identifier_text, first=True).text,
-        }
-
-        output.append(item)
-
-    for i in range(len(output)):
-        print("Title: {}".format(output[i]["title"]))
-        print("Link: {}".format(output[i]["link"]))
-        print("Text: {}\n".format(output[i]["text"]))
+        output += f"\nTitle: {title}\nText: {text}\nLink: {link}\n"
 
     return output
 
@@ -505,8 +563,17 @@ def google_search(query):
     return parse_results(response)
 
 
-def define_word(word):
+def define_word(text):
     """uses the dictionaryapi to get the dictionary definition of a word"""
+    # need to parse the word they want defined
+
+    # if they said define _____   extract the second word
+    if "define" in text:
+        word = text.split(" ", 1)[1].rsplit(" ", 1)[0]
+    # otherwise they probably said whats the definition of ____
+    else:
+        pass
+
     # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
     url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
     response = rq.request("GET", url)
@@ -524,12 +591,20 @@ def define_word(word):
     return output
 
 
+def unknown(text):
+    """Returns "I don't know" answer"""
+    options = [
+        "I didn't get that.",
+        "What?",
+        "Not sure I understand what you're asking.",
+        "Figure it out yourself.",
+    ]
+    return random.choice(options)
+
+
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    # pdb.set_trace()
-    # stuff = get_menu(["dinner", "caf"])
     pdb.set_trace()
-    # get_schedule("")
 
 
 if __name__ == "__main__":
