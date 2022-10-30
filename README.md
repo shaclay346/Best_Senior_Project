@@ -22,6 +22,21 @@ Libraries Used
     <li>re: Provides regular expression matching operations for strings (Unicode and 8-bit)</li>
     <li>datetime: Provides objects for any time, present or other</li>
     <li>keyboard: Grabs keyboard presses</li>
+    <li>sys: System functions</li>
+    <li>nltk: Command simplification and recognition</li>
+    <li>multiprocessing: Allows for multiple processes</li>
+    <li>sklearn: SVC (C-Support Vector Classification)</li>
+    <li>openpyxl: Works with Excel files</li>
+    <li>numpy: Simplify array functions and use</li>
+    <li>pandas: Provides data structures for manipulating numerical data</li>
+    <li>pickle: Serialize Python objects into Byte stream</li>
+    <li>argparse: Arguement parser</li>
+    <li>os: Operating system controals</li>
+    <li>joblib: Dump and load numpy arrays</li>
+    <li>werkzeug: Interactive debugger that allows inspecting stack traces</li>
+    <li>io: Provides main facilities for I/O</li>
+    <li>urllib: Handels URLs efficiently</li>
+    <li>wave: Deals with wave files for sound streams</li>
 </ul>
 
 Installation (Windows)
@@ -37,9 +52,18 @@ Installation (Windows)
     </ul>
 <li>Running the project Build</li>
     <ul>
-    <li>1) Open the new build -> lib -> FSCVA folder</li>
-    <li>2) From there you can open a terminal and run “python” -> “import main” -> “main.main()” to run the program</li>
+    <li>Option 1: terminal</li>
+    <ul>
+        <li>1) Open the new build -> lib -> FSCVA folder</li>
+        <li>2) From there you can open a terminal and run “python” -> “import main” -> “main.main()” to run the program</li>
     </ul>
+    <li>Option 2: IDE</li>
+    <ul>
+        <li>1) Open up an IDE and move to the main.py file in the built project</li>
+        <li>2) Run the main.py file</li>
+    </ul>
+    </ul>
+    <li>Upon first running the program you may have to install additional files that weren't installed by the inital building. Just follow all instuctions, installing all required files, & then the project should work.</li>
 </ul>
 
 Installation (Mac)
@@ -54,7 +78,16 @@ Installation (Mac)
     </ul>
 <li>Running the project Build</li>
     <ul>
-    <li>1) Open the new build -> lib -> FSCVA folder</li>
-    <li>2) From there you can open a terminal and run “python” -> “import main” -> “main.main()” to run the program</li>
+    <li>Option 1: terminal</li>
+    <ul>
+        <li>1) Open the new build -> lib -> FSCVA folder</li>
+        <li>2) From there you can open a terminal and run “python” -> “import main” -> “main.main()” to run the program</li>
     </ul>
+    <li>Option 2: IDE</li>
+    <ul>
+        <li>1) Open up an IDE and move to the main.py file in the built project</li>
+        <li>2) Run the main.py file</li>
+    </ul>
+    </ul>
+    <li>Upon first running the program you may have to install additional files that weren't installed by the inital building. Just follow all instuctions, installing all required files, & then the project should work.</li>
 </ul>

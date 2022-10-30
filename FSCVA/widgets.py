@@ -33,6 +33,7 @@ audio = pyaudio.PyAudio()
 timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 alarm = None
+alarmPros = multiprocessing.Process()
 
 
 def unknown(text):
@@ -372,72 +373,56 @@ def calculate(text):
 def manage_alarm(text):
     """Wrapper method for adding/removing alarms."""
     #Grab global variables
-    global alarm
+    global alarmPros
 
     #Check text for what we need to do
     if "cancel" in text:
-        if alarm != None:
+        if alarmPros.is_alive():
             #Cancel the alarm
             alarmPros.terminate()
-            alarm = None
+            alarmPros = multiprocessing.Process()
             return "Alarm Cancelled"
         return "There is no alarm set"
     else:
-        if alarm != None:
+        if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
         #Testing data (Grab actual time from text later)
-        alarm = True
         altime = datetime.datetime.now()
         if altime.minute == 59:
             altime = altime.replace(hour=altime.hour + 1, minute=00)
         else:
             altime = altime.replace(minute=altime.minute + 1)
-        message = "Hello There, I'm working"
-        alarmPros = multiprocessing.Process(target=set_alarm, args=(altime, message))
+        alarm = altime
+        alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
         return "Alarm Set"
 
 
-def set_alarm(altime, message):
+def set_alarm(alarm):
     """Set an alarm that, when the given time passes, activates an alarm sound"""
-    #Grab global variables
-    global alarm
-
-    #Add the alarm with the time (dateTime object) and message (string)
-    alarm = [altime, message]
-
     #Set alarm and play the alarm sound when the time comes
     # print("Setting Alarm, press tab to cancel it")
-    result = check_alarm()
-    if result == -1:
-        # print("Alarm Cancelled")
-        return
-    # print("Playing Alarm, press shift to stop the alarm")
+    check_alarm(alarm)
     play_alarm()
 
 
-def check_alarm():
+def check_alarm(alarm):
     """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
-    #Grab global variables
-    global alarm
-
     #Check if the current time matches the first alarm in the alarms array
     while True:
         #Check the date
-        if datetime.datetime.now().date() == alarm[0].date():  
+        if datetime.datetime.now().date() == alarm.date():  
             while True:
                 #Check the time
                 if (
-                    datetime.datetime.now().hour == alarm[0].hour
-                    and datetime.datetime.now().minute == alarm[0].minute
+                    datetime.datetime.now().hour == alarm.hour
+                    and datetime.datetime.now().minute == alarm.minute
                 ):
-                    print(alarm[1])
-                    return 1
+                    return
 
 
 def play_alarm():
     """Play an alarm sound, unless flagged to stop or the sound ends"""
-
     #Grab global variables
     global soundFile
     global audio

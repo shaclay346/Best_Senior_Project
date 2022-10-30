@@ -5,11 +5,10 @@
 # pip install 'speechrecognition', 'pyaudio', and 'pyttsx3' before running
 from threading import Thread
 import speech_recognition as sr
-#Make sure nltk import will work
-import sys
-import nltk
 import keyboard
 import time
+#Make sure nltk import will work
+import nltk
 try:
     import nltk.corpus
 except KeyError:
@@ -168,7 +167,7 @@ def main():
                 response = intents[intent](text)
 
                 # if response != "" and response != None:
-                #     say(response)
+                say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")
