@@ -28,6 +28,10 @@ import timer
 import datetime
 import multiprocessing
 
+# Robobrowser fix thing -N
+from urllib3.exceptions import InsecureRequestWarning
+import requests
+
 # "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate 
 # access tokens and *use the Canvas Open API* to come up with your own integrations."
 # Canvas key
@@ -110,6 +114,9 @@ def get_keyboard_input():
 
 
 def main():
+    # Disable Robobrowser Warning since Portal is Bad™
+    requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
     # Load the SVM in classifier.py
     print("Loading...\r", end="")
     clf.load_svm_corpus()
@@ -167,7 +174,7 @@ def main():
                 response = intents[intent](text)
 
                 # if response != "" and response != None:
-                say(response)
+                # say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")
