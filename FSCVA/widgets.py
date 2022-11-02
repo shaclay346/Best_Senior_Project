@@ -38,10 +38,11 @@ import pyaudio
 
 
 # Global variables
-alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
+soundRoot = "alarms/"
+alarmSound = soundRoot + "mixkit-retro-game-emergency-alarm-1000.wav"
 soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
-timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
+timerSound = soundRoot + "mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
@@ -433,7 +434,7 @@ def calculate(text):
 
 
 def manage_alarm(text):
-    """Wrapper method for adding/removing alarms."""
+    """Wrapper method for adding/removing an alarm."""
     #Grab global variables
     global alarmPros
 
@@ -469,11 +470,11 @@ def set_alarm(alarm):
 
 
 def check_alarm(alarm):
-    """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
-    #Check if the current time matches the first alarm in the alarms array
+    """Check the current alarm. If the current time matches the alarm, return"""
+    #Check if the current time matches the alarm time
     while True:
         #Check the date
-        if datetime.datetime.now().date() == alarm.date():  
+        if datetime.datetime.now().date() == alarm.date():
             while True:
                 #Check the time
                 if (
