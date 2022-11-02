@@ -25,6 +25,7 @@ from timer import Timer
 import urllib
 import pandas as pd
 import multiprocessing
+import ssl
 
 # needs to be added to build
 # don't want to mess anything up so I'm not adding it command was 'pip install selenium'
@@ -35,6 +36,9 @@ from selenium.webdriver.common.by import By
 # New imports
 import wave
 import pyaudio
+
+
+
 
 
 # Global variables
@@ -269,13 +273,15 @@ def get_date(text):
 
 def get_schedule(text, username="USERNAME", password="PASSWORD"):
     """Returns user's class schedule."""
+    username = "1242088"
+    password = "Colloportus"
     # Check to stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
         return ["Incomplete login credentials given."]
 
     # Creates a RoboBrowser Object and Logs into Portal
     br = RoboBrowser()
-    br.open("https://portal.flsouthern.edu/ICS/Students/")
+    br.open("https://portal.flsouthern.edu/ICS/Students/", verify=False)
 
     form = br.get_form()
 
@@ -317,13 +323,22 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
     # Check if Class is Today
     for course in courses:
         if today in course[-1]:
-            schedule.append(course[1])
+            schedule.append(better_title(course[1]))
 
-    return (
-        f"Looks like you don't have anything planned for today."
-        if not schedule
-        else f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today."
-    )
+    # No Classes Today
+    if not schedule:
+        return f"Looks like you don't have anything planned for today."
+    # One or More Classes Today
+    else:
+        return f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today." if len(schedule) > 1 else f"You have {schedule[0]} today."
+
+
+def better_title(text):
+    '''Converts text to real title case, unlike title()'''
+    lowercase_words = ["and", "as", "if", "at", "but", "by", "for", "from", "only", "in", "into", "like", "near", "of", "off", "on", "once", "onto", "or", "out", "over", 
+    "so", "that", "than", "to", "up", "upon", "with", "when"]
+    text = text.split()
+    return " ".join([a.title() if (a not in lowercase_words and len(a) > 3) or a == text[0] else a for a in text])
 
 
 def manage_timer(text):
