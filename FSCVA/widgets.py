@@ -1,5 +1,5 @@
 # widgets.py
-# File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
+# File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
 import werkzeug
 
 werkzeug.cached_property = (
@@ -23,7 +23,6 @@ from googlesearch import search
 from requests_html import HTMLSession
 from timer import Timer
 import urllib
-import pandas as pd
 import multiprocessing
 import ssl
 
@@ -54,6 +53,10 @@ alarmPros = multiprocessing.Process()
 
 def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
+    # Stop function if credentials are still default values
+    if username == "USERNAME" or password == "PASSWORD":
+        return "Incomplete login credentials given."
+
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
@@ -274,11 +277,9 @@ def get_date(text):
 
 def get_schedule(text, username="USERNAME", password="PASSWORD"):
     """Returns user's class schedule."""
-    username = "1242088"
-    password = "Colloportus"
-    # Check to stop function if credentials are still default values
+    # Stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
-        return ["Incomplete login credentials given."]
+        return "Incomplete login credentials given."
 
     # Creates a RoboBrowser Object and Logs into Portal
     br = RoboBrowser()
