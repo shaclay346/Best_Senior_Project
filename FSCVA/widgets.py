@@ -59,9 +59,9 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
-    path = "./chromedriver.exe"
+    # path = "./chromedriver.exe"
 
-    driver = webdriver.Chrome(path)
+    driver = webdriver.Chrome()
     # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
 
     # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
@@ -350,6 +350,10 @@ def manage_timer(text):
     """Wrapper method for setting/canceling timers."""
     if "cancel" in text:
         cancel_timer()
+    elif "end" in text:
+        cancel_timer()
+    elif "stop" in text:
+        cancel_timer()
     else:
         set_timer(text)
 
@@ -388,7 +392,6 @@ def set_timer(text):
 def cancel_timer():
     """cancels the timer by killing the thread"""
     # call the stop method on timer thread
-    print("timer is", timer)
     if timer != None:
         timer.stop()
     else:
@@ -624,7 +627,11 @@ def unknown(text):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    pdb.set_trace()
+    # pdb.set_trace()
+    manage_timer("set a timer for 20 minutes")
+
+    time.sleep(4)
+    manage_timer("stop the timer...")
 
 
 if __name__ == "__main__":
