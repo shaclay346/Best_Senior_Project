@@ -1,5 +1,5 @@
 # widgets.py
-# File of external function to pull from for virtual assistant (fetch the caf menu, fetch the weather, etc.)
+# File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
 import werkzeug
 
 werkzeug.cached_property = (
@@ -23,8 +23,8 @@ from googlesearch import search
 from requests_html import HTMLSession
 from timer import Timer
 import urllib
-import pandas as pd
 import multiprocessing
+import ssl
 
 # needs to be added to build
 # don't want to mess anything up so I'm not adding it command was 'pip install selenium'
@@ -37,16 +37,25 @@ import wave
 import pyaudio
 
 
+
+
+
 # Global variables
-# alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
-# soundFile = wave.open(alarmSound, "rb")
-# audio = pyaudio.PyAudio()
+alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
+soundFile = wave.open(alarmSound, "rb")
+audio = pyaudio.PyAudio()
 timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
+alarm = None
+alarmPros = multiprocessing.Process()
 
 
 def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
+    # Stop function if credentials are still default values
+    if username == "USERNAME" or password == "PASSWORD":
+        return "Incomplete login credentials given."
+
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
@@ -267,13 +276,13 @@ def get_date(text):
 
 def get_schedule(text, username="USERNAME", password="PASSWORD"):
     """Returns user's class schedule."""
-    # Check to stop function if credentials are still default values
+    # Stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
-        return ["Incomplete login credentials given."]
+        return "Incomplete login credentials given."
 
     # Creates a RoboBrowser Object and Logs into Portal
     br = RoboBrowser()
-    br.open("https://portal.flsouthern.edu/ICS/Students/")
+    br.open("https://portal.flsouthern.edu/ICS/Students/", verify=False)
 
     form = br.get_form()
 
@@ -315,13 +324,22 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
     # Check if Class is Today
     for course in courses:
         if today in course[-1]:
-            schedule.append(course[1])
+            schedule.append(better_title(course[1]))
 
-    return (
-        f"Looks like you don't have anything planned for today."
-        if not schedule
-        else f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today."
-    )
+    # No Classes Today
+    if not schedule:
+        return f"Looks like you don't have anything planned for today."
+    # One or More Classes Today
+    else:
+        return f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today." if len(schedule) > 1 else f"You have {schedule[0]} today."
+
+
+def better_title(text):
+    '''Converts text to real title case, unlike title()'''
+    lowercase_words = ["and", "as", "if", "at", "but", "by", "for", "from", "only", "in", "into", "like", "near", "of", "off", "on", "once", "onto", "or", "out", "over", 
+    "so", "that", "than", "to", "up", "upon", "with", "when"]
+    text = text.split()
+    return " ".join([a.title() if (a not in lowercase_words and len(a) > 3) or a == text[0] else a for a in text])
 
 
 def manage_timer(text):
@@ -435,61 +453,63 @@ def calculate(text):
 
 def manage_alarm(text):
     """Wrapper method for adding/removing alarms."""
-    pass
+    #Grab global variables
+    global alarmPros
 
-
-def set_alarm(altime, message, flag):
-    """Set an alarm that, when the given time passes, activates an alarm sound"""
-
-    # Testing data
-    altime = datetime.datetime.now()
-    if altime.minute == 59:
-        altime = altime.replace(hour=altime.hour + 1, minute=00)
+    #Check text for what we need to do
+    if "cancel" in text:
+        if alarmPros.is_alive():
+            #Cancel the alarm
+            alarmPros.terminate()
+            alarmPros = multiprocessing.Process()
+            return "Alarm Cancelled"
+        return "There is no alarm set"
     else:
-        altime = altime.replace(minute=altime.minute + 1)
-    message = "Hello There, I'm working"
-
-    # Add the alarm with the time (dateTime object) and message (string)
-    alarm = [altime, message]
-
-    # Set alarm and play the alarm sound when the time comes
-    print("Setting Alarm, press tab to cancel it")
-    result = check_alarm(alarm, flag)
-    if result == -1:
-        print("Alarm Cancelled")
-        return
-    print("Playing Alarm, press shift to stop the alarm")
-    play_alarm(flag)
+        if alarmPros.is_alive():
+            return "Alarm already set, cancel the current alarm to make a new one"
+        #Testing data (Grab actual time from text later)
+        altime = datetime.datetime.now()
+        if altime.minute == 59:
+            altime = altime.replace(hour=altime.hour + 1, minute=00)
+        else:
+            altime = altime.replace(minute=altime.minute + 1)
+        alarm = altime
+        alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
+        alarmPros.start()
+        return "Alarm Set"
 
 
-def check_alarm(alarm, flag):
+def set_alarm(alarm):
+    """Set an alarm that, when the given time passes, activates an alarm sound"""
+    #Set alarm and play the alarm sound when the time comes
+    # print("Setting Alarm, press tab to cancel it")
+    check_alarm(alarm)
+    play_alarm()
+
+
+def check_alarm(alarm):
     """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
-
-    # Check if the current time matches the first alarm in the alarms array
+    #Check if the current time matches the first alarm in the alarms array
     while True:
-        if flag:
-            print("Canceling Alarm")
-            return -1
-        if datetime.datetime.now().date() == alarm[0].date():  # Check the date
+        #Check the date
+        if datetime.datetime.now().date() == alarm.date():  
             while True:
-                if flag:
-                    print("Canceling Alarm")
-                    return -1
-                # Check the time
+                #Check the time
                 if (
-                    datetime.datetime.now().hour == alarm[0].hour
-                    and datetime.datetime.now().minute == alarm[0].minute
+                    datetime.datetime.now().hour == alarm.hour
+                    and datetime.datetime.now().minute == alarm.minute
                 ):
-                    print(alarm[1])
-                    return 1
+                    return
 
 
-def play_alarm(flag):
+def play_alarm():
     """Play an alarm sound, unless flagged to stop or the sound ends"""
-
-    # Grab global variables and play the alarm sound
+    #Grab global variables
     global soundFile
     global audio
+    global alarm
+
+    #Play the alarm sound
     stream = audio.open(
         format=audio.get_format_from_width(soundFile.getsampwidth()),
         channels=soundFile.getnchannels(),
@@ -499,11 +519,7 @@ def play_alarm(flag):
     )
     stream.start_stream()
     while stream.is_active():
-        if flag:
-            print("Stopping Alarm")
-            stream.stop_stream()
-            stream.close()
-            print("Alarm Stopped")
+        if False:
             return
 
 

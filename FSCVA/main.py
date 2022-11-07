@@ -1,20 +1,32 @@
 # main.py
-# Main File for Virtual Assistant
-# Do the following to properly run this script:
-# brew install portaudio
-# pip install 'speechrecognition', 'pyaudio', and 'pyttsx3' before running
-from threading import Thread
+# Main/Application File for Virtual Assistant
+
+import nltk
+# Check if First-Time NLTK Install is Needed
+try:
+    import nltk.corpus
+except KeyError:
+    import importCheck
+    print("nltk download needed, press space when you are done")
+    time.sleep(1)
+    importCheck.firstTimenltk()
+    while True:
+        if keyboard.is_pressed("space"):
+            break
+
+from urllib3.exceptions import InsecureRequestWarning # robobrowser warning silencer
 import speech_recognition as sr
-import classifier as clf
-import widgets
-import pyttsx3
-import threading
-import pdb
-import timer
 import keyboard
 import datetime
-import multiprocessing
+import requests
+import timer
 import time
+import pdb
+
+# Our Imports
+import classifier as clf
+import widgets
+import voice
 
 # "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate 
 # access tokens and *use the Canvas Open API* to come up with your own integrations."
@@ -22,82 +34,22 @@ import time
 # 15349~tpAglw1sd1wSVNED61mjP8KrewLv22rrMpvLzi0kQcF7rzky15rQlphXsF2PLPby
 
 
-# threaded function to allow quick stopping of VA
-def threaded(fn):
-    def wrapper(*args, **kwargs):
-        thread = Thread(target=fn, args=args, kwargs=kwargs)
-        thread.start()
-        return thread
-
-    return wrapper
-
-
-# function that actually starts the speech of the virtual assisstant
-def speak(text):
-    converter = pyttsx3.init()
-    converter.setProperty("volume", 0.7)
-    converter.setProperty(
-        "rate", 175
-    )  # changed the speed of the VA, default was 200 wpm, too fast imo
-
-    # String to Speak
-    if isinstance(text, str):
-        converter.say(text)
-        converter.runAndWait()
-
-    # List to Speak
-    else:
-        for item in text:
-            converter.say(text)
-            converter.runAndWait()
-
-    converter.stop()
-
-
-# called to stop the VA mid speech
-def stop_speaker():
-    global t
-    global term
-    term = True
-    # t.join()
-
-
-@threaded
-def manage_process(p):
-    global term
-    while p.is_alive():
-        if term:
-            p.terminate()
-            term = False
-        else:
-            continue
-
-
-# this is what you call when you want to give the VA something to say now
-def say(text):
-    """Uses tts to speak the given text"""
-    global t
-    global term
-    term = False
-    # use multiprocessing to start the speach of VA
-    p = multiprocessing.Process(target=speak, args=(text,))
-    p.start()
-    t = manage_process(p)
-
-
 def get_keyboard_input():
     # wait for user to press space to start the VA
     while True:
         if keyboard.is_pressed("space"):
-            stop_speaker()
-            print("Virtual Assistant listening")
+            voice.stop_speaker()
+            print("Virtual Assistant Listening...\r")
             break
         elif keyboard.is_pressed("Esc"):
-            print("exiting program")
+            print("Exiting program...")
             exit()
 
 
 def main():
+    # Disable Robobrowser Warning since Portal is Bad™
+    requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
     # Load the SVM in classifier.py
     print("Loading...\r", end="")
     clf.load_svm_corpus()
@@ -122,7 +74,7 @@ def main():
         "unknown": widgets.unknown
     }
 
-    print("Press Space Bar to start the virtual assistant")
+    print("Press [Space] to start the virtual assistant.")
     get_keyboard_input()
     response = ""
 
@@ -130,7 +82,7 @@ def main():
     recognizer = sr.Recognizer()
 
     # for index, name in enumerate(sr.Microphone.list_microphone_names()):
-    # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+    # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name)) # debug if microphone isn't recognized
 
     # Variables setup required for widgets (ex. alarms for the Alarm widget)
     alarm = []
@@ -143,8 +95,7 @@ def main():
 
                 # Use Google's STT and Get Text Back
                 text = recognizer.recognize_google(audio)
-                text = text.lower()
-                text = str(text)
+                text = str(text.lower())
 
                 print(f"Recognized: {text}")
 
@@ -154,8 +105,8 @@ def main():
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
-                # if response != "" and response != None:
-                #     say(response)
+                if response:
+                    voice.say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")
@@ -165,9 +116,8 @@ def main():
 
                 get_keyboard_input()
 
-        except sr.UnknownValueError:
-            # print("Error")
-            # recognizer = sr.Recognizer()
+        # STT throws errors if it can't transcribe what it hears; this catches them.
+        except sr.UnknownValueError: 
             continue
 
 
