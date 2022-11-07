@@ -154,6 +154,8 @@ def get_menu(text):
 
         meal = "dinner"
         dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+    else:
+        dishes = dishes[1:]
 
     # Remove Useless Information from dishes
     rnames = set(
@@ -162,10 +164,12 @@ def get_menu(text):
             "Portabello's",
             "World Tour",
             "BREAKFAST",
+            "LUNCH",
             "LUNCH & DINNER",
             "DINNER",
         ]
     )
+
     dishes = list(set(dishes) - rnames)
 
     # Output
