@@ -36,11 +36,7 @@ from selenium.webdriver.common.by import By
 import wave
 import pyaudio
 
-
-
-
-
-# Global variables
+# Constants/Global variables
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
 soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
@@ -48,10 +44,14 @@ timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
+    # Load login credentials from login_credentials.txt
+    username, password = load_login_creds("sso")
+
     # Stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
         return "Incomplete login credentials given."
@@ -245,8 +245,8 @@ def roll_dice(text):
     else:
         sides = 6
 
-    # return random number. Make sure it is a string
-    return str(random.randint(1, sides))
+    # return random number
+    return f"Rolling...it's {random.randint(1, sides)}."
 
 
 def get_time(text):
@@ -280,6 +280,9 @@ def get_date(text):
 
 def get_schedule(text, username="USERNAME", password="PASSWORD"):
     """Returns user's class schedule."""
+    # Load login credentials from login_credentials.txt
+    username, password = load_login_creds("portal")
+
     # Stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
         return "Incomplete login credentials given."
@@ -623,6 +626,22 @@ def unknown(text):
         "Figure it out yourself.",
     ]
     return random.choice(options)
+
+
+def load_login_creds(site):
+    '''Loads portal and SSO credentials for use in
+    get_schedule and get_upcoming_assignments.'''
+    with open(os.path.join(ROOT, "login_credentials.txt"), "r") as f:
+        creds = [a.strip() for a in f.readlines() if not a.startswith('#')]
+
+    if site == 'portal':
+        return creds[:2]
+    elif site == 'sso':
+        return creds[2:]
+    else:
+        return ['','','']
+
+
 
 
 def main():
