@@ -1,6 +1,5 @@
 # main.py
 # Main/Application File for Virtual Assistant
-
 import nltk
 # Check if First-Time NLTK Install is Needed
 try:
@@ -105,8 +104,8 @@ def main():
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
-                if response:
-                    voice.say(response)
+                # if response:
+                    # voice.say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")

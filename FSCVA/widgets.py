@@ -36,23 +36,22 @@ from selenium.webdriver.common.by import By
 import wave
 import pyaudio
 
-
-
-
-
-# Global variables
-soundRoot = "alarms/"
-alarmSound = soundRoot + "mixkit-retro-game-emergency-alarm-1000.wav"
+# Constants/Global variables
+alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
 soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
 timerSound = soundRoot + "mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
+    # Load login credentials from login_credentials.txt
+    username, password = load_login_creds("sso")
+
     # Stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
         return "Incomplete login credentials given."
@@ -60,9 +59,9 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
-    path = "./chromedriver.exe"
+    # path = "./chromedriver.exe"
 
-    driver = webdriver.Chrome(path)
+    driver = webdriver.Chrome()
     # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
 
     # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
@@ -155,6 +154,8 @@ def get_menu(text):
 
         meal = "dinner"
         dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+    else:
+        dishes = dishes[1:]
 
     # Remove Useless Information from dishes
     rnames = set(
@@ -163,10 +164,12 @@ def get_menu(text):
             "Portabello's",
             "World Tour",
             "BREAKFAST",
+            "LUNCH",
             "LUNCH & DINNER",
             "DINNER",
         ]
     )
+
     dishes = list(set(dishes) - rnames)
 
     # Output
@@ -242,8 +245,8 @@ def roll_dice(text):
     else:
         sides = 6
 
-    # return random number. Make sure it is a string
-    return str(random.randint(1, sides))
+    # return random number
+    return f"Rolling...it's {random.randint(1, sides)}."
 
 
 def get_time(text):
@@ -277,6 +280,9 @@ def get_date(text):
 
 def get_schedule(text, username="USERNAME", password="PASSWORD"):
     """Returns user's class schedule."""
+    # Load login credentials from login_credentials.txt
+    username, password = load_login_creds("portal")
+
     # Stop function if credentials are still default values
     if username == "USERNAME" or password == "PASSWORD":
         return "Incomplete login credentials given."
@@ -347,6 +353,10 @@ def manage_timer(text):
     """Wrapper method for setting/canceling timers."""
     if "cancel" in text:
         cancel_timer()
+    elif "end" in text:
+        cancel_timer()
+    elif "stop" in text:
+        cancel_timer()
     else:
         set_timer(text)
 
@@ -385,7 +395,6 @@ def set_timer(text):
 def cancel_timer():
     """cancels the timer by killing the thread"""
     # call the stop method on timer thread
-    print("timer is", timer)
     if timer != None:
         timer.stop()
     else:
@@ -681,9 +690,29 @@ def unknown(text):
     return random.choice(options)
 
 
+def load_login_creds(site):
+    '''Loads portal and SSO credentials for use in
+    get_schedule and get_upcoming_assignments.'''
+    with open(os.path.join(ROOT, "login_credentials.txt"), "r") as f:
+        creds = [a.strip() for a in f.readlines() if not a.startswith('#')]
+
+    if site == 'portal':
+        return creds[:2]
+    elif site == 'sso':
+        return creds[2:]
+    else:
+        return ['','','']
+
+
+
+
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    pdb.set_trace()
+    # pdb.set_trace()
+    manage_timer("set a timer for 20 minutes")
+
+    time.sleep(4)
+    manage_timer("stop the timer...")
 
 
 if __name__ == "__main__":
