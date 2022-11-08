@@ -465,16 +465,81 @@ def manage_alarm(text):
     else:
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
-        #Testing data (Grab actual time from text later)
-        altime = datetime.datetime.now()
-        if altime.minute == 59:
-            altime = altime.replace(hour=altime.hour + 1, minute=00)
-        else:
-            altime = altime.replace(minute=altime.minute + 1)
-        alarm = altime
+        alarm = getAlarmTime(text)
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
         return "Alarm Set"
+
+
+def getAlarmTime(text):
+    '''Extract the wanted time from the given text'''
+
+    #Search through the given text for a time, returning None if there is no time specified
+    timeStartIndex = -1
+    for i in range(len(text)):
+        if text[i].isnumeric():
+            timeStartIndex = i
+            break
+    if timeStartIndex == -1:
+        return None
+    
+    #Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
+    timeString = text[timeStartIndex]
+    currIndex = timeStartIndex + 1
+    timeFormat = "numeric" #Single number (ex. 6)
+    while currIndex < len(text):
+        if text[currIndex].isnumeric():
+            timeString += text[currIndex]
+            currIndex += 1
+            continue
+        if text[currIndex] == ":" and timeFormat != "time": #Time format (ex. 12:30)
+            timeString += text[currIndex]
+            timeFormat = "time"
+            currIndex += 1
+            continue
+        break
+
+    #Check if the given time is in an acceptable time form
+    if timeFormat == "numeric":
+        if int(timeString) < 0 or int(timeString) > 24:
+            return "Thats not a time"
+    else:
+        checkString = timeString.split(":")
+        if int(checkString[0]) < 0 or int(checkString[0]) > 23 or int(checkString[1]) < 0 or int(checkString[1]) > 59:
+            return "Thats not a time"
+
+    #Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
+    currentFix = None
+    currentFix = checkFix(text)
+    if currentFix == None and timeFormat != "time" and int(timeString) < 13:
+        fixStr = input("a.m. or p.m.?: ")
+        currentFix = checkFix(fixStr)
+
+    #Convert the given time to a datetime time object
+    timeStringList = ["00", "00", "00"]
+    if timeFormat == "numeric":
+        if currentFix == "pm":
+            if timeString != "12":
+                timeString = str(int(timeString) + 12)
+        if currentFix == "am" and timeString == "12":
+            timeString = "00"
+        timeStringList[0] = timeString
+    else:
+        splitTimeString = timeString.split(":")
+        timeStringList[0] = splitTimeString[0]
+        timeStringList[1] = splitTimeString[1]
+    if len(timeStringList[0]) == 1:
+        timeStringList[0] = "0" + timeStringList[0]
+    return datetime.time.fromisoformat(":".join(timeStringList))
+
+
+def checkFix(text):
+    '''Check if there is a time postfix (a.m. or p.m.) in the given text'''
+    if text.__contains__("a.m."):
+        return "am"
+    elif text.__contains__("p.m."):
+        return "pm"
+    return None
 
 
 def set_alarm(alarm):
@@ -489,15 +554,12 @@ def check_alarm(alarm):
     """Check the current alarm. If the current time matches the alarm, return"""
     #Check if the current time matches the alarm time
     while True:
-        #Check the date
-        if datetime.datetime.now().date() == alarm.date():
-            while True:
-                #Check the time
-                if (
-                    datetime.datetime.now().hour == alarm.hour
-                    and datetime.datetime.now().minute == alarm.minute
-                ):
-                    return
+        #Check the time
+        if (
+            datetime.datetime.now().hour == alarm.hour
+            and datetime.datetime.now().minute == alarm.minute
+        ):
+            return
 
 
 def play_alarm():
