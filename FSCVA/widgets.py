@@ -40,7 +40,7 @@ import pyaudio
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
 soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
-timerSound = soundRoot + "mixkit-scanning-sci-fi-alarm-905.wav"
+# timerSound = soundRoot + "mixkit-scanning-sci-fi-alarm-905.wav" # this line causes problems since soundRood isn't defined @Will
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
@@ -259,15 +259,11 @@ def get_time(text):
     if hours > 12:
         hours = hours % 12
         flag = True
+
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
 
-    if flag:
-        output += "PM"
-    else:
-        output += "AM"
-
-    return f"It's currently {output}."  ### temp ugly formatting for presentation
+    return f"It's currently {output}PM." if flag else f"It's currently {output}AM."
 
 
 def get_date(text):
@@ -322,7 +318,7 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
         if course:
             courses.append(course)
 
-    ### temp ugly formatting for presentation
+    # Get Today
     days = {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
     today = days.get(datetime.datetime.now().weekday())
 
