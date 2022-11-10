@@ -259,15 +259,11 @@ def get_time(text):
     if hours > 12:
         hours = hours % 12
         flag = True
+
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
 
-    if flag:
-        output += "PM"
-    else:
-        output += "AM"
-
-    return f"It's currently {output}."  ### temp ugly formatting for presentation
+    return f"It's currently {output}PM." if flag else f"It's currently {output}AM."
 
 
 def get_date(text):
@@ -322,7 +318,7 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
         if course:
             courses.append(course)
 
-    ### temp ugly formatting for presentation
+    # Get Today
     days = {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
     today = days.get(datetime.datetime.now().weekday())
 
@@ -527,14 +523,11 @@ def getAlarmTime(text):
     #Convert the given time to a datetime time object
     timeStringList = ["00", "00", "00"]
     if timeFormat == "numeric":
-        if currentFix == "pm":
-            if timeString != "12":
-                timeString = str(int(timeString) + 12)
-        if currentFix == "am" and timeString == "12":
-            timeString = "00"
+        timeString = adjustForFix(currentFix, timeString)
         timeStringList[0] = timeString
     else:
         splitTimeString = timeString.split(":")
+        splitTimeString[0] = adjustForFix(currentFix, splitTimeString[0])
         timeStringList[0] = splitTimeString[0]
         timeStringList[1] = splitTimeString[1]
     if len(timeStringList[0]) == 1:
@@ -549,6 +542,16 @@ def checkFix(text):
     elif text.__contains__("p.m."):
         return "pm"
     return None
+
+
+def adjustForFix(currentFix, text):
+    '''Adjust the hour given for the 24-hour format datetime uses'''
+    if currentFix == "pm":
+        if text != "12":
+            text = str(int(text) + 12)
+    if currentFix == "am" and text == "12":
+        text = "00"
+    return text
 
 
 def set_alarm(alarm):
