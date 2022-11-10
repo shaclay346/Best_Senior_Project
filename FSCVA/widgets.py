@@ -40,7 +40,7 @@ import pyaudio
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
 soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
-timerSound = soundRoot + "mixkit-scanning-sci-fi-alarm-905.wav"
+timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
