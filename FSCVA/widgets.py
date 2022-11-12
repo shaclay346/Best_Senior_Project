@@ -47,7 +47,7 @@ alarmPros = multiprocessing.Process()
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
+def get_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
     # Load login credentials from login_credentials.txt
     username, password = load_login_creds("sso")
@@ -57,7 +57,7 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
         return "Incomplete login credentials given."
 
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
 
     # path = "./chromedriver.exe"
 
@@ -79,6 +79,8 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     login_button.click()
 
     time.sleep(3)
+
+    pdb.set_trace()
 
 
 def get_menu(text):
@@ -153,7 +155,11 @@ def get_menu(text):
             return random.choice(fanswers)
 
         meal = "dinner"
-        dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+
+        if "LUNCH & DINNER" in dishes:
+            dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+        else:
+            dishes = dishes[dishes.index("DINNER") + 1:]
     else:
         dishes = dishes[1:]
 

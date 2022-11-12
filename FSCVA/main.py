@@ -61,6 +61,7 @@ def main():
         "calculate": widgets.calculate,
         "define_word": widgets.define_word,
         "flip_coin": widgets.flip_coin,
+        "get_assignments": widgets.get_assignments,
         "get_balance": widgets.get_balance,
         "get_date": widgets.get_date,
         "get_menu": widgets.get_menu,
