@@ -448,13 +448,13 @@ def get_operands(text):
 def calculate(text):
     operands = get_operands(text)
     result = 0
-    if "plus" in text:
+    if "+" in text:
         result = operands[0] + operands[1]
-    elif "minus" in text:
+    elif "-" in text:
         result = operands[0] - operands[1]
-    elif "times" in text:
+    elif "*" in text:
         result = operands[0] * operands[1]
-    elif "divide" in text:
+    elif "/" in text:
         result = operands[0] // operands[1]
 
     return result

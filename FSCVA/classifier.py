@@ -21,7 +21,6 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 global clf
 global feature_names
 
-# Confidence Threshold
 CONFIDENCE_THRESHOLD = 0.3
 
 
@@ -38,7 +37,7 @@ def predict(sentence):
 	# Convert to Lowercase
 	sentence = sentence.lower()
 
-	# Replace Nonletter Characters with Spaces
+	# Replace Nonletter (and non-math-operator) Characters with Spaces
 	sentence = re.sub('[^a-z\+\-\*\/]', " ", sentence)
 
 	# Tokenize Sentence
@@ -101,7 +100,7 @@ def preprocess():
 			# Convert to Lowercase
 			sentence = k.lower()
 
-			# Replace Nonletter Characters with Spaces
+			# Replace Nonletter (and non-math-operator) Characters with Spaces
 			sentence = re.sub('[^a-z\+\-\*\/]', " ", sentence)
 
 			# Tokenize Sentence
@@ -126,12 +125,12 @@ def preprocess():
 	data, labels = zip(*sorted(zip(data, labels)))
 
 	# Calculate BoW Counts
-	vectorizer = CountVectorizer(ngram_range=(1,2))
+	vectorizer = CountVectorizer(token_pattern="[a-z\*\/\+\-]+", ngram_range=(1,2))
 	vectors = vectorizer.fit_transform(data)
 
 	# Make DataFrame and Save ### delete later, just using this for sanity
-	# frame = pd.DataFrame(vectors.toarray(), columns=vectorizer.get_feature_names())
-	# frame.to_excel(os.path.join(ROOT, "bow_visualized.xlsx"))
+	frame = pd.DataFrame(vectors.toarray(), columns=vectorizer.get_feature_names())
+	frame.to_excel(os.path.join(ROOT, "bow_visualized.xlsx"))
 
 	print("Training SVM...\r", end='')
 
