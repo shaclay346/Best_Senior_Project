@@ -274,8 +274,7 @@ def get_date(text):
     """Returns current date in 'day month, year' format."""
     date_time = datetime.datetime.now()
 
-    output = date_time.strftime("%B %d, %Y")
-    return output
+    return date_time.strftime("%B %d, %Y")
 
 
 def get_schedule(text, username="USERNAME", password="PASSWORD"):
@@ -338,19 +337,59 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
         return f"Looks like you don't have anything planned for today."
     # One or More Classes Today
     else:
-        return f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today." if len(schedule) > 1 else f"You have {schedule[0]} today."
+        return (
+            f"You have {', '.join(schedule[:-1])} and {schedule[-1]} today."
+            if len(schedule) > 1
+            else f"You have {schedule[0]} today."
+        )
 
 
 def better_title(text):
-    '''Converts text to real title case, unlike title()'''
-    lowercase_words = ["and", "as", "if", "at", "but", "by", "for", "from", "only", "in", "into", "like", "near", "of", "off", "on", "once", "onto", "or", "out", "over", 
-    "so", "that", "than", "to", "up", "upon", "with", "when"]
+    """Converts text to real title case, unlike title()"""
+    lowercase_words = [
+        "and",
+        "as",
+        "if",
+        "at",
+        "but",
+        "by",
+        "for",
+        "from",
+        "only",
+        "in",
+        "into",
+        "like",
+        "near",
+        "of",
+        "off",
+        "on",
+        "once",
+        "onto",
+        "or",
+        "out",
+        "over",
+        "so",
+        "that",
+        "than",
+        "to",
+        "up",
+        "upon",
+        "with",
+        "when",
+    ]
     text = text.split()
-    return " ".join([a.title() if (a not in lowercase_words and len(a) > 3) or a == text[0] else a for a in text])
+    return " ".join(
+        [
+            a.title()
+            if (a not in lowercase_words and len(a) > 3) or a == text[0]
+            else a
+            for a in text
+        ]
+    )
 
 
 def manage_timer(text):
-    """Wrapper method for setting/canceling timers."""
+    """Wrapper method for setting/cancelling timers."""
     if "cancel" in text:
         cancel_timer()
     elif "end" in text:
@@ -358,7 +397,8 @@ def manage_timer(text):
     elif "stop" in text:
         cancel_timer()
     else:
-        set_timer(text)
+        output = set_timer(text)
+        return output
 
 
 def set_timer(text):
@@ -369,6 +409,7 @@ def set_timer(text):
         pass
     else:
         time = ""
+        output = ""
 
         for i in range(len(text)):
             if text[i].isdigit():
@@ -377,10 +418,14 @@ def set_timer(text):
         if time != "":
             seconds = int(time)
 
+        output += str(seconds)
+
         if "hour" in text:
             seconds *= 3600
+            output += " hours"
         elif "minute" in text:
             seconds *= 60
+            output += " minutes"
 
     # create thread for timer and start it
     global timer
@@ -397,8 +442,9 @@ def cancel_timer():
     # call the stop method on timer thread
     if timer != None:
         timer.stop()
+        return "timer cancelled"
     else:
-        print("No active timers")
+        return "No active timers"
 
 
 def name_timer(text):
@@ -460,13 +506,13 @@ def calculate(text):
 
 def manage_alarm(text):
     """Wrapper method for adding/removing alarms."""
-    #Grab global variables
+    # Grab global variables
     global alarmPros
 
-    #Check text for what we need to do
+    # Check text for what we need to do
     if "cancel" in text:
         if alarmPros.is_alive():
-            #Cancel the alarm
+            # Cancel the alarm
             alarmPros.terminate()
             alarmPros = multiprocessing.Process()
             return "Alarm Cancelled"
@@ -474,7 +520,7 @@ def manage_alarm(text):
     else:
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
-        #Testing data (Grab actual time from text later)
+        # Testing data (Grab actual time from text later)
         altime = datetime.datetime.now()
         if altime.minute == 59:
             altime = altime.replace(hour=altime.hour + 1, minute=00)
@@ -488,7 +534,7 @@ def manage_alarm(text):
 
 def set_alarm(alarm):
     """Set an alarm that, when the given time passes, activates an alarm sound"""
-    #Set alarm and play the alarm sound when the time comes
+    # Set alarm and play the alarm sound when the time comes
     # print("Setting Alarm, press tab to cancel it")
     check_alarm(alarm)
     play_alarm()
@@ -496,12 +542,12 @@ def set_alarm(alarm):
 
 def check_alarm(alarm):
     """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
-    #Check if the current time matches the first alarm in the alarms array
+    # Check if the current time matches the first alarm in the alarms array
     while True:
-        #Check the date
-        if datetime.datetime.now().date() == alarm.date():  
+        # Check the date
+        if datetime.datetime.now().date() == alarm.date():
             while True:
-                #Check the time
+                # Check the time
                 if (
                     datetime.datetime.now().hour == alarm.hour
                     and datetime.datetime.now().minute == alarm.minute
@@ -511,12 +557,12 @@ def check_alarm(alarm):
 
 def play_alarm():
     """Play an alarm sound, unless flagged to stop or the sound ends"""
-    #Grab global variables
+    # Grab global variables
     global soundFile
     global audio
     global alarm
 
-    #Play the alarm sound
+    # Play the alarm sound
     stream = audio.open(
         format=audio.get_format_from_width(soundFile.getsampwidth()),
         channels=soundFile.getnchannels(),
@@ -629,19 +675,17 @@ def unknown(text):
 
 
 def load_login_creds(site):
-    '''Loads portal and SSO credentials for use in
-    get_schedule and get_upcoming_assignments.'''
+    """Loads portal and SSO credentials for use in
+    get_schedule and get_upcoming_assignments."""
     with open(os.path.join(ROOT, "login_credentials.txt"), "r") as f:
-        creds = [a.strip() for a in f.readlines() if not a.startswith('#')]
+        creds = [a.strip() for a in f.readlines() if not a.startswith("#")]
 
-    if site == 'portal':
+    if site == "portal":
         return creds[:2]
-    elif site == 'sso':
+    elif site == "sso":
         return creds[2:]
     else:
-        return ['','','']
-
-
+        return ["", "", ""]
 
 
 def main():

@@ -1,11 +1,14 @@
 # main.py
 # Main/Application File for Virtual Assistant
+
 import nltk
+
 # Check if First-Time NLTK Install is Needed
 try:
     import nltk.corpus
 except KeyError:
     import importCheck
+
     print("nltk download needed, press space when you are done")
     time.sleep(1)
     importCheck.firstTimenltk()
@@ -13,7 +16,7 @@ except KeyError:
         if keyboard.is_pressed("space"):
             break
 
-from urllib3.exceptions import InsecureRequestWarning # robobrowser warning silencer
+from urllib3.exceptions import InsecureRequestWarning  # robobrowser warning silencer
 import speech_recognition as sr
 import keyboard
 import datetime
@@ -27,7 +30,7 @@ import classifier as clf
 import widgets
 import voice
 
-# "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate 
+# "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate
 # access tokens and *use the Canvas Open API* to come up with your own integrations."
 # Canvas key
 # 15349~tpAglw1sd1wSVNED61mjP8KrewLv22rrMpvLzi0kQcF7rzky15rQlphXsF2PLPby
@@ -70,7 +73,7 @@ def main():
         "manage_alarm": widgets.manage_alarm,
         "manage_timer": widgets.manage_timer,
         "roll_dice": widgets.roll_dice,
-        "unknown": widgets.unknown
+        "unknown": widgets.unknown,
     }
 
     print("Press [Space] to start the virtual assistant.")
@@ -104,8 +107,8 @@ def main():
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
-                # if response:
-                    # voice.say(response)
+                if response:
+                    voice.say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")
@@ -116,7 +119,7 @@ def main():
                 get_keyboard_input()
 
         # STT throws errors if it can't transcribe what it hears; this catches them.
-        except sr.UnknownValueError: 
+        except sr.UnknownValueError:
             continue
 
 
