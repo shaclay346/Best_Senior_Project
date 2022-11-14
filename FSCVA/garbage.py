@@ -20,8 +20,8 @@ def login_SSO():
 
     time.sleep(3.5)
 
-    username = "sclaycomb"
-    password = "Harley350@chai"
+    username = ""
+    password = ""
 
     driver.find_element(By.ID, "branding-username").send_keys(username)
     driver.find_element(By.ID, "branding-password").send_keys(password)
@@ -80,6 +80,7 @@ def login_SSO():
     except:
         print("no security question asked")
         time.sleep(5)
+
         canvas_card = driver.find_element(
             By.XPATH,
             r"""//*[@id="contentDiv"]/div[7]/div/div/div[1]""",
@@ -89,6 +90,7 @@ def login_SSO():
         time.sleep(6)
         print("saving page")
 
+        # trying to find elemtns with selenium
         test = driver.find_elements(By.CLASS_NAME, "ergWt_bGBk")
 
         print(test)
