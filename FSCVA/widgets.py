@@ -47,7 +47,7 @@ alarmPros = multiprocessing.Process()
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
+def get_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
     # Load login credentials from login_credentials.txt
     username, password = load_login_creds("sso")
@@ -57,7 +57,7 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
         return "Incomplete login credentials given."
 
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
 
     # path = "./chromedriver.exe"
 
@@ -79,6 +79,8 @@ def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     login_button.click()
 
     time.sleep(3)
+
+    pdb.set_trace()
 
 
 def get_menu(text):
@@ -153,7 +155,11 @@ def get_menu(text):
             return random.choice(fanswers)
 
         meal = "dinner"
-        dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+
+        if "LUNCH & DINNER" in dishes:
+            dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+        else:
+            dishes = dishes[dishes.index("DINNER") + 1:]
     else:
         dishes = dishes[1:]
 
@@ -259,15 +265,11 @@ def get_time(text):
     if hours > 12:
         hours = hours % 12
         flag = True
+
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
 
-    if flag:
-        output += "PM"
-    else:
-        output += "AM"
-
-    return f"It's currently {output}."  ### temp ugly formatting for presentation
+    return f"It's currently {output}PM." if flag else f"It's currently {output}AM."
 
 
 def get_date(text):
@@ -321,7 +323,7 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
         if course:
             courses.append(course)
 
-    ### temp ugly formatting for presentation
+    # Get Today
     days = {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
     today = days.get(datetime.datetime.now().weekday())
 
@@ -492,21 +494,26 @@ def get_operands(text):
 def calculate(text):
     operands = get_operands(text)
     result = 0
-    if "plus" in text:
+    if "+" in text:
         result = operands[0] + operands[1]
-    elif "minus" in text:
+    elif "-" in text:
         result = operands[0] - operands[1]
-    elif "times" in text:
+    elif "*" in text:
         result = operands[0] * operands[1]
-    elif "divide" in text:
+    elif "/" in text:
         result = operands[0] // operands[1]
 
     return result
 
 
 def manage_alarm(text):
+<<<<<<< HEAD
     """Wrapper method for adding/removing alarms."""
     # Grab global variables
+=======
+    """Wrapper method for adding/removing an alarm."""
+    #Grab global variables
+>>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
     global alarmPros
 
     # Check text for what we need to do
@@ -520,6 +527,7 @@ def manage_alarm(text):
     else:
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
+<<<<<<< HEAD
         # Testing data (Grab actual time from text later)
         altime = datetime.datetime.now()
         if altime.minute == 59:
@@ -527,9 +535,90 @@ def manage_alarm(text):
         else:
             altime = altime.replace(minute=altime.minute + 1)
         alarm = altime
+=======
+        alarm = getAlarmTime(text)
+>>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
         return "Alarm Set"
+
+
+def getAlarmTime(text):
+    '''Extract the wanted time from the given text'''
+
+    #Search through the given text for a time, returning None if there is no time specified
+    timeStartIndex = -1
+    for i in range(len(text)):
+        if text[i].isnumeric():
+            timeStartIndex = i
+            break
+    if timeStartIndex == -1:
+        return None
+    
+    #Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
+    timeString = text[timeStartIndex]
+    currIndex = timeStartIndex + 1
+    timeFormat = "numeric" #Single number (ex. 6)
+    while currIndex < len(text):
+        if text[currIndex].isnumeric():
+            timeString += text[currIndex]
+            currIndex += 1
+            continue
+        if text[currIndex] == ":" and timeFormat != "time": #Time format (ex. 12:30)
+            timeString += text[currIndex]
+            timeFormat = "time"
+            currIndex += 1
+            continue
+        break
+
+    #Check if the given time is in an acceptable time form
+    if timeFormat == "numeric":
+        if int(timeString) < 0 or int(timeString) > 24:
+            return "Thats not a time"
+    else:
+        checkString = timeString.split(":")
+        if int(checkString[0]) < 0 or int(checkString[0]) > 23 or int(checkString[1]) < 0 or int(checkString[1]) > 59:
+            return "Thats not a time"
+
+    #Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
+    currentFix = None
+    currentFix = checkFix(text)
+    if currentFix == None and timeFormat != "time" and int(timeString) < 13:
+        fixStr = input("a.m. or p.m.?: ")
+        currentFix = checkFix(fixStr)
+
+    #Convert the given time to a datetime time object
+    timeStringList = ["00", "00", "00"]
+    if timeFormat == "numeric":
+        timeString = adjustForFix(currentFix, timeString)
+        timeStringList[0] = timeString
+    else:
+        splitTimeString = timeString.split(":")
+        splitTimeString[0] = adjustForFix(currentFix, splitTimeString[0])
+        timeStringList[0] = splitTimeString[0]
+        timeStringList[1] = splitTimeString[1]
+    if len(timeStringList[0]) == 1:
+        timeStringList[0] = "0" + timeStringList[0]
+    return datetime.time.fromisoformat(":".join(timeStringList))
+
+
+def checkFix(text):
+    '''Check if there is a time postfix (a.m. or p.m.) in the given text'''
+    if text.__contains__("a.m."):
+        return "am"
+    elif text.__contains__("p.m."):
+        return "pm"
+    return None
+
+
+def adjustForFix(currentFix, text):
+    '''Adjust the hour given for the 24-hour format datetime uses'''
+    if currentFix == "pm":
+        if text != "12":
+            text = str(int(text) + 12)
+    if currentFix == "am" and text == "12":
+        text = "00"
+    return text
 
 
 def set_alarm(alarm):
@@ -541,6 +630,7 @@ def set_alarm(alarm):
 
 
 def check_alarm(alarm):
+<<<<<<< HEAD
     """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
     # Check if the current time matches the first alarm in the alarms array
     while True:
@@ -553,6 +643,17 @@ def check_alarm(alarm):
                     and datetime.datetime.now().minute == alarm.minute
                 ):
                     return
+=======
+    """Check the current alarm. If the current time matches the alarm, return"""
+    #Check if the current time matches the alarm time
+    while True:
+        #Check the time
+        if (
+            datetime.datetime.now().hour == alarm.hour
+            and datetime.datetime.now().minute == alarm.minute
+        ):
+            return
+>>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
 
 
 def play_alarm():

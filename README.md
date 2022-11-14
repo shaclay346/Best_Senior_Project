@@ -37,6 +37,7 @@ Libraries Used
     <li>io: Provides main facilities for I/O</li>
     <li>urllib: Handels URLs efficiently</li>
     <li>wave: Deals with wave files for sound streams</li>
+    <li>selenium: for web browsing and browser automation</li>
 </ul>
 
 Installation (Windows)

@@ -24,8 +24,8 @@ setup(
         "robobrowser",
         "werkzeug",
         "requests-html",
-        # "multiprocessing",    #this was causing "pip install ." to fail for me, so I'm doing this for now
         "pyaudio",
         "wave",
+        "selenium",
     ],
 )
