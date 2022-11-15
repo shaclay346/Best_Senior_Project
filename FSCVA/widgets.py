@@ -31,20 +31,15 @@ werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )  # Fixes roboBrowser error I (William) was getting
 
-# needs to be added to build
-# don't want to mess anything up so I'm not adding it command was 'pip install selenium'
-
-# New imports
-
 # Constants/Global variables
-alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
-soundFile = wave.open(alarmSound, "rb")
-audio = pyaudio.PyAudio()
-timerSound = "alarms/sci-fi.wav"  # mixkit-scanning-sci-fi-alarm-905.wav
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
 ROOT = os.path.dirname(os.path.abspath(__file__))
+alarmSound = os.path.join(ROOT, "alarms/retro.wav")
+timerSound = os.path.join(ROOT, "alarms/sci-fi.wav")
+soundFile = wave.open(alarmSound, "rb")
+audio = pyaudio.PyAudio()
 
 
 def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
@@ -762,8 +757,7 @@ def load_login_creds(site):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    # pdb.set_trace()
-    get_times("set a timer for 2 hours and 30 minutes")
+    pdb.set_trace()
 
 
 if __name__ == "__main__":

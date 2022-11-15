@@ -16,7 +16,8 @@ except KeyError:
         if keyboard.is_pressed("space"):
             break
 
-from urllib3.exceptions import InsecureRequestWarning  # robobrowser warning silencer
+# robobrowser warning silencer
+from urllib3.exceptions import InsecureRequestWarning
 import speech_recognition as sr
 import keyboard
 import datetime
@@ -64,7 +65,7 @@ def main():
         "calculate": widgets.calculate,
         "define_word": widgets.define_word,
         "flip_coin": widgets.flip_coin,
-        "get_assignments": widgets.get_assignments,
+        "get_assignments": widgets.get_upcoming_assignments,
         "get_balance": widgets.get_balance,
         "get_date": widgets.get_date,
         "get_menu": widgets.get_menu,
