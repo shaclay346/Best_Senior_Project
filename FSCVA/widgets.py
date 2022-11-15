@@ -40,7 +40,7 @@ werkzeug.cached_property = (
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
 soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
-timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
+timerSound = "alarms/sci-fi.wav"  # mixkit-scanning-sci-fi-alarm-905.wav
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
@@ -507,8 +507,6 @@ def calculate(text):
 def manage_alarm(text):
     """Wrapper method for adding/removing alarms."""
     # Grab global variables
-    """Wrapper method for adding/removing an alarm."""
-    # Grab global variables
     global alarmPros
 
     # Check text for what we need to do
@@ -522,13 +520,6 @@ def manage_alarm(text):
     else:
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
-        # Testing data (Grab actual time from text later)
-        altime = datetime.datetime.now()
-        if altime.minute == 59:
-            altime = altime.replace(hour=altime.hour + 1, minute=00)
-        else:
-            altime = altime.replace(minute=altime.minute + 1)
-        alarm = altime
         alarm = getAlarmTime(text)
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
@@ -536,7 +527,7 @@ def manage_alarm(text):
 
 
 def getAlarmTime(text):
-    """Extract the wanted time from the given text"""
+    '''Extract the wanted time from the given text'''
 
     # Search through the given text for a time, returning None if there is no time specified
     timeStartIndex = -1
@@ -596,7 +587,7 @@ def getAlarmTime(text):
 
 
 def checkFix(text):
-    """Check if there is a time postfix (a.m. or p.m.) in the given text"""
+    '''Check if there is a time postfix (a.m. or p.m.) in the given text'''
     if text.__contains__("a.m."):
         return "am"
     elif text.__contains__("p.m."):
@@ -605,7 +596,7 @@ def checkFix(text):
 
 
 def adjustForFix(currentFix, text):
-    """Adjust the hour given for the 24-hour format datetime uses"""
+    '''Adjust the hour given for the 24-hour format datetime uses'''
     if currentFix == "pm":
         if text != "12":
             text = str(int(text) + 12)
@@ -623,20 +614,9 @@ def set_alarm(alarm):
 
 
 def check_alarm(alarm):
-    """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
-    # Check if the current time matches the first alarm in the alarms array
     """Check the current alarm. If the current time matches the alarm, return"""
     # Check if the current time matches the alarm time
     while True:
-        # Check the date
-        if datetime.datetime.now().date() == alarm.date():
-            while True:
-                # Check the time
-                if (
-                    datetime.datetime.now().hour == alarm.hour
-                    and datetime.datetime.now().minute == alarm.minute
-                ):
-                    return
         # Check the time
         if (
             datetime.datetime.now().hour == alarm.hour
