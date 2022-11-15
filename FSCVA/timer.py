@@ -2,12 +2,7 @@ import threading
 import time
 from playsound import playsound
 
-<<<<<<< HEAD
-timerSound = 'alarms/mixkit-scanning-sci-fi-alarm-905.wav'
-# C:\Users\shacl\Documents\Best_Senior_Project\FSCVA\alarms\mixkit-retro-game-emergency-alarm-1000.wav
-=======
 timerSound = 'alarms/sci-fi.wav'
->>>>>>> f0b0ed5f282f73fe9e875e46a7b850d5abceed47
 
 # class for Timer Thread
 
