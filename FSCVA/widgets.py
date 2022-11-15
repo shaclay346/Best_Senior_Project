@@ -1,40 +1,40 @@
 # widgets.py
 # File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
+import pyaudio
+import wave
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+import ssl
+import multiprocessing
+import urllib
+from timer import Timer
+from requests_html import HTMLSession
+from googlesearch import search
+from bs4 import BeautifulSoup
+import requests as rq
+import datetime
+import os
+import io
+import re
+import pdb
+import json
+import math
+import time
+import random
+from playsound import playsound  # New pip install
+import threading  # Built-in method
+from robobrowser import RoboBrowser
 import werkzeug
 
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )  # Fixes roboBrowser error I (William) was getting
-from robobrowser import RoboBrowser
-import threading  # Built-in method
-from playsound import playsound  # New pip install
-import random
-import time
-import math
-import json
-import pdb
-import re
-import io
-import os
-import datetime
-import requests as rq
-from bs4 import BeautifulSoup
-from googlesearch import search
-from requests_html import HTMLSession
-from timer import Timer
-import urllib
-import multiprocessing
-import ssl
 
 # needs to be added to build
 # don't want to mess anything up so I'm not adding it command was 'pip install selenium'
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 
 # New imports
-import wave
-import pyaudio
 
 # Constants/Global variables
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
@@ -47,7 +47,7 @@ alarmPros = multiprocessing.Process()
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
-def get_assignments(text, username="USERNAME", password="PASSWORD"):
+def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
     # Load login credentials from login_credentials.txt
     username, password = load_login_creds("sso")
@@ -57,7 +57,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         return "Incomplete login credentials given."
 
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
 
     # path = "./chromedriver.exe"
 
@@ -79,8 +79,6 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     login_button.click()
 
     time.sleep(3)
-
-    pdb.set_trace()
 
 
 def get_menu(text):
@@ -141,14 +139,14 @@ def get_menu(text):
             return random.choice(fanswers)
 
         meal = "breakfast"
-        dishes = dishes[dishes.index("BREAKFAST") + 1 : dishes.index("LUNCH")]
+        dishes = dishes[dishes.index("BREAKFAST") + 1: dishes.index("LUNCH")]
     elif "lunch" in text:
         # Bad Menu Check
         if "LUNCH" not in dishes or "DINNER" not in dishes:
             return random.choice(fanswers)
 
         meal = "lunch"
-        dishes = dishes[dishes.index("LUNCH") + 1 : dishes.index("DINNER")]
+        dishes = dishes[dishes.index("LUNCH") + 1: dishes.index("DINNER")]
     elif "dinner" in text:
         # Bad Menu Check
         if "DINNER" not in dishes:
@@ -157,7 +155,7 @@ def get_menu(text):
         meal = "dinner"
 
         if "LUNCH & DINNER" in dishes:
-            dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+            dishes = dishes[dishes.index("LUNCH & DINNER") + 1:]
         else:
             dishes = dishes[dishes.index("DINNER") + 1:]
     else:
@@ -265,7 +263,6 @@ def get_time(text):
     if hours > 12:
         hours = hours % 12
         flag = True
-
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
 
@@ -324,7 +321,8 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
             courses.append(course)
 
     # Get Today
-    days = {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
+    days = {0: "Mon", 1: "Tue", 2: "Wed",
+            3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
     today = days.get(datetime.datetime.now().weekday())
 
     schedule = []
@@ -348,37 +346,8 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
 
 def better_title(text):
     """Converts text to real title case, unlike title()"""
-    lowercase_words = [
-        "and",
-        "as",
-        "if",
-        "at",
-        "but",
-        "by",
-        "for",
-        "from",
-        "only",
-        "in",
-        "into",
-        "like",
-        "near",
-        "of",
-        "off",
-        "on",
-        "once",
-        "onto",
-        "or",
-        "out",
-        "over",
-        "so",
-        "that",
-        "than",
-        "to",
-        "up",
-        "upon",
-        "with",
-        "when",
-    ]
+    lowercase_words = ["and", "as", "if", "at", "but", "by", "for", "from", "only", "in", "into", "like", "near", "of", "off",
+                       "on", "once", "onto", "or", "out", "over", "so", "that", "than", "to", "up", "upon", "with", "when"]
     text = text.split()
     return " ".join(
         [
@@ -403,12 +372,41 @@ def manage_timer(text):
         return output
 
 
+def get_times(text):
+    """gets the hours and minutes for timer if the user said something like
+    'set a timer for 2 hours and 15 minutes'"""
+    hours = ""
+    minutes = ""
+    index = 0
+    # first number they say is hours, second num is minutes
+    # need an edge case if they say two and a half
+    for i in range(len(text)):
+        if text[i].isdigit():
+            hours += text[i]
+            index = i
+            break
+
+    index = text.find("and", 0)
+    for j in range(index, len(text)):
+        if text[j].isdigit():
+            minutes += text[j]
+
+    seconds = int(hours) * 3600
+    seconds += int(minutes) * 60
+    print(f"timer set for {hours} hour")
+    print(seconds)
+
+    return seconds
+
+
 def set_timer(text):
     """sets a timer for a given period of time"""
     seconds = 0
     if "and" in text:
         # handle this seperately
-        pass
+        # so the only time they would say this would be with hours and minutes
+        # set a timer for 2 hours and 20 minutes or 1 and a half hours
+        seconds = get_times(text)
     else:
         time = ""
         output = ""
@@ -507,13 +505,10 @@ def calculate(text):
 
 
 def manage_alarm(text):
-<<<<<<< HEAD
     """Wrapper method for adding/removing alarms."""
     # Grab global variables
-=======
     """Wrapper method for adding/removing an alarm."""
-    #Grab global variables
->>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
+    # Grab global variables
     global alarmPros
 
     # Check text for what we need to do
@@ -527,7 +522,6 @@ def manage_alarm(text):
     else:
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
-<<<<<<< HEAD
         # Testing data (Grab actual time from text later)
         altime = datetime.datetime.now()
         if altime.minute == 59:
@@ -535,18 +529,16 @@ def manage_alarm(text):
         else:
             altime = altime.replace(minute=altime.minute + 1)
         alarm = altime
-=======
         alarm = getAlarmTime(text)
->>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
         return "Alarm Set"
 
 
 def getAlarmTime(text):
-    '''Extract the wanted time from the given text'''
+    """Extract the wanted time from the given text"""
 
-    #Search through the given text for a time, returning None if there is no time specified
+    # Search through the given text for a time, returning None if there is no time specified
     timeStartIndex = -1
     for i in range(len(text)):
         if text[i].isnumeric():
@@ -554,24 +546,25 @@ def getAlarmTime(text):
             break
     if timeStartIndex == -1:
         return None
-    
-    #Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
+
+    # Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
     timeString = text[timeStartIndex]
     currIndex = timeStartIndex + 1
-    timeFormat = "numeric" #Single number (ex. 6)
+    timeFormat = "numeric"  # Single number (ex. 6)
     while currIndex < len(text):
         if text[currIndex].isnumeric():
             timeString += text[currIndex]
             currIndex += 1
             continue
-        if text[currIndex] == ":" and timeFormat != "time": #Time format (ex. 12:30)
+        # Time format (ex. 12:30)
+        if text[currIndex] == ":" and timeFormat != "time":
             timeString += text[currIndex]
             timeFormat = "time"
             currIndex += 1
             continue
         break
 
-    #Check if the given time is in an acceptable time form
+    # Check if the given time is in an acceptable time form
     if timeFormat == "numeric":
         if int(timeString) < 0 or int(timeString) > 24:
             return "Thats not a time"
@@ -580,14 +573,14 @@ def getAlarmTime(text):
         if int(checkString[0]) < 0 or int(checkString[0]) > 23 or int(checkString[1]) < 0 or int(checkString[1]) > 59:
             return "Thats not a time"
 
-    #Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
+    # Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
     currentFix = None
     currentFix = checkFix(text)
     if currentFix == None and timeFormat != "time" and int(timeString) < 13:
         fixStr = input("a.m. or p.m.?: ")
         currentFix = checkFix(fixStr)
 
-    #Convert the given time to a datetime time object
+    # Convert the given time to a datetime time object
     timeStringList = ["00", "00", "00"]
     if timeFormat == "numeric":
         timeString = adjustForFix(currentFix, timeString)
@@ -603,7 +596,7 @@ def getAlarmTime(text):
 
 
 def checkFix(text):
-    '''Check if there is a time postfix (a.m. or p.m.) in the given text'''
+    """Check if there is a time postfix (a.m. or p.m.) in the given text"""
     if text.__contains__("a.m."):
         return "am"
     elif text.__contains__("p.m."):
@@ -612,7 +605,7 @@ def checkFix(text):
 
 
 def adjustForFix(currentFix, text):
-    '''Adjust the hour given for the 24-hour format datetime uses'''
+    """Adjust the hour given for the 24-hour format datetime uses"""
     if currentFix == "pm":
         if text != "12":
             text = str(int(text) + 12)
@@ -630,9 +623,10 @@ def set_alarm(alarm):
 
 
 def check_alarm(alarm):
-<<<<<<< HEAD
     """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
     # Check if the current time matches the first alarm in the alarms array
+    """Check the current alarm. If the current time matches the alarm, return"""
+    # Check if the current time matches the alarm time
     while True:
         # Check the date
         if datetime.datetime.now().date() == alarm.date():
@@ -643,17 +637,12 @@ def check_alarm(alarm):
                     and datetime.datetime.now().minute == alarm.minute
                 ):
                     return
-=======
-    """Check the current alarm. If the current time matches the alarm, return"""
-    #Check if the current time matches the alarm time
-    while True:
-        #Check the time
+        # Check the time
         if (
             datetime.datetime.now().hour == alarm.hour
             and datetime.datetime.now().minute == alarm.minute
         ):
             return
->>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
 
 
 def play_alarm():
@@ -701,10 +690,12 @@ def parse_results(response):
         try:
             title = results[i].find(css_identifier_title, first=True).text
             text = results[i].find(css_identifier_text, first=True).text
-            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+            link = results[i].find(css_identifier_link,
+                                   first=True).attrs["href"]
         except:
             title = results[i].find(css_identifier_title, first=True).text
-            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+            link = results[i].find(css_identifier_link,
+                                   first=True).attrs["href"]
             text = "Not available"
 
         output += f"\nTitle: {title}\nText: {text}\nLink: {link}\n"
@@ -792,10 +783,7 @@ def load_login_creds(site):
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
     # pdb.set_trace()
-    manage_timer("set a timer for 20 minutes")
-
-    time.sleep(4)
-    manage_timer("stop the timer...")
+    get_times("set a timer for 2 hours and 30 minutes")
 
 
 if __name__ == "__main__":

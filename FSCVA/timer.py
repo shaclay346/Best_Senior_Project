@@ -3,6 +3,7 @@ import time
 from playsound import playsound
 
 timerSound = 'alarms/mixkit-scanning-sci-fi-alarm-905.wav'
+# C:\Users\shacl\Documents\Best_Senior_Project\FSCVA\alarms\mixkit-retro-game-emergency-alarm-1000.wav
 
 # class for Timer Thread
 
@@ -14,7 +15,6 @@ class Timer(threading.Thread):
 
         # rather than doing this could do a loop that decrements a counter by 1 each iteration
         # and sleeps for a second each iteration
-        print("timer started for ", seconds, " seconds")
         while(seconds >= 0 and not self.__stopper):
             # print(seconds)
             time.sleep(1)
