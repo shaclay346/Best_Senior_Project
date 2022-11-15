@@ -40,7 +40,7 @@ import pyaudio
 alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
 soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
-timerSound = "alarms/mixkit-scanning-sci-fi-alarm-905.wav"
+timerSound = "alarms/sci-fi.wav" #mixkit-scanning-sci-fi-alarm-905.wav
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
@@ -507,13 +507,8 @@ def calculate(text):
 
 
 def manage_alarm(text):
-<<<<<<< HEAD
     """Wrapper method for adding/removing alarms."""
     # Grab global variables
-=======
-    """Wrapper method for adding/removing an alarm."""
-    #Grab global variables
->>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
     global alarmPros
 
     # Check text for what we need to do
@@ -527,17 +522,7 @@ def manage_alarm(text):
     else:
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
-<<<<<<< HEAD
-        # Testing data (Grab actual time from text later)
-        altime = datetime.datetime.now()
-        if altime.minute == 59:
-            altime = altime.replace(hour=altime.hour + 1, minute=00)
-        else:
-            altime = altime.replace(minute=altime.minute + 1)
-        alarm = altime
-=======
         alarm = getAlarmTime(text)
->>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
         return "Alarm Set"
@@ -630,20 +615,6 @@ def set_alarm(alarm):
 
 
 def check_alarm(alarm):
-<<<<<<< HEAD
-    """Check the current alarms. If the time matches one of the alarms, activate an alarm sound"""
-    # Check if the current time matches the first alarm in the alarms array
-    while True:
-        # Check the date
-        if datetime.datetime.now().date() == alarm.date():
-            while True:
-                # Check the time
-                if (
-                    datetime.datetime.now().hour == alarm.hour
-                    and datetime.datetime.now().minute == alarm.minute
-                ):
-                    return
-=======
     """Check the current alarm. If the current time matches the alarm, return"""
     #Check if the current time matches the alarm time
     while True:
@@ -653,7 +624,6 @@ def check_alarm(alarm):
             and datetime.datetime.now().minute == alarm.minute
         ):
             return
->>>>>>> f569f961c8fabcdc80fb39210bafce048de25af0
 
 
 def play_alarm():
