@@ -42,7 +42,7 @@ soundFile = wave.open(alarmSound, "rb")
 audio = pyaudio.PyAudio()
 
 
-def get_upcoming_assignments(text, username="USERNAME", password="PASSWORD"):
+def get_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
     # Load login credentials from login_credentials.txt
     username, password = load_login_creds("sso")
