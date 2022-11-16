@@ -363,8 +363,11 @@ def manage_timer(text):
     elif "stop" in text:
         cancel_timer()
     else:
-        output = set_timer(text)
-        return output
+        try:
+            output = set_timer(text)
+            return output
+        except:
+            return "Please try setting your timer again."
 
 
 def get_times(text):
@@ -372,39 +375,90 @@ def get_times(text):
     'set a timer for 2 hours and 15 minutes'"""
     hours = ""
     minutes = ""
+    seconds = 0
     index = 0
-    # first number they say is hours, second num is minutes
-    # need an edge case if they say two and a half
-    for i in range(len(text)):
-        if text[i].isdigit():
-            hours += text[i]
-            index = i
-            break
+    output = ""
 
-    index = text.find("and", 0)
-    for j in range(index, len(text)):
-        if text[j].isdigit():
-            minutes += text[j]
+    if("half" in text):
+        tempTime = ""
 
-    seconds = int(hours) * 3600
-    seconds += int(minutes) * 60
-    print(f"timer set for {hours} hour")
-    print(seconds)
+        for i in range(len(text)):
+            if text[i].isdigit():
+                tempTime += text[i]
+                break
 
-    return seconds
+        if("hour" in text):
+            hours += tempTime
+            # minutes = 30
+
+            seconds = int(hours) * 3600
+            seconds += 30 * 60
+
+            output = f"{hours} hours and {minutes} minutes"
+            return [seconds, output]
+        else:
+            minutes += tempTime
+            seconds = 30
+
+            seconds += int(minutes) * 60
+
+            output = f"{minutes} minutes and {30} seconds"
+            return [seconds, output]
+
+    # they said something like 5 minutes and 15 seconds
+    if("seconds" in text):
+        for i in range(len(text)):
+            if text[i].isdigit():
+                minutes += text[i]
+                index = i
+                break
+
+        index = text.find("and", 0)
+        temp = ""
+        for j in range(index, len(text)):
+            if text[j].isdigit():
+                temp += text[j]
+
+        seconds += int(temp)
+        seconds += int(minutes) * 60
+
+        output = f"{minutes} minutes and {temp} seconds"
+
+        return [seconds, output]
+
+    # hours and minutes
+    else:
+        for i in range(len(text)):
+            if text[i].isdigit():
+                hours += text[i]
+                index = i
+                break
+
+        index = text.find("and", 0)
+        for j in range(index, len(text)):
+            if text[j].isdigit():
+                minutes += text[j]
+
+        seconds = int(hours) * 3600
+        seconds += int(minutes) * 60
+
+        output = f"{hours} hours and {minutes} minutes"
+        return [seconds, output]
 
 
 def set_timer(text):
     """sets a timer for a given period of time"""
+    # all time will be converted to seconds
     seconds = 0
+    output = "timer set for "
+
+    # if the user says set a timer for 2 and a half hours
     if "and" in text:
-        # handle this seperately
-        # so the only time they would say this would be with hours and minutes
-        # set a timer for 2 hours and 20 minutes or 1 and a half hours
-        seconds = get_times(text)
+        data = get_times(text)
+        seconds = data[0]
+        output += data[1]
     else:
         time = ""
-        output = ""
 
         for i in range(len(text)):
             if text[i].isdigit():
@@ -421,15 +475,16 @@ def set_timer(text):
         elif "minute" in text:
             seconds *= 60
             output += " minutes"
+        else:
+            output += " seconds"
 
     # create thread for timer and start it
     global timer
+    print("seconds", seconds)
     timer = Timer(seconds, timerSound)
-
-    if "name" in text:
-        name_timer(text)
-
     timer.start()
+
+    return output
 
 
 def cancel_timer():
@@ -496,7 +551,7 @@ def calculate(text):
     elif "/" in text:
         result = operands[0] // operands[1]
 
-    return result
+    return str(result)
 
 
 def manage_alarm(text):
