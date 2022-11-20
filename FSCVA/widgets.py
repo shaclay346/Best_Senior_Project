@@ -53,7 +53,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         return "Incomplete login credentials given."
 
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.headless = True
 
     # Change Chromedriver File Depending on OS
     if sys.platform == 'darwin': # MacOS
@@ -63,8 +63,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     else: # Other
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
-    driver = webdriver.Chrome(path)
-    # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
+    driver = webdriver.Chrome(path, options=chrome_options)
 
     # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
     driver.get(
@@ -191,7 +190,37 @@ def get_menu(text):
 
 def get_balance(text):
     """Returns the student's Snake Bite Balance."""
-    return "Still working on this."
+    # return "Still working on this."
+    # Load login credentials from login_credentials.txt
+    username, password = load_login_creds("get")
+
+    chrome_options = Options()
+    # chrome_options.headless = True
+
+    # Change Chromedriver File Depending on OS
+    if sys.platform == 'darwin': # MacOS
+        path = os.path.join(ROOT, 'chromedriver')
+    elif sys.platform in ['win32', 'win64', 'cygwin']: # Windows
+        path = os.path.join(ROOT, 'chromedriver.exe')
+    else: # Other
+        return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
+
+    driver = webdriver.Chrome(path, options=chrome_options)
+
+    url = "https://get.cbord.com/flsouthern/full/login.php"
+
+    driver.get(url)
+
+    time.sleep(1)
+
+    driver.find_element(By.ID, "login_username_text").send_keys(username)
+    driver.find_element(By.ID, "login_password_text").send_keys(password)
+
+    login_button = driver.find_element(By.ID, "login_submit")
+    login_button.click()
+
+    time.sleep(3)
+
 
 
 def get_weather(text):
@@ -212,18 +241,26 @@ def get_weather(text):
     temperature = json_data["main"]["temp"]
     feels_like = json_data["main"]["feels_like"]
 
-    # (K − 273.15) × 9/5 + 32
+    # Convert Cº to Fº (K − 273.15) × 9/5 + 32
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    output = f"The weather is being described as {description} and the temperature is {temperature}ºF"
+    #### Output
 
-    # only add feels like temperature if it is different than actual temp
-    if feels_like != temperature:
-        output = f"The weather is being described as {description} and the temperature is {temperature}ºF, but feels like {feels_like}ºF."
+    # Basic Output
+    output = f"Looks like there'll be some {description} today"
 
-    if type_ == "Rain":
-        output += " I recommend you bring an umbrella with you today."
+    # Rain
+    if type_.lower() == 'rain':
+        output += ", so I'd recommend you take an umbrella with you"
+    
+    # Temperature / Feels Like Temperature
+    output += f". It's currently {temperature}ºF"
+    
+    if abs(feels_like - temperature) > 3:
+        output += f", but it feels like {feels_like}"
+
+    output += "."
 
     return output
 
@@ -817,13 +854,16 @@ def load_login_creds(site):
     if site == "portal":
         return creds[:2]
     elif site == "sso":
-        return creds[2:]
+        return creds[2:-2]
+    elif site == "get":
+        return creds [-2:]
     else:
-        return ["", "", ""]
+        return ["", ""]
 
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
+    print(get_balance('broke'))
     pdb.set_trace()
 
 
