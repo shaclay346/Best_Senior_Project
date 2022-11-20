@@ -17,6 +17,7 @@ import datetime
 import os
 import io
 import re
+import sys
 import pdb
 import json
 import math
@@ -54,9 +55,15 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
-    # path = "./chromedriver.exe"
+    # Change Chromedriver File Depending on OS
+    if sys.platform == 'darwin': # MacOS
+        path = os.path.join(ROOT, 'chromedriver')
+    elif sys.platform in ['win32', 'win64', 'cygwin']: # Windows
+        path = os.path.join(ROOT, 'chromedriver.exe')
+    else: # Other
+        return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(path)
     # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
 
     # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
@@ -298,6 +305,11 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
 
     # Get All Courses
     table = soup.find("table", {"id": "tblCoursesSched"})
+
+    # If no table, incorrect credentials were given.
+    if not table:
+        return "Incorrect login credentials given."
+
     table = table.find_all("tr", {"id": re.compile("[trItems$]")})
 
     # Split Courses
