@@ -22,6 +22,7 @@ import pdb
 import json
 import math
 import time
+import voice
 import random
 from playsound import playsound  # New pip install
 import threading  # Built-in method
@@ -140,7 +141,20 @@ def get_menu(text):
             return random.choice(fanswers)
 
         meal = "breakfast"
-        dishes = dishes[dishes.index("BREAKFAST") + 1: dishes.index("LUNCH")]
+
+        # Check if LUNCH exists. If not, brunch
+        next_meal = "LUNCH" if "LUNCH" in dishes else "BRUNCH"
+
+        dishes = dishes[dishes.index("BREAKFAST") + 1: dishes.index(next_meal)]
+    
+    elif "brunch" in text:
+        # Bad Menu Check
+        if "BRUNCH" not in dishes or "DINNER" not in dishes:
+            return random.choice(fanswers)
+
+        meal = "brunch"
+        dishes = dishes[dishes.index("BRUNCH") + 1: dishes.index("DINNER")]
+    
     elif "lunch" in text:
         # Bad Menu Check
         if "LUNCH" not in dishes or "DINNER" not in dishes:
@@ -148,6 +162,7 @@ def get_menu(text):
 
         meal = "lunch"
         dishes = dishes[dishes.index("LUNCH") + 1: dishes.index("DINNER")]
+    
     elif "dinner" in text:
         # Bad Menu Check
         if "DINNER" not in dishes:
@@ -169,6 +184,7 @@ def get_menu(text):
             "Portabello's",
             "World Tour",
             "BREAKFAST",
+            "BRUNCH",
             "LUNCH",
             "LUNCH & DINNER",
             "DINNER",
@@ -190,12 +206,15 @@ def get_menu(text):
 
 def get_balance(text):
     """Returns the student's Snake Bite Balance."""
-    # return "Still working on this."
+    
+    # Display Loading Message (Since this is a slow process)
+    waiting = show_waiting()
+
     # Load login credentials from login_credentials.txt
     username, password = load_login_creds("get")
 
     chrome_options = Options()
-    # chrome_options.headless = True
+    chrome_options.headless = True
 
     # Change Chromedriver File Depending on OS
     if sys.platform == 'darwin': # MacOS
@@ -219,8 +238,22 @@ def get_balance(text):
     login_button = driver.find_element(By.ID, "login_submit")
     login_button.click()
 
-    time.sleep(3)
+    time.sleep(1)
 
+    table = driver.find_element(By.ID, "get_funds_overview")
+
+    # Get Accounts (Flex, Snake Bites in that order)
+    contents = [a for a in table.text.split('\n') if any(b in a for b in ['Flex Dollars', 'Snake Bites'])]
+
+    # Be Snarky if You're Kinda Broke
+    monies = [a.split()[-1] for a in contents]
+
+    total = sum([float(a[1:]) for a in monies])
+
+    if total < 10:
+        return f"Your wallet's looking light. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
+    else:
+        return f"You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
 
 
 def get_weather(text):
@@ -843,6 +876,16 @@ def unknown(text):
         "Figure it out yourself.",
     ]
     return random.choice(options)
+
+
+def show_waiting():
+    """Returns and speaks "One moment..." Answer"""
+    options = ["One second...\r", "Checking...\r", "Hold on...\r"]
+    choice = random.choice(options)
+
+    print(f"{choice}\r")
+    
+    # voice.say(choice.strip()) # uncomment for presentation
 
 
 def load_login_creds(site):
