@@ -892,7 +892,7 @@ def load_login_creds(site):
     """Loads portal and SSO credentials for use in
     get_schedule and get_upcoming_assignments."""
     with open(os.path.join(ROOT, "login_credentials.txt"), "r") as f:
-        creds = [a.strip() for a in f.readlines() if not a.startswith("#")]
+        creds = [a.strip() for a in f.readlines() if a and not a.startswith("#")]
 
     if site == "portal":
         return creds[:2]
