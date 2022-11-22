@@ -631,7 +631,7 @@ def calculate(text):
     elif "*" in text:
         result = operands[0] * operands[1]
     elif "/" in text:
-        result = operands[0] // operands[1]
+        result = 0 if operands[1] == 0 else round(operands[0] / operands[1], 3)
 
     return str(result)
 
