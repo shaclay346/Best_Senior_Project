@@ -523,6 +523,8 @@ def manage_alarm(text):
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
         alarm = getAlarmTime(text)
+        if type(alarm) == str:
+            return alarm
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
         return "Alarm Set"
@@ -531,14 +533,14 @@ def manage_alarm(text):
 def getAlarmTime(text):
     '''Extract the wanted time from the given text'''
 
-    #Search through the given text for a time, returning None if there is no time specified
+    #Search through the given text for a time, returning error string if there is no time specified
     timeStartIndex = -1
     for i in range(len(text)):
         if text[i].isnumeric():
             timeStartIndex = i
             break
     if timeStartIndex == -1:
-        return None
+        return "No time has been given, please make an alarm with a time"
     
     #Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
     timeString = text[timeStartIndex]
@@ -559,11 +561,11 @@ def getAlarmTime(text):
     #Check if the given time is in an acceptable time form
     if timeFormat == "numeric":
         if int(timeString) < 0 or int(timeString) > 24:
-            return "Thats not a time"
+            return "Thats not a valid time, please make an alarm with a valid time"
     else:
         checkString = timeString.split(":")
         if int(checkString[0]) < 0 or int(checkString[0]) > 23 or int(checkString[1]) < 0 or int(checkString[1]) > 59:
-            return "Thats not a time"
+            return "Thats not a valid time, please make an alarm with a valid time"
 
     #Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
     currentFix = None
