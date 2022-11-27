@@ -14,7 +14,6 @@ class Timer(threading.Thread):
 
         # rather than doing this could do a loop that decrements a counter by 1 each iteration
         # and sleeps for a second each iteration
-        print("timer started for ", seconds, " seconds")
         while(seconds >= 0 and not self.__stopper):
             # print(seconds)
             time.sleep(1)

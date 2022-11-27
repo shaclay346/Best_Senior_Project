@@ -1,50 +1,46 @@
 # widgets.py
 # File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
+import pyaudio
+import wave
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+import ssl
+import multiprocessing
+import urllib
+from timer import Timer
+from requests_html import HTMLSession
+from googlesearch import search
+from bs4 import BeautifulSoup
+import requests as rq
+import datetime
+import os
+import io
+import re
+import sys
+import pdb
+import json
+import math
+import time
+import voice
+import random
+from playsound import playsound  # New pip install
+import threading  # Built-in method
 import werkzeug
-
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )  # Fixes roboBrowser error I (William) was getting
 from robobrowser import RoboBrowser
-import threading  # Built-in method
-from playsound import playsound  # New pip install
-import random
-import time
-import math
-import json
-import pdb
-import re
-import io
-import os
-import datetime
-import requests as rq
-from bs4 import BeautifulSoup
-from googlesearch import search
-from requests_html import HTMLSession
-from timer import Timer
-import urllib
-import multiprocessing
-import ssl
-
-# needs to be added to build
-# don't want to mess anything up so I'm not adding it command was 'pip install selenium'
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-
-# New imports
-import wave
-import pyaudio
 
 # Constants/Global variables
-alarmSound = "alarms/mixkit-retro-game-emergency-alarm-1000.wav"
-soundFile = wave.open(alarmSound, "rb")
-audio = pyaudio.PyAudio()
-timerSound = "alarms/sci-fi.wav" #mixkit-scanning-sci-fi-alarm-905.wav
 timer = None
 alarm = None
 alarmPros = multiprocessing.Process()
 ROOT = os.path.dirname(os.path.abspath(__file__))
+alarmSound = os.path.join(ROOT, "alarms/retro.wav")
+timerSound = os.path.join(ROOT, "alarms/sci-fi.wav")
+soundFile = wave.open(alarmSound, "rb")
+audio = pyaudio.PyAudio()
 
 
 def get_assignments(text, username="USERNAME", password="PASSWORD"):
@@ -57,12 +53,17 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         return "Incomplete login credentials given."
 
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
+    chrome_options.headless = True
 
-    # path = "./chromedriver.exe"
+    # Change Chromedriver File Depending on OS
+    if sys.platform == 'darwin': # MacOS
+        path = os.path.join(ROOT, 'chromedriver')
+    elif sys.platform in ['win32', 'win64', 'cygwin']: # Windows
+        path = os.path.join(ROOT, 'chromedriver.exe')
+    else: # Other
+        return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
-    driver = webdriver.Chrome()
-    # driver = webdriver.Chrome(executable_path=path, options=chrome_options)
+    driver = webdriver.Chrome(path, options=chrome_options)
 
     # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
     driver.get(
@@ -79,8 +80,6 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     login_button.click()
 
     time.sleep(3)
-
-    pdb.set_trace()
 
 
 def get_menu(text):
@@ -141,14 +140,28 @@ def get_menu(text):
             return random.choice(fanswers)
 
         meal = "breakfast"
-        dishes = dishes[dishes.index("BREAKFAST") + 1 : dishes.index("LUNCH")]
+
+        # Check if LUNCH exists. If not, brunch
+        next_meal = "LUNCH" if "LUNCH" in dishes else "BRUNCH"
+
+        dishes = dishes[dishes.index("BREAKFAST") + 1: dishes.index(next_meal)]
+    
+    elif "brunch" in text:
+        # Bad Menu Check
+        if "BRUNCH" not in dishes or "DINNER" not in dishes:
+            return random.choice(fanswers)
+
+        meal = "brunch"
+        dishes = dishes[dishes.index("BRUNCH") + 1: dishes.index("DINNER")]
+    
     elif "lunch" in text:
         # Bad Menu Check
         if "LUNCH" not in dishes or "DINNER" not in dishes:
             return random.choice(fanswers)
 
         meal = "lunch"
-        dishes = dishes[dishes.index("LUNCH") + 1 : dishes.index("DINNER")]
+        dishes = dishes[dishes.index("LUNCH") + 1: dishes.index("DINNER")]
+    
     elif "dinner" in text:
         # Bad Menu Check
         if "DINNER" not in dishes:
@@ -157,7 +170,7 @@ def get_menu(text):
         meal = "dinner"
 
         if "LUNCH & DINNER" in dishes:
-            dishes = dishes[dishes.index("LUNCH & DINNER") + 1 :]
+            dishes = dishes[dishes.index("LUNCH & DINNER") + 1:]
         else:
             dishes = dishes[dishes.index("DINNER") + 1:]
     else:
@@ -170,6 +183,7 @@ def get_menu(text):
             "Portabello's",
             "World Tour",
             "BREAKFAST",
+            "BRUNCH",
             "LUNCH",
             "LUNCH & DINNER",
             "DINNER",
@@ -191,7 +205,54 @@ def get_menu(text):
 
 def get_balance(text):
     """Returns the student's Snake Bite Balance."""
-    return "Still working on this."
+    
+    # Display Loading Message (Since this is a slow process)
+    waiting = show_waiting()
+
+    # Load login credentials from login_credentials.txt
+    username, password = load_login_creds("get")
+
+    chrome_options = Options()
+    chrome_options.headless = True
+
+    # Change Chromedriver File Depending on OS
+    if sys.platform == 'darwin': # MacOS
+        path = os.path.join(ROOT, 'chromedriver')
+    elif sys.platform in ['win32', 'win64', 'cygwin']: # Windows
+        path = os.path.join(ROOT, 'chromedriver.exe')
+    else: # Other
+        return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
+
+    driver = webdriver.Chrome(path, options=chrome_options)
+
+    url = "https://get.cbord.com/flsouthern/full/login.php"
+
+    driver.get(url)
+
+    time.sleep(1)
+
+    driver.find_element(By.ID, "login_username_text").send_keys(username)
+    driver.find_element(By.ID, "login_password_text").send_keys(password)
+
+    login_button = driver.find_element(By.ID, "login_submit")
+    login_button.click()
+
+    time.sleep(1)
+
+    table = driver.find_element(By.ID, "get_funds_overview")
+
+    # Get Accounts (Flex, Snake Bites in that order)
+    contents = [a for a in table.text.split('\n') if any(b in a for b in ['Flex Dollars', 'Snake Bites'])]
+
+    # Be Snarky if You're Kinda Broke
+    monies = [a.split()[-1] for a in contents]
+
+    total = sum([float(a[1:]) for a in monies])
+
+    if total < 10:
+        return f"Your wallet's looking light. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
+    else:
+        return f"You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
 
 
 def get_weather(text):
@@ -212,18 +273,26 @@ def get_weather(text):
     temperature = json_data["main"]["temp"]
     feels_like = json_data["main"]["feels_like"]
 
-    # (K − 273.15) × 9/5 + 32
+    # Convert Cº to Fº (K − 273.15) × 9/5 + 32
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    output = f"The weather is being described as {description} and the temperature is {temperature}ºF"
+    #### Output
 
-    # only add feels like temperature if it is different than actual temp
-    if feels_like != temperature:
-        output = f"The weather is being described as {description} and the temperature is {temperature}ºF, but feels like {feels_like}ºF."
+    # Basic Output
+    output = f"Looks like there'll be some {description} today"
 
-    if type_ == "Rain":
-        output += " I recommend you bring an umbrella with you today."
+    # Rain
+    if type_.lower() == 'rain':
+        output += ", so I'd recommend you take an umbrella with you"
+    
+    # Temperature / Feels Like Temperature
+    output += f". It's currently {temperature}ºF"
+    
+    if abs(feels_like - temperature) > 3:
+        output += f", but it feels like {feels_like}"
+
+    output += "."
 
     return output
 
@@ -265,7 +334,6 @@ def get_time(text):
     if hours > 12:
         hours = hours % 12
         flag = True
-
     minutes = now.strftime("%M")
     output = str(hours) + ":" + minutes
 
@@ -306,6 +374,11 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
 
     # Get All Courses
     table = soup.find("table", {"id": "tblCoursesSched"})
+
+    # If no table, incorrect credentials were given.
+    if not table:
+        return "Incorrect login credentials given."
+
     table = table.find_all("tr", {"id": re.compile("[trItems$]")})
 
     # Split Courses
@@ -324,7 +397,8 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
             courses.append(course)
 
     # Get Today
-    days = {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
+    days = {0: "Mon", 1: "Tue", 2: "Wed",
+            3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
     today = days.get(datetime.datetime.now().weekday())
 
     schedule = []
@@ -348,37 +422,8 @@ def get_schedule(text, username="USERNAME", password="PASSWORD"):
 
 def better_title(text):
     """Converts text to real title case, unlike title()"""
-    lowercase_words = [
-        "and",
-        "as",
-        "if",
-        "at",
-        "but",
-        "by",
-        "for",
-        "from",
-        "only",
-        "in",
-        "into",
-        "like",
-        "near",
-        "of",
-        "off",
-        "on",
-        "once",
-        "onto",
-        "or",
-        "out",
-        "over",
-        "so",
-        "that",
-        "than",
-        "to",
-        "up",
-        "upon",
-        "with",
-        "when",
-    ]
+    lowercase_words = ["and", "as", "if", "at", "but", "by", "for", "from", "only", "in", "into", "like", "near", "of", "off",
+                       "on", "once", "onto", "or", "out", "over", "so", "that", "than", "to", "up", "upon", "with", "when"]
     text = text.split()
     return " ".join(
         [
@@ -399,19 +444,102 @@ def manage_timer(text):
     elif "stop" in text:
         cancel_timer()
     else:
-        output = set_timer(text)
-        return output
+        try:
+            output = set_timer(text)
+            return output
+        except:
+            return "Please try setting your timer again."
+
+
+def get_times(text):
+    """gets the hours and minutes for timer if the user said something like
+    'set a timer for 2 hours and 15 minutes'"""
+    hours = ""
+    minutes = ""
+    seconds = 0
+    index = 0
+    output = ""
+
+    if("half" in text):
+        tempTime = ""
+
+        for i in range(len(text)):
+            if text[i].isdigit():
+                tempTime += text[i]
+                break
+
+        if("hour" in text):
+            hours += tempTime
+            # minutes = 30
+
+            seconds = int(hours) * 3600
+            seconds += 30 * 60
+
+            output = f"{hours} hours and {minutes} minutes"
+            return [seconds, output]
+        else:
+            minutes += tempTime
+            seconds = 30
+
+            seconds += int(minutes) * 60
+
+            output = f"{minutes} minutes and {30} seconds"
+            return [seconds, output]
+
+    # they said something like 5 minutes and 15 seconds
+    if("seconds" in text):
+        for i in range(len(text)):
+            if text[i].isdigit():
+                minutes += text[i]
+                index = i
+                break
+
+        index = text.find("and", 0)
+        temp = ""
+        for j in range(index, len(text)):
+            if text[j].isdigit():
+                temp += text[j]
+
+        seconds += int(temp)
+        seconds += int(minutes) * 60
+
+        output = f"{minutes} minutes and {temp} seconds"
+
+        return [seconds, output]
+
+    # hours and minutes
+    else:
+        for i in range(len(text)):
+            if text[i].isdigit():
+                hours += text[i]
+                index = i
+                break
+
+        index = text.find("and", 0)
+        for j in range(index, len(text)):
+            if text[j].isdigit():
+                minutes += text[j]
+
+        seconds = int(hours) * 3600
+        seconds += int(minutes) * 60
+
+        output = f"{hours} hours and {minutes} minutes"
+        return [seconds, output]
 
 
 def set_timer(text):
     """sets a timer for a given period of time"""
+    # all time will be converted to seconds
     seconds = 0
+    output = "timer set for "
+
+    # if the user says set a timer for 2 and a half hours
     if "and" in text:
-        # handle this seperately
-        pass
+        data = get_times(text)
+        seconds = data[0]
+        output += data[1]
     else:
         time = ""
-        output = ""
 
         for i in range(len(text)):
             if text[i].isdigit():
@@ -428,15 +556,16 @@ def set_timer(text):
         elif "minute" in text:
             seconds *= 60
             output += " minutes"
+        else:
+            output += " seconds"
 
     # create thread for timer and start it
     global timer
+    print("seconds", seconds)
     timer = Timer(seconds, timerSound)
-
-    if "name" in text:
-        name_timer(text)
-
     timer.start()
+
+    return output
 
 
 def cancel_timer():
@@ -501,9 +630,9 @@ def calculate(text):
     elif "*" in text:
         result = operands[0] * operands[1]
     elif "/" in text:
-        result = operands[0] // operands[1]
+        result = 0 if operands[1] == 0 else round(operands[0] / operands[1], 3)
 
-    return result
+    return str(result)
 
 
 def manage_alarm(text):
@@ -545,20 +674,21 @@ def getAlarmTime(text):
     #Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
     timeString = text[timeStartIndex]
     currIndex = timeStartIndex + 1
-    timeFormat = "numeric" #Single number (ex. 6)
+    timeFormat = "numeric"  # Single number (ex. 6)
     while currIndex < len(text):
         if text[currIndex].isnumeric():
             timeString += text[currIndex]
             currIndex += 1
             continue
-        if text[currIndex] == ":" and timeFormat != "time": #Time format (ex. 12:30)
+        # Time format (ex. 12:30)
+        if text[currIndex] == ":" and timeFormat != "time":
             timeString += text[currIndex]
             timeFormat = "time"
             currIndex += 1
             continue
         break
 
-    #Check if the given time is in an acceptable time form
+    # Check if the given time is in an acceptable time form
     if timeFormat == "numeric":
         if int(timeString) < 0 or int(timeString) > 24:
             return "Thats not a valid time, please make an alarm with a valid time"
@@ -567,14 +697,13 @@ def getAlarmTime(text):
         if int(checkString[0]) < 0 or int(checkString[0]) > 23 or int(checkString[1]) < 0 or int(checkString[1]) > 59:
             return "Thats not a valid time, please make an alarm with a valid time"
 
-    #Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
+    # Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
     currentFix = None
     currentFix = checkFix(text)
     if currentFix == None and timeFormat != "time" and int(timeString) < 13:
-        fixStr = input("a.m. or p.m.?: ")
-        currentFix = checkFix(fixStr)
+        return "No abbreviation recognized, try again including a.m. or p.m."
 
-    #Convert the given time to a datetime time object
+    # Convert the given time to a datetime time object
     timeStringList = ["00", "00", "00"]
     if timeFormat == "numeric":
         timeString = adjustForFix(currentFix, timeString)
@@ -618,9 +747,9 @@ def set_alarm(alarm):
 
 def check_alarm(alarm):
     """Check the current alarm. If the current time matches the alarm, return"""
-    #Check if the current time matches the alarm time
+    # Check if the current time matches the alarm time
     while True:
-        #Check the time
+        # Check the time
         if (
             datetime.datetime.now().hour == alarm.hour
             and datetime.datetime.now().minute == alarm.minute
@@ -673,10 +802,12 @@ def parse_results(response):
         try:
             title = results[i].find(css_identifier_title, first=True).text
             text = results[i].find(css_identifier_text, first=True).text
-            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+            link = results[i].find(css_identifier_link,
+                                   first=True).attrs["href"]
         except:
             title = results[i].find(css_identifier_title, first=True).text
-            link = results[i].find(css_identifier_link, first=True).attrs["href"]
+            link = results[i].find(css_identifier_link,
+                                   first=True).attrs["href"]
             text = "Not available"
 
         output += f"\nTitle: {title}\nText: {text}\nLink: {link}\n"
@@ -747,27 +878,36 @@ def unknown(text):
     return random.choice(options)
 
 
+def show_waiting():
+    """Returns and speaks "One moment..." Answer"""
+    options = ["One second...\r", "Checking...\r", "Hold on...\r"]
+    choice = random.choice(options)
+
+    print(f"{choice}\r")
+    
+    # voice.say(choice.strip()) # uncomment for presentation
+
+
 def load_login_creds(site):
     """Loads portal and SSO credentials for use in
     get_schedule and get_upcoming_assignments."""
     with open(os.path.join(ROOT, "login_credentials.txt"), "r") as f:
-        creds = [a.strip() for a in f.readlines() if not a.startswith("#")]
+        creds = [a.strip() for a in f.readlines() if a and not a.startswith("#")]
 
     if site == "portal":
         return creds[:2]
     elif site == "sso":
-        return creds[2:]
+        return creds[2:-2]
+    elif site == "get":
+        return creds [-2:]
     else:
-        return ["", "", ""]
+        return ["", ""]
 
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    # pdb.set_trace()
-    manage_timer("set a timer for 20 minutes")
-
-    time.sleep(4)
-    manage_timer("stop the timer...")
+    print(get_balance('broke'))
+    pdb.set_trace()
 
 
 if __name__ == "__main__":

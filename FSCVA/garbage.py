@@ -98,7 +98,8 @@ def login_SSO():
         # load the page into beautiful soup
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        assignments = soup.find_all("span", {"class": "Grouping-styles__title"})
+        assignments = soup.find_all(
+            "span", {"class": "Grouping-styles__title"})
         # assignments = soup.find_all("span", class_="Grouping-styles__title")
 
         print(assignments)
@@ -106,33 +107,33 @@ def login_SSO():
         time.sleep(10)
 
 
-login_SSO()
+# login_SSO()
 # now I will need to webscrape the html page
-# br = RoboBrowser()
-# br.open("https://flsouthern.instructure.com/?login_success=1", verify=True)
+br = RoboBrowser()
+br.open("https://flsouthern.instructure.com/?login_success=1", verify=True)
 
-# link = "https://flsouthern.instructure.com/?login_success=1"
-# src = str(br.parsed())
-# soup = BeautifulSoup(src, "html.parser")
+link = "https://flsouthern.instructure.com/?login_success=1"
+time.sleep(3)
+src = str(br.parsed())
+soup = BeautifulSoup(src, "html.parser")
 
-# assignments = soup.find_all("span", {"aria-hidden": "true"})
-# #                                       fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN
+assignments = soup.find_all("span", {"aria-hidden": "true"})
+#                                       fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN
 
-# class_names = soup.find_all(
-#     "span", class_="enRcg_bGBk enRcg_dfBC enRcg_eQnG enRcg_bLsb"
+# class_names = soup.find(
+#     "span", class_="Grouping-styles__title"
 # )
 
-# test = soup.find("div", {"class": "PlannerItem-styles__type"})
-# # assignments = soup.find_all("a", {"class": r"""fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN"""})
-# # assignments = soup.find_all("a", class_="fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN")
-# print(test)
+test = soup.find_all("span")
+print(len(test))
+# assignments = soup.find_all("a", {"class": r"""fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN"""})
+# assignments = soup.find_all("a", class_="fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN")
 # for i in range(len(assignments)):
 #     tag = assignments[i].b
 #     # tag.string
 #     print(tag.string)
-# temp = assignments[0]
 
-# print(assignments[0])
+print(len(assignments))
 
 # x path for clicking on canvas if sso is successful
 # //*[@id="contentDiv"]/div[7]/div/div/div[1]

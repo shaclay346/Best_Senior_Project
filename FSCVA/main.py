@@ -16,7 +16,8 @@ except KeyError:
         if keyboard.is_pressed("space"):
             break
 
-from urllib3.exceptions import InsecureRequestWarning  # robobrowser warning silencer
+# robobrowser warning silencer
+from urllib3.exceptions import InsecureRequestWarning
 import speech_recognition as sr
 import keyboard
 import datetime
@@ -108,8 +109,8 @@ def main():
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
-                if response:
-                    voice.say(response)
+                # if response:
+                #     voice.say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")
