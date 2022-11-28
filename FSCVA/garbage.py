@@ -4,6 +4,9 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from robobrowser import RoboBrowser
 import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 def login_SSO():
@@ -20,8 +23,8 @@ def login_SSO():
 
     time.sleep(3.5)
 
-    username = ""
-    password = ""
+    username = "sclaycomb"
+    password = "Harley351@chai"
 
     driver.find_element(By.ID, "branding-username").send_keys(username)
     driver.find_element(By.ID, "branding-password").send_keys(password)
@@ -79,7 +82,7 @@ def login_SSO():
     # sometimes a security question won't be asked, so just click on the access canvas card
     except:
         print("no security question asked")
-        time.sleep(5)
+        time.sleep(3)
 
         canvas_card = driver.find_element(
             By.XPATH,
@@ -88,52 +91,87 @@ def login_SSO():
         canvas_card.click()
 
         time.sleep(6)
-        print("saving page")
 
-        # trying to find elemtns with selenium
-        test = driver.find_elements(By.CLASS_NAME, "ergWt_bGBk")
+        # for the love of god please load me into the dashboard with this
+        driver.get("https://flsouthern.instructure.com/")
+        time.sleep(4)
 
-        print(test)
-
-        # load the page into beautiful soup
         soup = BeautifulSoup(driver.page_source, "html.parser")
+        tags = soup.find_all("span", class_="ergWt_bGBk")
 
-        assignments = soup.find_all(
-            "span", {"class": "Grouping-styles__title"})
-        # assignments = soup.find_all("span", class_="Grouping-styles__title")
+        assignments = []
+        for i in range(len(tags) - 1):
+            print(tags[i].getText())
+        #     s = str(tags[i])
+            if("due" in s):
+                assignments.append(tags[i].getText())
+        #         print(assignments[i])
+        #     del assignments[i]
 
-        print(assignments)
+        # //*[@id="global_nav_dashboard_link"]
 
         time.sleep(10)
 
+        # soup = BeautifulSoup(driver.page_source, "html.parser")
+        # print(soup.prettify())
 
-# login_SSO()
+        # soup = BeautifulSoup(driver.page_source, "html.parser")
+        # assignments = soup.find_all("span", class_="ergWt_bGBk")
+        # print(assignments)
+
+        # # class="ergWt_bGBk"
+        # test = driver.find_elements(By.CLASS_NAME, "ergWt_bGBk")
+        # print(test)
+
+        # wait = WebDriverWait(driver, 10)
+        # # element = wait.until(EC.text_to_be_present_in_element(
+        # #     (By.CLASS_NAME, "fOyUs_bGBk blnAQ_bGBk blnAQ_cVrl blnAQ_drOs"), "Tomorrow"))
+
+        # # print the html at this point
+        # element = wait.until(EC.visibility_of_all_elements_located(
+        #     (By.CLASS_NAME, "ergWt_bGBk")))
+
+        # print(element)
+        # element = WebDriverWait(driver, 900).until(
+        #     EC.text_to_be_present_in_element(
+        #         (By.CLASS_NAME, "enRcg_bGBk enRcg_cMDj enRcg_bdMA enRcg_eQnG"), "Today")
+        # )
+
+        # print(element)
+
+        # time.sleep(8)
+
+        # wait until something with this class shows up
+        # element = WebDriverWait(driver, 10).until(
+        #     EC.presence_of_element_located(
+        #         (By.CLASS_NAME, "styles__secondary"))
+        # )
+        # print("elem", element)
+
+
+login_SSO()
+
 # now I will need to webscrape the html page
-br = RoboBrowser()
-br.open("https://flsouthern.instructure.com/?login_success=1", verify=True)
+# br = RoboBrowser()
+# br.open("https://flsouthern.instructure.com/?login_success=1", verify=True)
 
-link = "https://flsouthern.instructure.com/?login_success=1"
-time.sleep(3)
-src = str(br.parsed())
-soup = BeautifulSoup(src, "html.parser")
+# link = "https://flsouthern.instructure.com/?login_success=1"
+# time.sleep(3)
+# src = str(br.parsed())
+# soup = BeautifulSoup(src, "html.parser")
 
-assignments = soup.find_all("span", {"aria-hidden": "true"})
-#                                       fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN
+# driver = webdriver.Chrome()
+# driver.get("https://flsouthern.instructure.com/?login_success=1")
 
-# class_names = soup.find(
-#     "span", class_="Grouping-styles__title"
+
+# styles__secondary
+
+# wait until something with this class shows up
+# element = WebDriverWait(driver, 10).until(
+#     EC.presence_of_element_located((By.CLASS_NAME, "styles__secondary"))
 # )
 
-test = soup.find_all("span")
-print(len(test))
-# assignments = soup.find_all("a", {"class": r"""fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN"""})
-# assignments = soup.find_all("a", class_="fOyUs_bGBk fbyHH_bGBk fbyHH_bSMN")
-# for i in range(len(assignments)):
-#     tag = assignments[i].b
-#     # tag.string
-#     print(tag.string)
 
-print(len(assignments))
+# test = soup.find_all("span", {"aria-hidden": "true"})
 
-# x path for clicking on canvas if sso is successful
-# //*[@id="contentDiv"]/div[7]/div/div/div[1]
+# print(len(test))
