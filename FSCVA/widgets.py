@@ -80,12 +80,13 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     login_button = driver.find_element(By.ID, "branding-sumbit-button")
     login_button.click()
 
-    time.sleep(3)
+    time.sleep(4)
 
     # if a security question gets asked this handles it, at least for me (Shane)
     try:
+        # //*[@id="mfaDivId"]/form/div[2]/div[2]/div[2]/a
         security_button = driver.find_element(
-            By.XPATH, r"""//*[@id="mfaDivId"]/form/div[2]/div[2]/div[1]"""
+            By.XPATH, r"""/html/body/div[4]/div/div[3]/div/div/form/div[2]/div[2]/div[2]"""
         )
         security_button.click()
 
@@ -96,7 +97,6 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
                 By.XPATH,
                 r"""//*[@id="securityQuestionModal"]/div[3]/div/div/div[2]/div[2]/form/div[1]/div/p""",
             ).text
-            print(question)
 
             if "movie" in question:
                 break
@@ -119,7 +119,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         )
         submit_button.click()
 
-        time.sleep(5)
+        time.sleep(6)
         canvas_card = driver.find_element(
             By.XPATH,
             r"""//*[@id="contentDiv"]/div[7]/div/div/div[1]""",
@@ -136,13 +136,14 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         )
         canvas_card.click()
 
+    finally:
         time.sleep(6)
 
-        # for the love of god please load me into the dashboard with this
         driver.get("https://flsouthern.instructure.com/")
         time.sleep(4)
 
         soup = BeautifulSoup(driver.page_source, "html.parser")
+        # find info about the assignments by getting items with this class
         tags = soup.find_all("span", class_="ergWt_bGBk")
 
         assignments = []
@@ -915,15 +916,21 @@ def google_search(query):
 def define_word(text):
     """uses the dictionaryapi to get the dictionary definition of a word"""
     # need to parse the word they want defined
+    word = ""
 
     # if they said define _____   extract the second word
     if "define" in text:
         word = text.split(" ", 1)[1].rsplit(" ", 1)[0]
     # otherwise they probably said whats the definition of ____
     else:
-        pass
+        idx = text.rfind(' ')
+        for i in range(idx+1, len(text)):
+            word += text[i]
 
     # https://api.dictionaryapi.dev/api/v2/entries/en/<word>
+    if word == "":
+        return "unable to define that word."
+
     url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
     response = rq.request("GET", url)
     text = json.loads(response.text)
@@ -980,7 +987,8 @@ def load_login_creds(site):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    pdb.set_trace()
+    print(get_assignments(""))
+    # pdb.set_trace()
 
 
 if __name__ == "__main__":

@@ -31,11 +31,6 @@ import classifier as clf
 import widgets
 import voice
 
-# "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate
-# access tokens and *use the Canvas Open API* to come up with your own integrations."
-# Canvas key
-# 15349~tpAglw1sd1wSVNED61mjP8KrewLv22rrMpvLzi0kQcF7rzky15rQlphXsF2PLPby
-
 
 def get_keyboard_input():
     # wait for user to press space to start the VA
@@ -76,6 +71,7 @@ def main():
         "manage_timer": widgets.manage_timer,
         "roll_dice": widgets.roll_dice,
         "unknown": widgets.unknown,
+        "google_search": widgets.google_search,
     }
 
     print("Press [Space] to start the virtual assistant.")
