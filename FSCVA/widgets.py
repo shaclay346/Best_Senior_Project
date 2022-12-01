@@ -28,8 +28,6 @@ from bs4 import BeautifulSoup
 import requests as rq
 import datetime
 import os
-
-
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )  # Fixes roboBrowser error I (William) was getting
@@ -54,6 +52,9 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     if username == "USERNAME" or password == "PASSWORD":
         return "Incomplete login credentials given."
 
+    chrome_options = Options()
+    chrome_options.headless = True
+
     # Change Chromedriver File Depending on OS
     if sys.platform == 'darwin':  # MacOS
         path = os.path.join(ROOT, 'chromedriver')
@@ -63,9 +64,8 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
     chrome_options = Options()
-    chrome_options.headless = True
     chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--output=/dev/null")
+    driver = webdriver.Chrome()
     driver = webdriver.Chrome(options=chrome_options)
 
     # have chrome open the SSO page
@@ -128,7 +128,6 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
     # sometimes a security question won't be asked, so just click on the access canvas card
     except:
-        print("no security question asked")
         time.sleep(3)
 
         canvas_card = driver.find_element(
@@ -981,7 +980,7 @@ def load_login_creds(site):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    print(google_search("When was gremlins released"))
+    print(get_assignments("", "sclaycomb", "Harley351@chai"))
 
 
 if __name__ == "__main__":
