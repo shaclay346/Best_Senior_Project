@@ -980,7 +980,7 @@ def load_login_creds(site):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    print(get_assignments("", "sclaycomb", "Harley351@chai"))
+    pdb.set_trace()
 
 
 if __name__ == "__main__":
