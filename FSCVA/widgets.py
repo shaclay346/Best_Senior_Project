@@ -1,5 +1,18 @@
 # widgets.py
 # File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
+import werkzeug
+import threading  # Built-in method
+from playsound import playsound  # New pip install
+import random
+import voice
+import time
+import math
+import json
+import pdb
+import sys
+import re
+import io
+from robobrowser import RoboBrowser
 import pyaudio
 import wave
 from selenium.webdriver.common.by import By
@@ -15,22 +28,9 @@ from bs4 import BeautifulSoup
 import requests as rq
 import datetime
 import os
-import io
-import re
-import sys
-import pdb
-import json
-import math
-import time
-import voice
-import random
-from playsound import playsound  # New pip install
-import threading  # Built-in method
-import werkzeug
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )  # Fixes roboBrowser error I (William) was getting
-from robobrowser import RoboBrowser
 
 # Constants/Global variables
 timer = None
@@ -56,21 +56,22 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     chrome_options.headless = True
 
     # Change Chromedriver File Depending on OS
-    if sys.platform == 'darwin': # MacOS
+    if sys.platform == 'darwin':  # MacOS
         path = os.path.join(ROOT, 'chromedriver')
-    elif sys.platform in ['win32', 'win64', 'cygwin']: # Windows
+    elif sys.platform in ['win32', 'win64', 'cygwin']:  # Windows
         path = os.path.join(ROOT, 'chromedriver.exe')
-    else: # Other
+    else:  # Other
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
-    driver = webdriver.Chrome(path, options=chrome_options)
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(options=chrome_options)
 
-    # https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-30T15%3A23%3A20Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=cf5a8855-b88e-4b66-a427-fc216714d8a1&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL
-    driver.get(
-        r"""https://id.quicklaunch.io/authenticationendpoint/login.do?commonAuthCallerPath=%2Fpassivests&forceAuth=false&passiveAuth=false&tenantDomain=flsouthern.edu&wa=wsignin1.0&wct=2022-10-21T13%3A15%3A25Z&wctx=rm%3D0%26id%3Dpassive%26ru%3D%252fcas%252flogin%253fservice%253dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fadmin%25252Fsecured%25252F414%25252Fapi%25252Fauth%25253Furl%25253Dhttps%25253A%25252F%25252Fsso.flsouthern.edu%25252Fhome%25252F414&wtrealm=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&sessionDataKey=0f8b7a5d-4491-4530-9fc1-61c3da9512c3&relyingParty=https%3A%2F%2Fcas-flsouthern.quicklaunch.io%2F&type=passivests&sp=flsouthernedu&isSaaSApp=false&authenticators=BasicAuthenticator:LOCAL"""
-    )
+    # have chrome open the SSO page
+    driver.get("https://sso.flsouthern.edu/home/414")
 
-    time.sleep(4)
+    time.sleep(3.5)
 
     driver.find_element(By.ID, "branding-username").send_keys(username)
     driver.find_element(By.ID, "branding-password").send_keys(password)
@@ -80,6 +81,78 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     login_button.click()
 
     time.sleep(3)
+
+    # if a security question gets asked this handles it, at least for me (Shane)
+    try:
+        security_button = driver.find_element(
+            By.XPATH, r"""//*[@id="mfaDivId"]/form/div[2]/div[2]/div[1]"""
+        )
+        security_button.click()
+
+        question = ""
+
+        while True:
+            question = driver.find_element(
+                By.XPATH,
+                r"""//*[@id="securityQuestionModal"]/div[3]/div/div/div[2]/div[2]/form/div[1]/div/p""",
+            ).text
+            print(question)
+
+            if "movie" in question:
+                break
+
+            skip_button = driver.find_element(
+                By.XPATH,
+                r"""//*[@id="securityQuestionModal"]/div[3]/div/div/div[2]/div[2]/form/div[2]/button[2]""",
+            )
+            skip_button.click()
+
+            time.sleep(2)
+
+        # id for Answer: securityAnswer
+        driver.find_element(By.ID, r"""securityAnswer""").send_keys("hot rod")
+        time.sleep(3)
+
+        submit_button = driver.find_element(
+            By.XPATH,
+            r"""//*[@id="securityQuestionModal"]/div[3]/div/div/div[2]/div[2]/form/div[2]/button[4]""",
+        )
+        submit_button.click()
+
+        time.sleep(5)
+        canvas_card = driver.find_element(
+            By.XPATH,
+            r"""//*[@id="contentDiv"]/div[7]/div/div/div[1]""",
+        )
+        canvas_card.click()
+
+    # sometimes a security question won't be asked, so just click on the access canvas card
+    except:
+        print("no security question asked")
+        time.sleep(3)
+
+        canvas_card = driver.find_element(
+            By.XPATH,
+            r"""//*[@id="contentDiv"]/div[7]/div/div/div[1]""",
+        )
+        canvas_card.click()
+
+        time.sleep(6)
+
+        # for the love of god please load me into the dashboard with this
+        driver.get("https://flsouthern.instructure.com/")
+        time.sleep(4)
+
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        tags = soup.find_all("span", class_="ergWt_bGBk")
+
+        assignments = []
+        for i in range(len(tags) - 1):
+            s = str(tags[i].getText)
+            if("due" in s):
+                assignments.append(tags[i].getText())
+
+        return assignments
 
 
 def get_menu(text):
@@ -145,7 +218,7 @@ def get_menu(text):
         next_meal = "LUNCH" if "LUNCH" in dishes else "BRUNCH"
 
         dishes = dishes[dishes.index("BREAKFAST") + 1: dishes.index(next_meal)]
-    
+
     elif "brunch" in text:
         # Bad Menu Check
         if "BRUNCH" not in dishes or "DINNER" not in dishes:
@@ -153,7 +226,7 @@ def get_menu(text):
 
         meal = "brunch"
         dishes = dishes[dishes.index("BRUNCH") + 1: dishes.index("DINNER")]
-    
+
     elif "lunch" in text:
         # Bad Menu Check
         if "LUNCH" not in dishes or "DINNER" not in dishes:
@@ -161,7 +234,7 @@ def get_menu(text):
 
         meal = "lunch"
         dishes = dishes[dishes.index("LUNCH") + 1: dishes.index("DINNER")]
-    
+
     elif "dinner" in text:
         # Bad Menu Check
         if "DINNER" not in dishes:
@@ -205,7 +278,7 @@ def get_menu(text):
 
 def get_balance(text):
     """Returns the student's Snake Bite Balance."""
-    
+
     # Display Loading Message (Since this is a slow process)
     waiting = show_waiting()
 
@@ -216,11 +289,11 @@ def get_balance(text):
     chrome_options.headless = True
 
     # Change Chromedriver File Depending on OS
-    if sys.platform == 'darwin': # MacOS
+    if sys.platform == 'darwin':  # MacOS
         path = os.path.join(ROOT, 'chromedriver')
-    elif sys.platform in ['win32', 'win64', 'cygwin']: # Windows
+    elif sys.platform in ['win32', 'win64', 'cygwin']:  # Windows
         path = os.path.join(ROOT, 'chromedriver.exe')
-    else: # Other
+    else:  # Other
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
     driver = webdriver.Chrome(path, options=chrome_options)
@@ -242,7 +315,8 @@ def get_balance(text):
     table = driver.find_element(By.ID, "get_funds_overview")
 
     # Get Accounts (Flex, Snake Bites in that order)
-    contents = [a for a in table.text.split('\n') if any(b in a for b in ['Flex Dollars', 'Snake Bites'])]
+    contents = [a for a in table.text.split('\n') if any(
+        b in a for b in ['Flex Dollars', 'Snake Bites'])]
 
     # Be Snarky if You're Kinda Broke
     monies = [a.split()[-1] for a in contents]
@@ -277,7 +351,7 @@ def get_weather(text):
     temperature = math.floor((temperature - 273.15) * 9 // 5 + 32)
     feels_like = math.floor((feels_like - 273.15) * 9 // 5 + 32)
 
-    #### Output
+    # Output
 
     # Basic Output
     output = f"Looks like there'll be some {description} today"
@@ -285,10 +359,10 @@ def get_weather(text):
     # Rain
     if type_.lower() == 'rain':
         output += ", so I'd recommend you take an umbrella with you"
-    
+
     # Temperature / Feels Like Temperature
     output += f". It's currently {temperature}ºF"
-    
+
     if abs(feels_like - temperature) > 3:
         output += f", but it feels like {feels_like}"
 
@@ -662,7 +736,7 @@ def manage_alarm(text):
 def getAlarmTime(text):
     '''Extract the wanted time from the given text'''
 
-    #Search through the given text for a time, returning error string if there is no time specified
+    # Search through the given text for a time, returning error string if there is no time specified
     timeStartIndex = -1
     for i in range(len(text)):
         if text[i].isnumeric():
@@ -670,8 +744,8 @@ def getAlarmTime(text):
             break
     if timeStartIndex == -1:
         return "No time has been given, please make an alarm with a time"
-    
-    #Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
+
+    # Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
     timeString = text[timeStartIndex]
     currIndex = timeStartIndex + 1
     timeFormat = "numeric"  # Single number (ex. 6)
@@ -884,7 +958,7 @@ def show_waiting():
     choice = random.choice(options)
 
     print(f"{choice}\r")
-    
+
     # voice.say(choice.strip()) # uncomment for presentation
 
 
@@ -892,22 +966,22 @@ def load_login_creds(site):
     """Loads portal and SSO credentials for use in
     get_schedule and get_upcoming_assignments."""
     with open(os.path.join(ROOT, "login_credentials.txt"), "r") as f:
-        creds = [a.strip() for a in f.readlines() if a and not a.startswith("#")]
+        creds = [a.strip()
+                 for a in f.readlines() if a and not a.startswith("#")]
 
     if site == "portal":
         return creds[:2]
     elif site == "sso":
         return creds[2:-2]
     elif site == "get":
-        return creds [-2:]
+        return creds[-2:]
     else:
         return ["", ""]
 
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    print(get_balance('broke'))
-    pdb.set_trace()
+    print(get_assignments("", "sclaycomb", "Harley351@chai"))
 
 
 if __name__ == "__main__":
