@@ -24,7 +24,7 @@ global feature_names
 CONFIDENCE_THRESHOLD = 0.3
 
 
-def predict(sentence):
+def predict(sentence, verbose=False):
 	'''Processes and predicts the string "sentence"'''
 	# Invalid sentence type
 	if not isinstance(sentence, str):
@@ -65,10 +65,10 @@ def predict(sentence):
 	# Check for Empty Sentence (Invalid Query) or Low Confidence
 	confidence = np.max(clf.predict_proba(vectors.reshape(1,-1)))
 
-	# pdb.set_trace()
-	# print(f"\tSentence: {sentence}")
-	# print(f"\tPrediction: {prediction}")
-	# print(f"\tConfidence: {confidence}")
+	if verbose:
+		print(f"\tSentence: {sentence}")
+		print(f"\tPrediction: {prediction}")
+		print(f"\tConfidence: {confidence}")
 
 	if not sentence or confidence < CONFIDENCE_THRESHOLD:
 		return "unknown"
@@ -215,12 +215,18 @@ def main(args):
 		if query == 'q':
 			break
 
-		prediction = predict(query)
+		prediction = predict(query, True)
 
 		print(f"\tPrediction: {prediction}")
 
 
 if __name__ == '__main__':
 	main(parser.parse_args())
+
+
+
+
+
+
 
 
