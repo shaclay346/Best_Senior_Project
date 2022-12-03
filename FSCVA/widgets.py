@@ -1,36 +1,23 @@
 # widgets.py
 # File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
 import werkzeug
-import threading  # Built-in method
-from playsound import playsound  # New pip install
-import random
-import voice
-import time
-import math
-import json
-import pdb
-import sys
-import re
-import io
+import threading
+from playsound import playsound
+import random, voice, time, math, json, pdb, sys, re, io, multiprocessing, datetime, os
 from robobrowser import RoboBrowser
-import pyaudio
-import wave
+import pyaudio, wave
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-import ssl
-import multiprocessing
-import urllib
+import ssl, urllib
 from timer import Timer
 from requests_html import HTMLSession
 from googlesearch import search
 from bs4 import BeautifulSoup
 import requests as rq
-import datetime
-import os
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
-)  # Fixes roboBrowser error I (William) was getting
+)
 
 # Constants/Global variables
 timer = None
@@ -710,23 +697,21 @@ def calculate(text):
 
 
 def manage_alarm(text):
-    """Wrapper method for adding/removing alarms."""
-    # Grab global variables
+    """Wrapper method for adding/canceling alarms."""
     global alarmPros
 
     # Check text for what we need to do
-    if "cancel" in text:
+    if "cancel" in text: # Cancel alarm
         if alarmPros.is_alive():
-            # Cancel the alarm
             alarmPros.terminate()
             alarmPros = multiprocessing.Process()
             return "Alarm Cancelled"
         return "There is no alarm set"
-    else:
+    else: # Create alarm
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
         alarm = getAlarmTime(text)
-        if type(alarm) == str:
+        if type(alarm) == str: #If the alarm couldn't be made because of some error
             return alarm
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
@@ -745,7 +730,7 @@ def getAlarmTime(text):
     if timeStartIndex == -1:
         return "No time has been given, please make an alarm with a time"
 
-    # Using the starting index of the wanted time, determine the format of it (single number, time format, etc.)
+    # Using the starting index of the wanted time, determine the format of it (single number or time)
     timeString = text[timeStartIndex]
     currIndex = timeStartIndex + 1
     timeFormat = "numeric"  # Single number (ex. 6)
@@ -765,13 +750,13 @@ def getAlarmTime(text):
     # Check if the given time is in an acceptable time form
     if timeFormat == "numeric":
         if int(timeString) < 0 or int(timeString) > 24:
-            return "Thats not a valid time, please make an alarm with a valid time"
+            return "That is not a valid time, please make an alarm with a valid time"
     else:
         checkString = timeString.split(":")
         if int(checkString[0]) < 0 or int(checkString[0]) > 23 or int(checkString[1]) < 0 or int(checkString[1]) > 59:
-            return "Thats not a valid time, please make an alarm with a valid time"
+            return "That is not a valid time, please make an alarm with a valid time"
 
-    # Check if the text specifies am or pm for the time for 24 hour conversion, and if need be ask for one
+    # Check if the text specifies am or pm for 24 hour conversion, returning an error if not recognized and needed
     currentFix = None
     currentFix = checkFix(text)
     if currentFix == None and timeFormat != "time" and int(timeString) < 13:
@@ -793,7 +778,7 @@ def getAlarmTime(text):
 
 
 def checkFix(text):
-    '''Check if there is a time postfix (a.m. or p.m.) in the given text'''
+    '''Check if there is a time abbreviation (a.m. or p.m.) in the given text'''
     if text.__contains__("a.m."):
         return "am"
     elif text.__contains__("p.m."):
@@ -813,17 +798,13 @@ def adjustForFix(currentFix, text):
 
 def set_alarm(alarm):
     """Set an alarm that, when the given time passes, activates an alarm sound"""
-    # Set alarm and play the alarm sound when the time comes
-    # print("Setting Alarm, press tab to cancel it")
     check_alarm(alarm)
     play_alarm()
 
 
 def check_alarm(alarm):
-    """Check the current alarm. If the current time matches the alarm, return"""
-    # Check if the current time matches the alarm time
+    """Check the current time. If the current time matches the alarm, return"""
     while True:
-        # Check the time
         if (
             datetime.datetime.now().hour == alarm.hour
             and datetime.datetime.now().minute == alarm.minute
@@ -833,7 +814,6 @@ def check_alarm(alarm):
 
 def play_alarm():
     """Play an alarm sound, unless flagged to stop or the sound ends"""
-    # Grab global variables
     global soundFile
     global audio
     global alarm
