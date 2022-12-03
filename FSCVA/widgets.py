@@ -52,8 +52,8 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     if username == "USERNAME" or password == "PASSWORD":
         return "Incomplete login credentials given."
 
-    chrome_options = Options()
-    chrome_options.headless = True
+    # chrome_options = Options()
+    # chrome_options.headless = True
 
     # Change Chromedriver File Depending on OS
     if sys.platform == 'darwin':  # MacOS
@@ -64,8 +64,11 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
     chrome_options = Options()
+    # opt = webdriver.ChromeOptions()-=[p mn]]]"HNJB;.\[b8u pl\ bl 6yyyyyyyyyvg;plo"
     chrome_options.add_argument("--headless")
-    driver = webdriver.Chrome()
+    chrome_options.add_argument("--disable-logging")
+    chrome_options.add_argument("--disable-crash-reporter")
+
     driver = webdriver.Chrome(options=chrome_options)
 
     # have chrome open the SSO page
@@ -146,13 +149,24 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         # find info about the assignments by getting items with this class
         tags = soup.find_all("span", class_="ergWt_bGBk")
 
-        assignments = []
+        length = len(tags)
+        output = ""
+        # output = f"you have {length} upcoming assignments.\nhere they are:"
+        assignments = 0
         for i in range(len(tags) - 1):
-            s = str(tags[i].getText)
+            s = str(tags[i].getText())
             if("due" in s):
-                assignments.append(tags[i].getText())
+                assignments += 1
+                # assignments.append(tags[i].getText())
+        output += f"you have {assignments} upcoming assignments.\nhere they are:"
 
-        return assignments
+        for i in range(len(tags)):
+            s = str(tags[i].getText())
+            if("due" in s):
+                temp = tags[i].getText()
+                output += f"{temp}\n"
+
+        return output
 
 
 def get_menu(text):
@@ -953,7 +967,6 @@ def unknown(text):
         "I didn't get that.",
         "What?",
         "Not sure I understand what you're asking.",
-        "Figure it out yourself.",
     ]
     return random.choice(options)
 
