@@ -1,7 +1,7 @@
 # Best_Senior_Project
 
 Docs:
-Libraries Used
+<strong>Libraries Used</strong>
 
 <ul>
     <li>speech_recognition: Performing speech recognition online and offline</li>
@@ -40,7 +40,7 @@ Libraries Used
     <li>selenium: for web browsing and browser automation</li>
 </ul>
 
-Installation (Windows)
+<strong>Installation (Windows)</strong>
 
 <ul>
 <li>Download the Project</li>
@@ -67,7 +67,7 @@ Installation (Windows)
     <li>Upon first running the program you may have to install additional files that weren't installed by the inital building. Just follow all instuctions, installing all required files, & then the project should work.</li>
 </ul>
 
-Installation (Mac)
+<strong>Installation (Mac)</strong>
 
 <li>Download the Project</li>
     <ul>
@@ -91,4 +91,89 @@ Installation (Mac)
     </ul>
     </ul>
     <li>Upon first running the program you may have to install additional files that weren't installed by the inital building. Just follow all instuctions, installing all required files, & then the project should work.</li>
+</ul>
+<br>
+
+<strong>Commands</strong>
+
+<ul>
+<li><u>Get Upcoming Canvas Assignments</u></li>
+    <ul>
+    <li>Requirements: Canvas login credentials in "login_credentials.txt" file</li>
+    <li>Function: Returns a list of your upcoming assignments for all classes from your Canvas page</li>
+    </ul>
+<li><u>Get Cafeteria Menu</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns the food options being served at the cafeteria for the given meal and day</li>
+    </ul>
+<li><u>Get Snakebite Balence</u></li>
+    <ul>
+    <li>Requirements: Get Balence credentials in "login_credentials.txt" file</li>
+    <li>Function: Returns the amount of snakebites you have left for the week</li>
+    </ul>
+<li><u>Get Current Weather</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns the current weather, including tempurature in fahrenheit, type of weather (cloudy, sunny, etc.)</li>
+    </ul>
+<li><u>Flip a Coin</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns heads or tails randomly, as if you're flipping a coin</li>
+    </ul>
+<li><u>Roll Dice</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns a number between 1 and a number given (default 6), as if you're rolling a die</li>
+    </ul>
+<li><u>Get time</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns the current time</li>
+    </ul>
+<li><u>Get Date</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns the current date</li>
+    </ul>
+<li><u>Get Schedule</u></li>
+    <ul>
+    <li>Requirements: Portal credentials in "login_credentials.txt" file</li>
+    <li>Function: Returns the classes you have that day and their current grade</li>
+    </ul>
+<li><u>Timer</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Functions:</li>
+    <ul>
+        <li>Creates a timer with a time and name that will sound when the timer ends</li>
+        <li>Cancels a set timer</li>
+    </ul>
+    </ul>
+<li><u>Calculator</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns the result of a supported operation</li>
+    <li>Supported Operations: Addition, Subtraction, Division, Multiplication</li>
+    </ul>
+<li><u>Alarm</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Functions:</li>
+    <ul>
+        <li>Creates an alarm within a 24-hour time frame that will sound when it is the given time</li>
+        <li>Cancels a set alarm</li>
+    </ul>
+    </ul>
+<li><u>Google Search</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns a list of results from a google search of a command</li>
+    </ul>
+<li><u>Word Definition</u></li>
+    <ul>
+    <li>Requirements: NA</li>
+    <li>Function: Returns the definition of a given word</li>
+    </ul>
 </ul>
