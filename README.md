@@ -1,7 +1,7 @@
 # Best_Senior_Project
 
 Docs:
-<u><strong>Libraries Used</strong></u>
+<strong>Libraries Used</strong>
 
 <ul>
     <li>speech_recognition: Performing speech recognition online and offline</li>
@@ -40,7 +40,7 @@ Docs:
     <li>selenium: for web browsing and browser automation</li>
 </ul>
 
-<u><strong>Installation (Windows)</u></strong>
+<strong>Installation (Windows)</strong>
 
 <ul>
 <li>Download the Project</li>
@@ -67,7 +67,7 @@ Docs:
     <li>Upon first running the program you may have to install additional files that weren't installed by the inital building. Just follow all instuctions, installing all required files, & then the project should work.</li>
 </ul>
 
-<u><strong>Installation (Mac)</u></strong>
+<strong>Installation (Mac)</strong>
 
 <li>Download the Project</li>
     <ul>
@@ -92,8 +92,9 @@ Docs:
     </ul>
     <li>Upon first running the program you may have to install additional files that weren't installed by the inital building. Just follow all instuctions, installing all required files, & then the project should work.</li>
 </ul>
+<br>
 
-<u><strong>Commands</u></strong>
+<strong>Commands</strong>
 
 <ul>
 <li><u>Get Upcoming Canvas Assignments</u></li>
