@@ -1,6 +1,5 @@
 # main.py
 # Main/Application File for Virtual Assistant
-
 import nltk
 
 # Check if First-Time NLTK Install is Needed
@@ -9,31 +8,28 @@ try:
 except KeyError:
     import importCheck
 
-    print("nltk download needed, press space when you are done")
+    print("nltk download needed; press [Space] when the download has completed.")
     time.sleep(1)
     importCheck.firstTimenltk()
     while True:
         if keyboard.is_pressed("space"):
             break
 
-# robobrowser warning silencer
-from urllib3.exceptions import InsecureRequestWarning
+from urllib3.exceptions import InsecureRequestWarning # silence robobrowser warnings
 import speech_recognition as sr
-import keyboard
-import datetime
-import requests
-import timer
-import time
-import pdb
+import argparse, datetime, keyboard, requests, time, timer, pdb
 
 # Our Imports
 import classifier as clf
-import widgets
-import voice
+import widgets, voice
+
+# Argument Parsing
+parser = argparse.ArgumentParser()
+parser.add_argument('-p', '--present', help='presentation mode', action='store_true')
 
 
 def get_keyboard_input():
-    # wait for user to press space to start the VA
+    """Wait for the user to press [Space] to start the VA"""
     while True:
         if keyboard.is_pressed("space"):
             voice.stop_speaker()
@@ -84,13 +80,10 @@ def main():
     # for index, name in enumerate(sr.Microphone.list_microphone_names()):
     # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name)) # debug if microphone isn't recognized
 
-    # Variables setup required for widgets (ex. alarms for the Alarm widget)
-    alarm = []
-
     while True:
         try:
             with sr.Microphone() as mic:
-                recognizer.adjust_for_ambient_noise(mic, duration=0.2)
+                recognizer.adjust_for_ambient_noise(mic, duration=0.2) # duration is the length of silence it will accept before continuing
                 audio = recognizer.listen(mic)
 
                 # Use Google's STT and Get Text Back
@@ -122,4 +115,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(parser.parse_args())
+
+    
