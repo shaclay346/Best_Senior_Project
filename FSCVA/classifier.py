@@ -1,6 +1,5 @@
 # classifier.py
 # Performs query processing and prediction.
-
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import stopwords, wordnet
 from sklearn.feature_extraction.text import CountVectorizer
@@ -222,8 +221,6 @@ def main(args):
 
 if __name__ == '__main__':
 	main(parser.parse_args())
-
-
 
 
 

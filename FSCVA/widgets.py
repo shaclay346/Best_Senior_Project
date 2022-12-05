@@ -1,7 +1,7 @@
 # widgets.py
 # File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
-import werkzeug
-import threading
+from bs4 import BeautifulSoup
+from googlesearch import search
 from playsound import playsound
 import random
 import voice
@@ -27,7 +27,36 @@ from timer import Timer
 from requests_html import HTMLSession
 from googlesearch import search
 from bs4 import BeautifulSoup
+from requests_html import HTMLSession
+from robobrowser import RoboBrowser
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+
+import pyaudio
+import wave  # voice libraries
 import requests as rq
+import ssl
+import urllib
+import threading
+import multiprocessing
+
+import datetime
+import time
+import io
+import os
+import sys
+import math
+import random
+import re
+import json
+import pdb
+
+# custom imports
+from timer import Timer
+import voice
+
+import werkzeug  # robobrowser fix
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )
@@ -757,7 +786,7 @@ def manage_alarm(text):
 
 
 def getAlarmTime(text):
-    '''Extract the wanted time from the given text'''
+    """Extract the wanted time from the given text"""
 
     # Search through the given text for a time, returning error string if there is no time specified
     timeStartIndex = -1
@@ -816,7 +845,7 @@ def getAlarmTime(text):
 
 
 def checkFix(text):
-    '''Check if there is a time abbreviation (a.m. or p.m.) in the given text'''
+    """Check if there is a time abbreviation (a.m. or p.m.) in the given text"""
     if text.__contains__("a.m."):
         return "am"
     elif text.__contains__("p.m."):
@@ -825,7 +854,7 @@ def checkFix(text):
 
 
 def adjustForFix(currentFix, text):
-    '''Adjust the hour given for the 24-hour format datetime uses'''
+    """Adjust the hour given for the 24-hour format datetime uses"""
     if currentFix == "pm":
         if text != "12":
             text = str(int(text) + 12)
@@ -1004,8 +1033,7 @@ def load_login_creds(site):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    print(get_assignments(""))
-    # pdb.set_trace()
+    pdb.set_trace()
 
 
 if __name__ == "__main__":

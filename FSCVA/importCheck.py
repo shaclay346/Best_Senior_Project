@@ -1,6 +1,5 @@
 #importCheck.py
-#Fix any errors regarding imports
-
+#Fix any errors regarding importing nltk
 import nltk
 
 def main():
