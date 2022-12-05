@@ -40,7 +40,7 @@ def get_keyboard_input():
             exit()
 
 
-def main():
+def main(args):
     # Disable Robobrowser Warning since Portal is Bad™
     requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -117,4 +117,3 @@ def main():
 if __name__ == "__main__":
     main(parser.parse_args())
 
-    
