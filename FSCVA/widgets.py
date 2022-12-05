@@ -79,9 +79,6 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     if username == "USERNAME" or password == "PASSWORD":
         return "Incomplete login credentials given."
 
-    # chrome_options = Options()
-    # chrome_options.headless = True
-
     # Change Chromedriver File Depending on OS
     if sys.platform == 'darwin':  # MacOS
         path = os.path.join(ROOT, 'chromedriver')
@@ -89,13 +86,6 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
         path = os.path.join(ROOT, 'chromedriver.exe')
     else:  # Other
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
-
-    # chrome_options = Options()
-    # opt = webdriver.ChromeOptions()-=[p mn]]]"HNJB;.\[b8u pl\ bl 6yyyyyyyyyvg;plo"
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--disable-logging")
-    # chrome_options.add_argument("--disable-crash-reporter")
-    # chrome_options.add_argument('--disable-logging')
 
     options = webdriver.ChromeOptions()
     options.add_argument('--disable-logging')
@@ -194,7 +184,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
             if("due" in s):
                 assignments += 1
                 # assignments.append(tags[i].getText())
-        output += f"you have {assignments} upcoming assignments.\nhere they are:"
+        output += f"you have {assignments} upcoming assignments.\nhere they are:\n"
 
         for i in range(len(tags)):
             s = str(tags[i].getText())
@@ -338,8 +328,10 @@ def get_balance(text):
     # Load login credentials from login_credentials.txt
     username, password = load_login_creds("get")
 
-    chrome_options = Options()
-    chrome_options.headless = True
+    options = webdriver.ChromeOptions()
+    options.add_argument('--disable-logging')
+    options.add_argument("--headless")
+    options.add_argument("--log-level=3")
 
     # Change Chromedriver File Depending on OS
     if sys.platform == 'darwin':  # MacOS
@@ -349,7 +341,7 @@ def get_balance(text):
     else:  # Other
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
-    driver = webdriver.Chrome(path, options=chrome_options)
+    driver = webdriver.Chrome(path, options=options)
 
     url = "https://get.cbord.com/flsouthern/full/login.php"
 
@@ -1034,7 +1026,7 @@ def load_login_creds(site):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    print(get_assignments(""))
+    pdb.set_trace()
 
 
 if __name__ == "__main__":
