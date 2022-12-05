@@ -32,7 +32,6 @@ from robobrowser import RoboBrowser
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-
 import pyaudio
 import wave  # voice libraries
 import requests as rq
@@ -40,7 +39,6 @@ import ssl
 import urllib
 import threading
 import multiprocessing
-
 import datetime
 import time
 import io
@@ -203,6 +201,9 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
             if("due" in s):
                 temp = tags[i].getText()
                 output += f"{temp}\n"
+
+        if(assignments == 0):
+            return "You have no upcoming assignments."
 
         return output
 
@@ -1033,7 +1034,7 @@ def load_login_creds(site):
 
 def main():
     # print("This file isn't meant to be run as part of the final project.") # uncomment later: leave while testing
-    pdb.set_trace()
+    print(get_assignments(""))
 
 
 if __name__ == "__main__":
