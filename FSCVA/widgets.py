@@ -3,13 +3,26 @@
 import werkzeug
 import threading
 from playsound import playsound
-import random, voice, time, math, json, pdb, sys, re, io, multiprocessing, datetime, os
+import random
+import voice
+import time
+import math
+import json
+import pdb
+import sys
+import re
+import io
+import multiprocessing
+import datetime
+import os
 from robobrowser import RoboBrowser
-import pyaudio, wave
+import pyaudio
+import wave
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-import ssl, urllib
+import ssl
+import urllib
 from timer import Timer
 from requests_html import HTMLSession
 from googlesearch import search
@@ -50,19 +63,26 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     else:  # Other
         return f"Unsupported OS. Our implementation of chromedriver is not supported on your os, {sys.platform}"
 
-    chrome_options = Options()
+    # chrome_options = Options()
     # opt = webdriver.ChromeOptions()-=[p mn]]]"HNJB;.\[b8u pl\ bl 6yyyyyyyyyvg;plo"
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-logging")
-    chrome_options.add_argument("--disable-crash-reporter")
+    # chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--disable-logging")
+    # chrome_options.add_argument("--disable-crash-reporter")
+    # chrome_options.add_argument('--disable-logging')
 
-    driver = webdriver.Chrome(options=chrome_options)
+    options = webdriver.ChromeOptions()
+    options.add_argument('--disable-logging')
+    options.add_argument("--headless")
+    options.add_argument("--log-level=3")
+
+    driver = webdriver.Chrome(options=options)
 
     # have chrome open the SSO page
     driver.get("https://sso.flsouthern.edu/home/414")
 
     time.sleep(3.5)
 
+    print("Logging in to SSO.")
     driver.find_element(By.ID, "branding-username").send_keys(username)
     driver.find_element(By.ID, "branding-password").send_keys(password)
 
@@ -82,6 +102,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
         question = ""
 
+        print("Answering security questions.")
         while True:
             question = driver.find_element(
                 By.XPATH,
@@ -128,6 +149,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
     finally:
         time.sleep(6)
+        print("Finding assignments.\n")
 
         driver.get("https://flsouthern.instructure.com/")
         time.sleep(4)
@@ -691,8 +713,10 @@ def get_operands(text):
                     break
     # reverse right operand
     right_operand = right_operand[::-1]
-
-    return [int(left_operand), int(right_operand)]
+    try:
+        return [int(left_operand), int(right_operand)]
+    except:
+        return ""
 
 
 def calculate(text):
@@ -715,17 +739,17 @@ def manage_alarm(text):
     global alarmPros
 
     # Check text for what we need to do
-    if "cancel" in text: # Cancel alarm
+    if "cancel" in text:  # Cancel alarm
         if alarmPros.is_alive():
             alarmPros.terminate()
             alarmPros = multiprocessing.Process()
             return "Alarm Cancelled"
         return "There is no alarm set"
-    else: # Create alarm
+    else:  # Create alarm
         if alarmPros.is_alive():
             return "Alarm already set, cancel the current alarm to make a new one"
         alarm = getAlarmTime(text)
-        if type(alarm) == str: #If the alarm couldn't be made because of some error
+        if type(alarm) == str:  # If the alarm couldn't be made because of some error
             return alarm
         alarmPros = multiprocessing.Process(target=set_alarm, args=(alarm,))
         alarmPros.start()
