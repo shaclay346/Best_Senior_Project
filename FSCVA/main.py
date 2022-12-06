@@ -8,24 +8,34 @@ try:
 except KeyError:
     import importCheck
 
-    print("nltk download needed; press [Space] when the download has completed.")
+    print(
+        "nltk download needed; press [Space] when the download has completed.")
     time.sleep(1)
     importCheck.firstTimenltk()
     while True:
         if keyboard.is_pressed("space"):
             break
 
-from urllib3.exceptions import InsecureRequestWarning # silence robobrowser warnings
+# silence robobrowser warnings
+from urllib3.exceptions import InsecureRequestWarning
 import speech_recognition as sr
-import argparse, datetime, keyboard, requests, time, timer, pdb
+import argparse
+import datetime
+import keyboard
+import requests
+import time
+import timer
+import pdb
 
 # Our Imports
 import classifier as clf
-import widgets, voice
+import widgets
+import voice
 
 # Argument Parsing
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--present', help='presentation mode', action='store_true')
+parser.add_argument('-p', '--present',
+                    help='presentation mode', action='store_true')
 
 
 def get_keyboard_input():
@@ -83,7 +93,8 @@ def main(args):
     while True:
         try:
             with sr.Microphone() as mic:
-                recognizer.adjust_for_ambient_noise(mic, duration=0.2) # duration is the length of silence it will accept before continuing
+                # duration is the length of silence it will accept before continuing
+                recognizer.adjust_for_ambient_noise(mic, duration=0.3)
                 audio = recognizer.listen(mic)
 
                 # Use Google's STT and Get Text Back
@@ -116,4 +127,3 @@ def main(args):
 
 if __name__ == "__main__":
     main(parser.parse_args())
-
