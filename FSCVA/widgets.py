@@ -97,7 +97,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     # have chrome open the SSO page
     driver.get("https://sso.flsouthern.edu/home/414")
 
-    time.sleep(3.5)
+    time.sleep(4)
 
     print("Logging in to SSO.")
     driver.find_element(By.ID, "branding-username").send_keys(username)
@@ -111,7 +111,6 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
     # if a security question gets asked this handles it, at least for me (Shane)
     try:
-        # //*[@id="mfaDivId"]/form/div[2]/div[2]/div[2]/a
         security_button = driver.find_element(
             By.XPATH, r"""/html/body/div[4]/div/div[3]/div/div/form/div[2]/div[2]/div[2]"""
         )
@@ -121,11 +120,13 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
         print("Answering security questions.")
         while True:
+            # find the text of the security questions
             question = driver.find_element(
                 By.XPATH,
                 r"""//*[@id="securityQuestionModal"]/div[3]/div/div/div[2]/div[2]/form/div[1]/div/p""",
             ).text
 
+            # for my case stop skipping questions when we get to favourite movie security question
             if "movie" in question:
                 break
 
@@ -139,8 +140,9 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
         # id for Answer: securityAnswer
         driver.find_element(By.ID, r"""securityAnswer""").send_keys("hot rod")
-        time.sleep(3)
+        time.sleep(1)
 
+        # submit security question
         submit_button = driver.find_element(
             By.XPATH,
             r"""//*[@id="securityQuestionModal"]/div[3]/div/div/div[2]/div[2]/form/div[2]/button[4]""",
@@ -929,15 +931,18 @@ def parse_results(response):
     return output
 
 
-def google_search(query):
+def google_search(text):
     """Does a google search on a command, returns title and link to results.
     example command: How old is Ryan Reynolds?
-                    How many ounces in a cup
+                     How many ounces in a cup?
     """
 
+    if(text == ""):
+        return "Error google searching, try again."
+
     # parse the query
-    query = urllib.parse.quote_plus(query)
-    url = "https://www.google.co.uk/search?q=" + query
+    query = urllib.parse.quote_plus(text)
+    url = "https://www.google.co.uk/search?q=" + text
 
     response = ""
 
