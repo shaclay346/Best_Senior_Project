@@ -127,9 +127,9 @@ def preprocess():
 	vectorizer = CountVectorizer(token_pattern="[a-z\*\/\+\-]+", ngram_range=(1,2))
 	vectors = vectorizer.fit_transform(data)
 
-	# Make DataFrame and Save ### delete later, just using this for sanity
-	frame = pd.DataFrame(vectors.toarray(), columns=vectorizer.get_feature_names())
-	frame.to_excel(os.path.join(ROOT, "bow_visualized.xlsx"))
+	# Make DataFrame and Save ### unnecessary, just using this for sanity
+	# frame = pd.DataFrame(vectors.toarray(), columns=vectorizer.get_feature_names())
+	# frame.to_excel(os.path.join(ROOT, "bow_visualized.xlsx"))
 
 	print("Training SVM...\r", end='')
 
