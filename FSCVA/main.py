@@ -102,7 +102,7 @@ def main(args):
                 text = recognizer.recognize_google(audio)
                 text = str(text.lower())
 
-                print(f"Recognized: {text}")
+                print(f"\rRecognized: {text}")
 
                 # Predict Intent
                 intent = clf.predict(text)
@@ -114,8 +114,8 @@ def main(args):
                 #     voice.say(response)
 
                 # Format Widget Response
-                print(f"Intent: {intent}")
-                print(f"Response: {response}")
+                # print(f"Intent: {intent}")
+                print(f"> {response}")
 
                 print("\nPress [Space] to say another command\n")
 
