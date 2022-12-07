@@ -4,3 +4,5 @@ __pycache__/
 garbage.py  
 
 login_credentials.txt
+
+build/
