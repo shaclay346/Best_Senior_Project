@@ -1,4 +1,5 @@
 .DS_Store
+.gitignore
 MANIFEST.in
 README.md
 chromedriver.exe
@@ -96,6 +97,7 @@ setup.py
 .git/objects/10/858620169444de6ce4c0f588e5385de29b75d0
 .git/objects/10/a7008fb3dd47c8fc4eae91c4ccb1d690e3bc06
 .git/objects/10/df49a23da0e6af58458c610dde7f33ab2d88de
+.git/objects/11/1ed04f679ccffee378fa05bb9a1e3b4ea71362
 .git/objects/11/4f20530ffcf7d71c83ebbeb5bf2f5f9d6cabff
 .git/objects/11/75a5b63c5706e4d25d9a62e33258de32bfb33e
 .git/objects/11/77673fe8ad017af6d50632e048114d17c32a87
@@ -310,6 +312,7 @@ setup.py
 .git/objects/4e/fc28936c9e1b8bbb660b93ae48fdd9c8a7e6f1
 .git/objects/4f/359598c797442fc91a962f6b99d94f3ee63128
 .git/objects/4f/7fd15f55e76e6c083bd6b375c41d46f2049076
+.git/objects/4f/a25e0d37c64fd97dec4bb9d800782c012c726e
 .git/objects/4f/b96679ef0c46b312105ccf5d2c965014f1d21d
 .git/objects/50/30b287bc55bb69870077ce9bd99b8aa28c195c
 .git/objects/50/6493783df467caf0640916faf55f564cc5e3e1
@@ -346,7 +349,9 @@ setup.py
 .git/objects/5d/c8a5861ca1121ca798a5ac48deabe3764d790a
 .git/objects/5d/c9108c22c888b1a9bf6a1f24e53608b31b20be
 .git/objects/5e/8a14af4aa111d2dfb36ef12ad37dd1da1a5370
+.git/objects/5e/b72f65b0439e3719be6d4d692d3a69aacb07ad
 .git/objects/5e/de31b5c834ead00481eaf7d8e13483cea1ac9a
+.git/objects/5e/f1e9221ac6f416397fa9acf140f85c982f3540
 .git/objects/5f/6a6d66bb5c387d7971d94a3328b9abcbb05d30
 .git/objects/5f/8401793829daccf9e607fa70b12fde06da6fee
 .git/objects/5f/9fab9b4eceb00b398dd3bbf285d07d429d3968
@@ -389,11 +394,13 @@ setup.py
 .git/objects/6d/1d44d9841e9b8302a6acfa7501e89585b5f6ff
 .git/objects/6d/c71608804b279a1075be4bde6cf67fa4850c5f
 .git/objects/6e/47e771eb4d202a2448d9ce47cc71d69a914604
+.git/objects/6e/71841bead2bd69be2bf06c8239085e76d81a73
 .git/objects/6e/7a6e930af9026375055c853414567bcdab4638
 .git/objects/6e/9e09f0b90ea1daa3cbd98de39661bff2083edf
 .git/objects/6e/df0dd8e95cb834752f584d7dce51679fee98e2
 .git/objects/70/a4a1b0c87537555e2f92966754590e15a92a45
 .git/objects/70/b2b7a1fd2fb4f2098f8d637580f063441bf63c
+.git/objects/70/c975d256b003bfa4f6b1599637e7185c86f790
 .git/objects/70/ca143ed3fbb1ae60bc756566d4b64abe3046b8
 .git/objects/71/07c51d1a32782805a08bc9a983acece5682a47
 .git/objects/71/30c2ffd736e6966a1f16bc19f16e20d69d7ad7
@@ -438,6 +445,7 @@ setup.py
 .git/objects/7b/b67958dd681b7daa8f25352d49ca32c4cad979
 .git/objects/7c/19343ce109036ee9f2d4865bc8d5226941941e
 .git/objects/7c/c76c11287aa9bf442e59e747e87b4f312a50ba
+.git/objects/7c/e1bef39b4d4801dbfa31a37cfb8b5f5709c656
 .git/objects/7c/fd5751104f7aa08d1571476a3417facb721d11
 .git/objects/7d/ae95685f127790302ff196cb71d43f436f831c
 .git/objects/7d/b31dfd85357873622492e53255f6ae57f06ae7
@@ -526,6 +534,7 @@ setup.py
 .git/objects/94/607c10601859920d51bb095165cbb55f5ad0e3
 .git/objects/94/7d05ed38f2aaf131e1e47dfccd9763e5fdc231
 .git/objects/94/f5eaf9781cc0489eb41e5af23294b3d48f24da
+.git/objects/95/1864ce97b2f0df33c3800e4700ef05a30bb3e4
 .git/objects/95/3b660bf451ef6a6716d14f26ba90d88730aa6c
 .git/objects/95/41bfc4cbd75b3d8d76379cb60d362c35e02d74
 .git/objects/95/65884cf56bea1f0d7b451cdd02bbc2e8ed2e2d
@@ -537,8 +546,10 @@ setup.py
 .git/objects/95/feef108c10cde7bdead66d189c2429a354dad9
 .git/objects/96/7dc3941159a81dfde3a0bb58d6de563635cb2f
 .git/objects/96/8c8b95e2a8d4053e850b95a20a6fcabf5befd1
+.git/objects/96/a4cb1ff8ade66a3b50ad379844a3f3997d2c70
 .git/objects/96/d87a4a3efe375325afce5fc6118112cd1a1660
 .git/objects/97/4f7e02aa610377af88ada0507aad0523164e64
+.git/objects/97/84a0e8d5832167d6e323319b687ef059176a89
 .git/objects/98/845f73c7ed5882fa5ac0adb1056df923f6fd50
 .git/objects/99/0bea46d59b6bb58f614f22622fd7fa7f426df1
 .git/objects/99/353fa13dd2042e1404c68e6e655ba61eddbd17
@@ -597,9 +608,11 @@ setup.py
 .git/objects/a8/58873c745d514be11c9fe80201f680f3e106cd
 .git/objects/a9/79bb1de7ac03fa364a3898bb2882dc85d2e106
 .git/objects/a9/9f2a0d38779cafa19745f6b8122b88d35a74f6
+.git/objects/a9/a5a95e776d86dd1cffa50e52b8e5a08814e5bb
 .git/objects/a9/b7ee90de0d11765c1ae3cc0368094a48473af3
 .git/objects/aa/24e49cbc9300da7eb6f23b6144bae67d50ac53
 .git/objects/aa/a0bdeb4e669c8c7eb1811a370f1e85442522aa
+.git/objects/ab/35a05de1dd4473c153af08eaa8f747097755e5
 .git/objects/ab/4bd67d2d87cc8836d446c24f0092fabdb4fc43
 .git/objects/ab/5022a6870e8e5cbcefa25883d75528cf89728e
 .git/objects/ab/d299232a385a3125ab2e5e3b68e7dc479a26e3
@@ -705,6 +718,7 @@ setup.py
 .git/objects/c6/a7da9a0abdabd88cfd7917abd79fb62ecfe1ed
 .git/objects/c6/ac1c047f2d161bdac64dcb667e6de0852dd674
 .git/objects/c7/6059554616b005be5ce9479f893a6c0ce5fa92
+.git/objects/c7/836622a0848137ce3044a596429fa6c1164264
 .git/objects/c8/0a4ade96473a3727c4aca60ff469554156c1d6
 .git/objects/c8/384b684ae0cc32ce7e6866a85dc2f627f3cd2d
 .git/objects/c8/3f2aed334a966c10b9bbb2a1421b81f0488806
@@ -859,6 +873,7 @@ setup.py
 .git/objects/f5/b0e449e69230cadd0325a4cdea4a674b6b9d9a
 .git/objects/f5/d661d691019d1dec2eee57e5612b50c3a570e3
 .git/objects/f6/6e803125e4373c96c3a6bc3e93fded46a54679
+.git/objects/f6/94d5b9286c42b3a5b5a5966571f847ea1b1651
 .git/objects/f6/aacf14f5ce303c23b0bd23b7fb16363918158b
 .git/objects/f6/be565c2b73d5a827463ae71de3829cb8c961f8
 .git/objects/f6/da5facd40bdc0a3f239a172f538dec481ea72b
@@ -890,6 +905,7 @@ setup.py
 .git/objects/fd/b96946616cb0a516530be1f1e4ad7549eca07f
 .git/objects/fe/0a6f08bbf633085027bb3822b9060ccd28af14
 .git/objects/fe/1c06e46be1391056d2ab482d9af677a4640b7f
+.git/objects/fe/4b36642fc34f4a8b036358c2badc83727579d2
 .git/objects/fe/531e1ccb4a75335820c1a6384a597e794f39b1
 .git/objects/fe/63c1e6e916d073caf8a803265c9ddd42130f20
 .git/objects/fe/b58c2929b9c5cf0df070a65bd30d1e7ffbf9ab
@@ -917,7 +933,6 @@ setup.py
 .git/refs/remotes/origin/gitignore
 .git/refs/remotes/origin/main
 FSCVA/.DS_Store
-FSCVA/.gitignore
 FSCVA/__init__.py
 FSCVA/bow_visualized.xlsx
 FSCVA/chromedriver

@@ -36,7 +36,7 @@ class Timer(threading.Thread):
         self.name = name
 
     def stop(self):
-        print("stopping timer")
+        # print("stopping timer")
         self.__stopper = True
 
 

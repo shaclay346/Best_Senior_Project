@@ -1,33 +1,67 @@
 # widgets.py
 # File of widgets called by main (fetch the caf menu, fetch the weather, etc.)
+import wave  # Voice Libraries
 from bs4 import BeautifulSoup
 from googlesearch import search
 from playsound import playsound
+import random
+import voice
+import time
+import math
+import json
+import pdb
+import sys
+import re
+import io
+import multiprocessing
+import datetime
+import os
+from robobrowser import RoboBrowser
+import pyaudio
+import wave
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+import ssl
+import urllib
+from timer import Timer
+from requests_html import HTMLSession
+from googlesearch import search
+from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 from robobrowser import RoboBrowser
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
+import pyaudio
+import wave  # voice libraries
+import requests as rq
+import ssl
+import urllib
+import threading
+import multiprocessing
+import datetime
+import time
+import io
+import os
+import sys
+import math
+import random
+import re
+import json
+import pdb
+
+# custom imports
+from timer import Timer
+import voice
 
 import werkzeug  # robobrowser fix
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )
 
-import requests as rq
-
-import pyaudio, wave # Voice Libraries
-
-import ssl, urllib
-
-import threading, multiprocessing
-import time, datetime
-
-import io, os, sys, math, random, re, json, pdb
 
 # custom imports
-from timer import Timer
-import voice
 
 # Constants/Global variables
 timer = None
@@ -64,6 +98,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     options.add_argument('--disable-logging')
     options.add_argument("--headless")
     options.add_argument("--log-level=3")
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
     driver = webdriver.Chrome(path, options=options)
 
@@ -167,7 +202,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
                 temp = tags[i].getText()
                 output += f"{temp}\n"
 
-        if assignments == 0:
+        if(assignments == 0):
             return "You have no upcoming assignments."
 
         return output
@@ -282,7 +317,8 @@ def get_menu(text):
     )
 
     dishes = list(set(dishes) - rnames)
-    dishes = [dish for dish in dishes if not any([a == a.upper() and len(a) > 1 for a in dish.split()])]
+    dishes = [dish for dish in dishes if not any(
+        [a == a.upper() and len(a) > 1 for a in dish.split()])]
 
     # Output
     response = (
@@ -308,6 +344,7 @@ def get_balance(text):
     options.add_argument('--disable-logging')
     options.add_argument("--headless")
     options.add_argument("--log-level=3")
+    options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
     # Change Chromedriver File Depending on OS
     if sys.platform == 'darwin':  # MacOS
@@ -536,10 +573,13 @@ def manage_timer(text):
     """Wrapper method for setting/cancelling timers."""
     if "cancel" in text:
         cancel_timer()
+        return "timer stopped"
     elif "end" in text:
         cancel_timer()
+        return "timer stopped"
     elif "stop" in text:
         cancel_timer()
+        return "timer stopped"
     else:
         try:
             output = set_timer(text)
@@ -658,7 +698,6 @@ def set_timer(text):
 
     # create thread for timer and start it
     global timer
-    print("seconds", seconds)
     timer = Timer(seconds, timerSound)
     timer.start()
 
