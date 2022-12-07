@@ -73,6 +73,9 @@ audio = pyaudio.PyAudio()
 def get_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
     # Load login credentials from login_credentials.txt
+    # Display Loading Message (Since this is a slow process)
+    waiting = show_waiting()
+
     username, password = load_login_creds("sso")
 
     # Stop function if credentials are still default values
@@ -92,14 +95,14 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     options.add_argument("--headless")
     options.add_argument("--log-level=3")
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(path, options=options)
 
     # have chrome open the SSO page
     driver.get("https://sso.flsouthern.edu/home/414")
 
     time.sleep(4)
 
-    print("Logging in to SSO.")
+    print("Logging in to SSO...\r")
     driver.find_element(By.ID, "branding-username").send_keys(username)
     driver.find_element(By.ID, "branding-password").send_keys(password)
 
@@ -118,7 +121,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
         question = ""
 
-        print("Answering security questions.")
+        print("Answering security questions...\r")
         while True:
             # find the text of the security questions
             question = driver.find_element(
@@ -168,7 +171,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
     finally:
         time.sleep(6)
-        print("Finding assignments.\n")
+        print("Finding assignments...\r\n")
 
         driver.get("https://flsouthern.instructure.com/")
         time.sleep(4)
@@ -194,7 +197,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
                 temp = tags[i].getText()
                 output += f"{temp}\n"
 
-        if(assignments == 0):
+        if assignments == 0:
             return "You have no upcoming assignments."
 
         return output

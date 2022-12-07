@@ -109,8 +109,8 @@ def main(args):
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
-                if response:
-                    voice.say(response)
+                # if response:
+                #     voice.say(response)
 
                 # Format Widget Response
                 print(f"Intent: {intent}")
