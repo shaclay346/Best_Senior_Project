@@ -3,61 +3,31 @@
 from bs4 import BeautifulSoup
 from googlesearch import search
 from playsound import playsound
-import random
-import voice
-import time
-import math
-import json
-import pdb
-import sys
-import re
-import io
-import multiprocessing
-import datetime
-import os
-from robobrowser import RoboBrowser
-import pyaudio
-import wave
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium import webdriver
-import ssl
-import urllib
-from timer import Timer
-from requests_html import HTMLSession
-from googlesearch import search
-from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 from robobrowser import RoboBrowser
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-import pyaudio
-import wave  # voice libraries
-import requests as rq
-import ssl
-import urllib
-import threading
-import multiprocessing
-import datetime
-import time
-import io
-import os
-import sys
-import math
-import random
-import re
-import json
-import pdb
-
-# custom imports
-from timer import Timer
-import voice
 
 import werkzeug  # robobrowser fix
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )
+
+import requests as rq
+
+import pyaudio, wave # Voice Libraries
+
+import ssl, urllib
+
+import threading, multiprocessing
+import time, datetime
+
+import io, os, sys, math, random, re, json, pdb
+
+# custom imports
+from timer import Timer
+import voice
 
 # Constants/Global variables
 timer = None
