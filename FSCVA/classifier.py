@@ -97,7 +97,7 @@ def preprocess():
 		row = []
 		for j, k in enumerate(data[i]):
 			# Convert to Lowercase
-			sentence = k.lower()
+			sentence = str(k.lower())
 
 			# Replace Nonletter (and non-math-operator) Characters with Spaces
 			sentence = re.sub('[^a-z\+\-\*\/]', " ", sentence)

@@ -3,61 +3,31 @@
 from bs4 import BeautifulSoup
 from googlesearch import search
 from playsound import playsound
-import random
-import voice
-import time
-import math
-import json
-import pdb
-import sys
-import re
-import io
-import multiprocessing
-import datetime
-import os
-from robobrowser import RoboBrowser
-import pyaudio
-import wave
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium import webdriver
-import ssl
-import urllib
-from timer import Timer
-from requests_html import HTMLSession
-from googlesearch import search
-from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 from robobrowser import RoboBrowser
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-import pyaudio
-import wave  # voice libraries
-import requests as rq
-import ssl
-import urllib
-import threading
-import multiprocessing
-import datetime
-import time
-import io
-import os
-import sys
-import math
-import random
-import re
-import json
-import pdb
-
-# custom imports
-from timer import Timer
-import voice
 
 import werkzeug  # robobrowser fix
 werkzeug.cached_property = (
     werkzeug.utils.cached_property
 )
+
+import requests as rq
+
+import pyaudio, wave # Voice Libraries
+
+import ssl, urllib
+
+import threading, multiprocessing
+import time, datetime
+
+import io, os, sys, math, random, re, json, pdb
+
+# custom imports
+from timer import Timer
+import voice
 
 # Constants/Global variables
 timer = None
@@ -73,6 +43,9 @@ audio = pyaudio.PyAudio()
 def get_assignments(text, username="USERNAME", password="PASSWORD"):
     """Gets the users upcoming assignments by webscraping Canvas"""
     # Load login credentials from login_credentials.txt
+    # Display Loading Message (Since this is a slow process)
+    waiting = show_waiting()
+
     username, password = load_login_creds("sso")
 
     # Stop function if credentials are still default values
@@ -92,14 +65,14 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
     options.add_argument("--headless")
     options.add_argument("--log-level=3")
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(path, options=options)
 
     # have chrome open the SSO page
     driver.get("https://sso.flsouthern.edu/home/414")
 
     time.sleep(4)
 
-    print("Logging in to SSO.")
+    print("Logging in to SSO...\r")
     driver.find_element(By.ID, "branding-username").send_keys(username)
     driver.find_element(By.ID, "branding-password").send_keys(password)
 
@@ -118,7 +91,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
         question = ""
 
-        print("Answering security questions.")
+        print("Answering security questions...\r")
         while True:
             # find the text of the security questions
             question = driver.find_element(
@@ -168,7 +141,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
 
     finally:
         time.sleep(6)
-        print("Finding assignments.\n")
+        print("Finding assignments...\r\n")
 
         driver.get("https://flsouthern.instructure.com/")
         time.sleep(4)
@@ -194,7 +167,7 @@ def get_assignments(text, username="USERNAME", password="PASSWORD"):
                 temp = tags[i].getText()
                 output += f"{temp}\n"
 
-        if(assignments == 0):
+        if assignments == 0:
             return "You have no upcoming assignments."
 
         return output
@@ -309,6 +282,7 @@ def get_menu(text):
     )
 
     dishes = list(set(dishes) - rnames)
+    dishes = [dish for dish in dishes if not any([a == a.upper() and len(a) > 1 for a in dish.split()])]
 
     # Output
     response = (
@@ -372,6 +346,8 @@ def get_balance(text):
 
     if total < 10:
         return f"Your wallet's looking light. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
+    elif total > 100:
+        return f"Looks like \033[1msomeone\033[0m has the freshman meal plan. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
     else:
         return f"You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
 
@@ -747,7 +723,11 @@ def calculate(text):
     operands = get_operands(text)
     result = 0
     if "+" in text:
-        result = operands[0] + operands[1]
+        # Stale Meme for Presentation
+        if (operands[0] == 9 and operands[1] == 10) or (operands[1] == 9 and operands[0] == 10):
+            result = 21
+        else:
+            result = operands[0] + operands[1]
     elif "-" in text:
         result = operands[0] - operands[1]
     elif "*" in text:
@@ -990,6 +970,12 @@ def define_word(text):
     output = f"{word}: {type_of_speach}, {definition}"
 
     return output
+
+
+def wake_up(text):
+    """Meme function meant solely for use in the final presentation."""
+    time.sleep(0.5)
+    return "Alright. I've set your 8:20, 8:30, 8:35, 8:40, 8:45, 8:50, 8:55, and 9:00AM alarms."
 
 
 def unknown(text):

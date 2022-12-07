@@ -78,6 +78,7 @@ def main(args):
         "manage_timer": widgets.manage_timer,
         "roll_dice": widgets.roll_dice,
         "unknown": widgets.unknown,
+        "wake_up": widgets.wake_up,
     }
 
     print("Press [Space] to start the virtual assistant.")
@@ -101,7 +102,7 @@ def main(args):
                 text = recognizer.recognize_google(audio)
                 text = str(text.lower())
 
-                print(f"Recognized: {text}")
+                print(f"\rRecognized: {text}")
 
                 # Predict Intent
                 intent = clf.predict(text)
@@ -109,12 +110,12 @@ def main(args):
                 # Call Corresponding Widget from Predicted Intent
                 response = intents[intent](text)
 
-                if response:
-                    voice.say(response)
+                # if response:
+                #     voice.say(response)
 
                 # Format Widget Response
-                print(f"Intent: {intent}")
-                print(f"Response: {response}")
+                # print(f"Intent: {intent}")
+                print(f"> {response}")
 
                 print("\nPress [Space] to say another command\n")
 
