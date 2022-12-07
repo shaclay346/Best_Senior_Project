@@ -347,7 +347,7 @@ def get_balance(text):
     if total < 10:
         return f"Your wallet's looking light. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
     elif total > 100:
-        return f"Looks like \033[1msomeone\033[0m has a freshman meal plan. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
+        return f"Looks like \033[1msomeone\033[0m has the freshman meal plan. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
     else:
         return f"You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
 
@@ -974,6 +974,7 @@ def define_word(text):
 
 def wake_up(text):
     """Meme function meant solely for use in the final presentation."""
+    time.sleep(0.5)
     return "Alright. I've set your 8:20, 8:30, 8:35, 8:40, 8:45, 8:50, 8:55, and 9:00AM alarms."
 
 
