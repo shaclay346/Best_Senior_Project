@@ -282,6 +282,7 @@ def get_menu(text):
     )
 
     dishes = list(set(dishes) - rnames)
+    dishes = [dish for dish in dishes if not any([a == a.upper() and len(a) > 1 for a in dish.split()])]
 
     # Output
     response = (
