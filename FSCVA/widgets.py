@@ -345,6 +345,8 @@ def get_balance(text):
 
     if total < 10:
         return f"Your wallet's looking light. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
+    elif total > 100:
+        return f"Looks like \033[1msomeone\033[0m has a freshman meal plan. You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
     else:
         return f"You have {monies[1]} worth of Snake Bites and {monies[0]} worth of Flex Dollars."
 
@@ -720,7 +722,11 @@ def calculate(text):
     operands = get_operands(text)
     result = 0
     if "+" in text:
-        result = operands[0] + operands[1]
+        # Stale Meme for Presentation
+        if (operands[0] == 9 and operands[1] == 10) or (operands[1] == 9 and operands[0] == 10):
+            result = 21
+        else:
+            result = operands[0] + operands[1]
     elif "-" in text:
         result = operands[0] - operands[1]
     elif "*" in text:
@@ -963,6 +969,11 @@ def define_word(text):
     output = f"{word}: {type_of_speach}, {definition}"
 
     return output
+
+
+def wake_up(text):
+    """Meme function meant solely for use in the final presentation."""
+    return "Alright. I've set your 8:20, 8:30, 8:35, 8:40, 8:45, 8:50, 8:55, and 9:00AM alarms."
 
 
 def unknown(text):

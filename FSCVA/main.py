@@ -78,6 +78,7 @@ def main(args):
         "manage_timer": widgets.manage_timer,
         "roll_dice": widgets.roll_dice,
         "unknown": widgets.unknown,
+        "wake_up": widgets.wake_up,
     }
 
     print("Press [Space] to start the virtual assistant.")
