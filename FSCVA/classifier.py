@@ -233,20 +233,11 @@ def get_accuracy():
 	matrix = confusion_matrix(labels, predictions)
 	accuracy = np.divide(np.sum(matrix.diagonal()), np.sum(matrix))
 
-	#vmatrix = ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='tab20b', colorbar=False)
-	#vmatrix.figure_.tight_layout() #bone_r, Blues, PuBu
-	ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='bone_r', colorbar=False)
-	ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='Blues', colorbar=False)
-	ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='PuBu', colorbar=False)
+	vmatrix = ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='Blues', colorbar=False)
+	vmatrix.figure_.tight_layout() #bone_r, Blues, PuBu, Redds
 	plt.show()
 
-
-
-
-
-
-	accuracy = -1
-	return accuracy
+	return f"Accuracy: {round(accuracy * 100, 3)}%"
 
 
 
@@ -261,7 +252,7 @@ def main(args):
 	# Get the SVM's Accuracy
 	if args.accuracy:
 		accuracy = get_accuracy()
-		print("placeholder")
+		print(accuracy)
 		return
 
 	# This is just for testing purposes (and also to retrain the model if need be)
