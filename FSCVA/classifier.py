@@ -3,7 +3,9 @@
 from nltk import WordNetLemmatizer, pos_tag
 from nltk.corpus import stopwords, wordnet
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.svm import SVC
+import matplotlib.pyplot as plt
 import openpyxl as pyxl
 import numpy as np
 import pandas as pd
@@ -13,6 +15,7 @@ import math, argparse, os, re, joblib, pdb
 # Argument Parsing
 parser = argparse.ArgumentParser()
 parser.add_argument('-t', '--train', help='retrains/saves the SVM using intents.xlsx', action='store_true')
+parser.add_argument('-a', '--accuracy', help="calculates the SVM's accuracy using testing.xlsx", action='store_true')
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -143,7 +146,7 @@ def preprocess():
 	save_svm(clf)
 
 	# Save Feature Names
-	save_corpus(vectorizer.get_feature_names())
+	save_corpus([a for a in vectorizer.get_feature_names_out()])
 
 
 def get_wordnet_pos(word):
@@ -199,10 +202,66 @@ def save_corpus(feature_names):
 		pkl.dump(feature_names, f)
 
 
+def get_accuracy():
+	'''Uses testing.xlsx to determine the model's accuracy.'''
+	# Load Corpus
+	load_svm_corpus()
+
+	# Load Data from intents.xlsx
+	wb = pyxl.load_workbook('testing.xlsx')
+	sheet = wb.active
+
+	labels = []
+	data = []
+
+	print("Reading testing dataset...\r", end='')
+	# Iterate Col by Col
+	for col in sheet.iter_cols(min_row=1, max_col=sheet.max_column, max_row=sheet.max_row, values_only=True):
+		data.append([a for a in col[1:] if a])
+		labels += [col[0]] * len(data[-1])
+
+	# Flatten Data
+	data = [a for b in data for a in b]
+
+	print("Predicting queries...     \r", end='')
+	# Get Prediction for Each Query in Data
+	predictions = [predict(sentence) for sentence in data]
+
+	print("Done.                     ")
+
+	# Create Confusion Matrix
+	matrix = confusion_matrix(labels, predictions)
+	accuracy = np.divide(np.sum(matrix.diagonal()), np.sum(matrix))
+
+	#vmatrix = ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='tab20b', colorbar=False)
+	#vmatrix.figure_.tight_layout() #bone_r, Blues, PuBu
+	ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='bone_r', colorbar=False)
+	ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='Blues', colorbar=False)
+	ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='PuBu', colorbar=False)
+	plt.show()
+
+
+
+
+
+
+	accuracy = -1
+	return accuracy
+
+
+
+
+
 def main(args):
 	# Retrain the SVM
 	if args.train:
 		preprocess()
+		return
+
+	# Get the SVM's Accuracy
+	if args.accuracy:
+		accuracy = get_accuracy()
+		print("placeholder")
 		return
 
 	# This is just for testing purposes (and also to retrain the model if need be)
