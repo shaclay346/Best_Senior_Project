@@ -234,10 +234,10 @@ def get_accuracy():
 	accuracy = np.divide(np.sum(matrix.diagonal()), np.sum(matrix))
 
 	vmatrix = ConfusionMatrixDisplay.from_predictions(labels, predictions, xticks_rotation='vertical', cmap='Blues', colorbar=False)
-	vmatrix.figure_.tight_layout() #bone_r, Blues, PuBu, Redds
-	plt.show()
+	vmatrix.figure_.tight_layout()
+	# plt.show()
 
-	return f"Accuracy: {round(accuracy * 100, 3)}%"
+	return f"Accuracy: {round(accuracy * 100, 3)}% ({np.sum(matrix.diagonal())}/{np.sum(matrix)})"
 
 
 
